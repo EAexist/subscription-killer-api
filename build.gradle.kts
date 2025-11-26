@@ -49,6 +49,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot3
     implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.1.5")
+
+    // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-libraries
+    implementation("com.amazonaws:aws-lambda-java-core:1.4.0")
+    implementation("com.amazonaws:aws-lambda-java-events:3.16.1")
+    runtimeOnly("com.amazonaws:aws-lambda-java-log4j2:1.6.0")
+    
 }
 
 kotlin {
@@ -67,3 +73,14 @@ allOpen {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+task packageJar(type: Zip) {
+    into('lib') {
+        from(jar)
+        from(configurations.runtimeClasspath)
+    }
+}
+
+build.dependsOn packageJar
+
+// TODO : Use layers for dependencies. https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
