@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   deploy:
+    env:
+      AWS_REGION: ap-northeast-2
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
