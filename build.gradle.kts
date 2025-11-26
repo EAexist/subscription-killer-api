@@ -46,6 +46,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     implementation("org.postgresql:postgresql:42.7.8")
+
+    // https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot3
+    implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.1.5")
 }
 
 kotlin {
