@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17.6
+    container_name: subscription_killer_db
+    ports:
+      - "5432:5432"
+    environment:
+      - "POSTGRES_DB=subscription_killer_db"
+      - "POSTGRES_USER=guest"
+      - "POSTGRES_PASSWORD=hello_guest"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: subscription-killer-api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_ENDPOINT}:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
