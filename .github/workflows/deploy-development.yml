@@ -2,6 +2,9 @@
 
 name: Deploy to AWS Lambda
 
+env:
+  AWS_REGION: ap-northeast-2
+
 on:
   push:
     branches: ["ci/test-aws-lambda-deploy"]
