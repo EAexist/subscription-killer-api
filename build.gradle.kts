@@ -41,6 +41,11 @@ dependencies {
     implementation("com.amazonaws:aws-lambda-java-core:1.4.0")
     implementation("com.amazonaws:aws-lambda-java-events:3.16.1")
     runtimeOnly("com.amazonaws:aws-lambda-java-log4j2:1.6.0")
+
+    // https://mvnrepository.com/artifact/com.google.cloud/libraries-bom
+    implementation(platform("com.google.cloud:libraries-bom:26.72.0"))
+
+    implementation("com.google.api-client:google-api-client")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
