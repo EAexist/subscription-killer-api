@@ -31,6 +31,9 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+    
+    // https://mvnrepository.com/artifact/org.assertj/assertj-core
+    testImplementation("org.assertj:assertj-core:3.27.6")
 
     // https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot3
     // !Do not make this runtimeOnly() prevent to exclude from test environment: it prevents
