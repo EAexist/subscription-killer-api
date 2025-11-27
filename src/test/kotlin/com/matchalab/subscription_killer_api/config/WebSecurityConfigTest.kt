@@ -40,7 +40,7 @@ class WebSecurityConfigTest @Autowired constructor() {
     }
 
     @Test
-    fun `should return 200 OK when origin is allowed by CORS`() {
+    fun `should return 200 OK when origin is subscription-killer frontend(production)`() {
         client.get()
                 .uri("/ping")
                 .header(
@@ -54,6 +54,42 @@ class WebSecurityConfigTest @Autowired constructor() {
                 .valueEquals(
                         "accessControlAllowOrigin",
                         "https://subscription-killer-git-main-matchalab-project.vercel.app"
+                )
+    }
+    
+    @Test
+    fun `should return 200 OK when origin is subscription-killer frontend(preview)`() {
+        client.get()
+                .uri("/ping")
+                .header(
+                        HttpHeaders.ORIGIN,
+                        "https://subscription-killer-git-staging-matchalab-project.vercel.app"
+                )
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals(
+                        "accessControlAllowOrigin",
+                        "https://subscription-killer-git-staging-matchalab-project.vercel.app"
+                )
+    }
+    
+    @Test
+    fun `should return 200 OK when origin is subscription-killer frontend(local https dev server)`() {
+        client.get()
+                .uri("/ping")
+                .header(
+                        HttpHeaders.ORIGIN,
+                        "https://localhost:3000"
+                )
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals(
+                        "accessControlAllowOrigin",
+                        "https://localhost:3000"
                 )
     }
 }
