@@ -28,7 +28,7 @@ class WebSecurityConfigTest @Autowired constructor() {
     }
 
     @Test
-    fun `should return 403 Forbbien when origin is not allowed by CORS`() {
+    fun `should return 403 Forbbiden when origin is not allowed by CORS`() {
         client.get()
                 .uri("/ping")
                 .header(HttpHeaders.ORIGIN, "https://www.google.com/")
