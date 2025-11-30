@@ -10,8 +10,7 @@ export DB_PASSWORD=hello_guest
 if [ ${#TEST_CLASSES[@]} -eq 0 ]; then
     ./gradlew test -Dspring.profiles.active=local,development
 else
-    TEST_ARGS=$(printf "'%s' " "${TEST_CLASSES[@]}")
-    ./gradlew test -Dspring.profiles.active=local,development --tests $TEST_ARGS
+    ./gradlew test -Dspring.profiles.active=local,development --tests "${TEST_CLASSES[@]}"
 fi
 
 docker compose down
