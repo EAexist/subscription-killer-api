@@ -71,9 +71,7 @@ class CorsConfigTest {
                 .header(HttpHeaders.ORIGIN, "https://www.google.com/")
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectHeader()
-                .doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)
+                .isForbidden()
     }
 
     @Test
