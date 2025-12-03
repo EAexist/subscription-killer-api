@@ -119,6 +119,6 @@ class CorsConfigTest {
                 .expectStatus()
                 .isOk()
                 .expectHeader()
-                .valueEquals("accessControlAllowOrigin", allowedOrigin)
+                .valueEquals(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin)
     }
 }
