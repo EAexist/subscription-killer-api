@@ -49,6 +49,9 @@ dependencies {
     implementation(platform("com.google.cloud:libraries-bom:26.72.0"))
 
     implementation("com.google.api-client:google-api-client")
+
+    // https://github.com/oshai/kotlin-logging?tab=readme-ov-file#gradle
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
@@ -59,7 +62,10 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-tasks.withType<Test> { useJUnitPlatform() }
+tasks.withType<Test> { 
+    useJUnitPlatform() 
+systemProperty("spring.profiles.active", "test,local,development") 
+}
 
 tasks.register<Zip>("buildZip") {
     from(tasks.compileJava)
