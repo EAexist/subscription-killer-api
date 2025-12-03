@@ -1,40 +1,59 @@
 package com.matchalab.subscription_killer_api.config
 
 import com.matchalab.subscription_killer_api.controller.PingController
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.context.web.WebAppConfiguration
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient
 import org.springframework.web.context.WebApplicationContext
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
 
-@ExtendWith(SpringExtension::class)
-@WebAppConfiguration("classpath:META-INF/web-resources")
-@ContextConfiguration(
-        classes = [WebSecurityConfig::class, CorsConfig::class, PingController::class]
-)
+private val logger = KotlinLogging.logger {}
+
+@WebMvcTest(PingController::class)
+@Import(WebSecurityConfig::class, CorsConfig::class)
 class CorsConfigTest {
-
-    companion object {
-        private val log = LoggerFactory.getLogger(CorsConfigTest::class.java)
-    }
 
     @Autowired lateinit var wac: WebApplicationContext
     lateinit var client: WebTestClient
+
+    @Autowired lateinit var corsConfigurationSource: CorsConfigurationSource
 
     @BeforeEach
     fun setUp() {
         client =
                 MockMvcWebTestClient.bindToApplicationContext(wac)
+                        .apply(springSecurity())
                         .configureClient()
                         .defaultHeader(HttpHeaders.ACCEPT, "application/json")
                         .build()
+    }
+
+    @Test
+    fun inspectLoadedCorsConfig() {
+        val request: MockHttpServletRequest = MockHttpServletRequest("OPTIONS", "/ping")
+        request.addHeader(
+                "Origin",
+                "https://subscription-killer-git-main-matchalab-project.vercel.app"
+        )
+        request.addHeader("Access-Control-Request-Method", "GET")
+
+        val config: CorsConfiguration? = corsConfigurationSource.getCorsConfiguration(request)
+
+        if (config == null) {
+            logger.debug { "🚨 ERROR: No CORS Configuration found for /ping" }
+        } else {
+            logger.debug { "✅ Loaded Config for /ping:" }
+            logger.debug { "    Config: " + config.toString() }
+        }
     }
 
     @Test
