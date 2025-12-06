@@ -82,7 +82,7 @@ class AuthControllerTest() {
     @Test
     @WithMockUser
     fun `should return AppUserDTO and HttpStatus provided by AuthService when requested login`() {
-        val requestBody: LoginRequestDTO = LoginRequestDTO(hello = "FAKE_VALID_FIRST_SEEN_TOKEN")
+        val requestBody: LoginRequestDTO = LoginRequestDTO(idToken = "FAKE_VALID_FIRST_SEEN_TOKEN")
         val jsonBody = objectMapper.writeValueAsString(requestBody)
         logger.debug { "jsonBody: ${jsonBody}" }
         val debugDto = objectMapper.readValue(jsonBody, LoginRequestDTO::class.java)
