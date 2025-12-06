@@ -72,6 +72,20 @@ constructor(
     }
 
     @Test
+    fun `should return 401 Unauthorized when requested login with invalid LoginRequestDTO format`() {
+
+        val requestBody = mapOf()
+        client.post()
+                .uri("/auth")
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus()
+                .isUnauthorized()
+                .expectBody()
+                .isEmpty()
+    }
+
+    @Test
     fun `should return 401 Unauthorized when requested login with invalid Google id token`() {
 
         val requestBody = mapOf("idToken" to "FAKE_INVALID_TOKEN")
