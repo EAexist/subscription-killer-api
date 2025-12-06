@@ -1,8 +1,8 @@
 package com.matchalab.subscription_killer_api.config
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
-import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDTO
-import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDTO
+import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
+import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
@@ -46,10 +46,10 @@ constructor(
                 email = fakeEmail
             }
 
-    private val expectedGoogleAccountResponseDTO: GoogleAccountResponseDTO =
-            GoogleAccountResponseDTO(fakeSubject, fakeName)
-    private val expectedAppUserResponseDTO: AppUserResponseDTO =
-            AppUserResponseDTO(fakeName, listOf(expectedGoogleAccountResponseDTO))
+    private val expectedGoogleAccountResponseDto: GoogleAccountResponseDto =
+            GoogleAccountResponseDto(fakeSubject, fakeName)
+    private val expectedAppUserResponseDto: AppUserResponseDto =
+            AppUserResponseDto(fakeName, listOf(expectedGoogleAccountResponseDto))
 
     @BeforeEach
     fun setUp() {
@@ -77,7 +77,7 @@ constructor(
     }
 
     @Test
-    fun `should return 400 BadRequest when requested login with invalid LoginRequestDTO format`() {
+    fun `should return 400 BadRequest when requested login with invalid LoginRequestDto format`() {
 
         val requestBody: Map<String, Any> = Collections.emptyMap()
         client.post()
@@ -115,11 +115,11 @@ constructor(
                 .exchange()
                 .expectStatus()
                 .isCreated()
-                .expectBody<AppUserResponseDTO>()
+                .expectBody<AppUserResponseDto>()
                 .consumeWith { result ->
-                    val appUserResponseDTO: AppUserResponseDTO = result.responseBody!!
+                    val appUserResponseDto: AppUserResponseDto = result.responseBody!!
 
-                    assertThat(appUserResponseDTO).isEqualTo(expectedAppUserResponseDTO)
+                    assertThat(appUserResponseDto).isEqualTo(expectedAppUserResponseDto)
                 }
     }
 
@@ -138,11 +138,11 @@ constructor(
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody<AppUserResponseDTO>()
+                .expectBody<AppUserResponseDto>()
                 .consumeWith { result ->
-                    val appUserResponseDTO: AppUserResponseDTO = result.responseBody!!
+                    val appUserResponseDto: AppUserResponseDto = result.responseBody!!
 
-                    assertThat(appUserResponseDTO).isEqualTo(expectedAppUserResponseDTO)
+                    assertThat(appUserResponseDto).isEqualTo(expectedAppUserResponseDto)
                 }
     }
 }

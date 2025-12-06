@@ -1,9 +1,9 @@
 package com.matchalab.subscription_killer_api.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDTO
-import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDTO
-import com.matchalab.subscription_killer_api.core.dto.LoginRequestDTO
+import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
+import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
+import com.matchalab.subscription_killer_api.core.dto.LoginRequestDto
 import com.matchalab.subscription_killer_api.domain.AuthResult
 import com.matchalab.subscription_killer_api.service.AuthService
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -44,17 +44,17 @@ class AuthControllerTest() {
     private val fakeSubject = "fakeSubject"
     private val fakeEmail = "test@mock.com"
     private val fakeName = "fakeName"
-    private val fakeGoogleAccountResponseDTO = GoogleAccountResponseDTO(fakeSubject, fakeName)
+    private val fakeGoogleAccountResponseDto = GoogleAccountResponseDto(fakeSubject, fakeName)
 
-    private val expectedAppUserResponseDTO: AppUserResponseDTO =
-            AppUserResponseDTO(fakeName, listOf(fakeGoogleAccountResponseDTO))
+    private val expectedAppUserResponseDto: AppUserResponseDto =
+            AppUserResponseDto(fakeName, listOf(fakeGoogleAccountResponseDto))
 
     @BeforeEach
     fun setUp() {
         `when`(authService.loginOrRegister("FAKE_VALID_FIRST_SEEN_TOKEN"))
                 .thenReturn(
                         AuthResult.Registered(
-                                AppUserResponseDTO(fakeName, listOf(fakeGoogleAccountResponseDTO))
+                                AppUserResponseDto(fakeName, listOf(fakeGoogleAccountResponseDto))
                         )
                 )
     }
@@ -82,10 +82,10 @@ class AuthControllerTest() {
     @Test
     @WithMockUser
     fun `should return AppUserDTO and HttpStatus provided by AuthService when requested login`() {
-        val requestBody: LoginRequestDTO = LoginRequestDTO(idToken = "FAKE_VALID_FIRST_SEEN_TOKEN")
+        val requestBody: LoginRequestDto = LoginRequestDto(idToken = "FAKE_VALID_FIRST_SEEN_TOKEN")
         val jsonBody = objectMapper.writeValueAsString(requestBody)
         logger.debug { "jsonBody: ${jsonBody}" }
-        val debugDto = objectMapper.readValue(jsonBody, LoginRequestDTO::class.java)
+        val debugDto = objectMapper.readValue(jsonBody, LoginRequestDto::class.java)
         logger.debug { "debugDto: ${debugDto}" }
 
         val result =
@@ -102,9 +102,9 @@ class AuthControllerTest() {
 
         val responseBodyString: String = result.response.contentAsString
 
-        val actualAppUserResponseDTO: AppUserResponseDTO =
-                objectMapper.readValue(responseBodyString, AppUserResponseDTO::class.java)
+        val actualAppUserResponseDto: AppUserResponseDto =
+                objectMapper.readValue(responseBodyString, AppUserResponseDto::class.java)
 
-        assertThat(actualAppUserResponseDTO).isEqualTo(expectedAppUserResponseDTO)
+        assertThat(actualAppUserResponseDto).isEqualTo(expectedAppUserResponseDto)
     }
 }
