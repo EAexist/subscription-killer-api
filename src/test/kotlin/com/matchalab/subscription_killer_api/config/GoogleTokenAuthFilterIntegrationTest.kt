@@ -73,7 +73,7 @@ constructor(
     }
 
     @Test
-    fun `should return 401 Unauthorized when requested login with invalid LoginRequestDTO format`() {
+    fun `should return 400 BadRequest when requested login with invalid LoginRequestDTO format`() {
 
         val requestBody: Map<String, Any> = Collections.emptyMap()
         client.post()
