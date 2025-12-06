@@ -81,7 +81,7 @@ constructor(
                 .bodyValue(requestBody)
                 .exchange()
                 .expectStatus()
-                .isUnauthorized()
+                .isBadRequest()
                 .expectBody()
                 .isEmpty()
     }
