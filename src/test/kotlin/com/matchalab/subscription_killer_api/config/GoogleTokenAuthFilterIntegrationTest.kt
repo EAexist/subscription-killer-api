@@ -9,6 +9,7 @@ import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.service.TokenVerifierService
 import java.util.Collections
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -70,6 +71,11 @@ constructor(
 
         `when`(googleVerifierService.verifyToken("FAKE_VALID_EXISTING_TOKEN"))
                 .thenReturn(fakePayload)
+    }
+
+    @AfterEach
+    fun clearRepositories() {
+        appUserRepository.deleteAll()
     }
 
     @Test
