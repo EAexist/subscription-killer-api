@@ -20,7 +20,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient
 import org.springframework.web.context.WebApplicationContext
 
@@ -30,7 +29,6 @@ class GoogleTokenAuthFilterTest
 @Autowired
 constructor(
         val appUserRepository: AppUserRepository,
-        val mockMvc: MockMvc,
 ) {
 
     @Autowired lateinit var wac: WebApplicationContext
