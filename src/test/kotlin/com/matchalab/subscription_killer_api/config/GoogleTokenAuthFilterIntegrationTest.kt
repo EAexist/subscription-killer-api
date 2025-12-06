@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.service.TokenVerifierService
+import java.util.Collections
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -74,7 +75,7 @@ constructor(
     @Test
     fun `should return 401 Unauthorized when requested login with invalid LoginRequestDTO format`() {
 
-        val requestBody = mapOf()
+        val requestBody: Map<String, Any> = Collections.emptyMap()
         client.post()
                 .uri("/auth")
                 .bodyValue(requestBody)
