@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.service.TokenVerifierService
+import jakarta.servlet.http.HttpServletResponse
 import java.util.Collections
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -20,19 +21,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient
-import org.springframework.web.context.WebApplicationContext
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class GoogleTokenAuthFilterTest
 @Autowired
-constructor(
-        val appUserRepository: AppUserRepository,
-) {
+constructor(val appUserRepository: AppUserRepository, val client: WebTestClient) {
 
-    @Autowired lateinit var wac: WebApplicationContext
-    lateinit var client: WebTestClient
+    lateinit var customClient: WebTestClient
 
     @MockitoBean private lateinit var googleVerifierService: TokenVerifierService
 
@@ -54,9 +50,8 @@ constructor(
     @BeforeEach
     fun setUp() {
         fakePayload.set("name", fakeName)
-        client =
-                MockMvcWebTestClient.bindToApplicationContext(wac)
-                        .configureClient()
+        customClient =
+                client.mutate()
                         .defaultHeader(HttpHeaders.ORIGIN, "https://localhost:3000")
                         .baseUrl("/api/v1")
                         .build()
@@ -80,28 +75,36 @@ constructor(
     fun `should return 400 BadRequest when requested login with invalid LoginRequestDto format`() {
 
         val requestBody: Map<String, Any> = Collections.emptyMap()
-        client.post()
+        customClient
+                .post()
                 .uri("/auth")
                 .bodyValue(requestBody)
                 .exchange()
                 .expectStatus()
                 .isBadRequest()
                 .expectBody()
-                .isEmpty()
+                .jsonPath("$.status")
+                .isEqualTo(HttpServletResponse.SC_BAD_REQUEST)
+                .jsonPath("$.error")
+                .isEqualTo("Invalid Request Body")
     }
 
     @Test
     fun `should return 401 Unauthorized when requested login with invalid Google id token`() {
 
         val requestBody = mapOf("idToken" to "INVALID_TOKEN")
-        client.post()
+        customClient
+                .post()
                 .uri("/auth")
                 .bodyValue(requestBody)
                 .exchange()
                 .expectStatus()
                 .isUnauthorized()
                 .expectBody()
-                .isEmpty()
+                .jsonPath("$.status")
+                .isEqualTo(HttpServletResponse.SC_UNAUTHORIZED)
+                .jsonPath("$.error")
+                .isEqualTo("Authentication Failed")
     }
 
     @Test
@@ -109,7 +112,8 @@ constructor(
 
         val requestBody = mapOf("idToken" to "FAKE_VALID_FIRST_SEEN_TOKEN")
 
-        client.post()
+        customClient
+                .post()
                 .uri("/auth")
                 .bodyValue(requestBody)
                 .exchange()
@@ -132,7 +136,8 @@ constructor(
 
         val requestBody = mapOf("idToken" to "FAKE_VALID_EXISTING_TOKEN")
 
-        client.post()
+        customClient
+                .post()
                 .uri("/auth")
                 .bodyValue(requestBody)
                 .exchange()
