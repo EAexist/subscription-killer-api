@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient
@@ -24,7 +23,6 @@ private val logger = KotlinLogging.logger {}
 
 @WebMvcTest(PingController::class)
 @Import(WebSecurityConfig::class, CorsConfig::class)
-@ContextConfiguration(classes = [CorsConfigTestConfig::class])
 class CorsConfigTest {
 
     @MockitoBean
