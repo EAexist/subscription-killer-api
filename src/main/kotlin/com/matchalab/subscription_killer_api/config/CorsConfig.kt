@@ -25,8 +25,6 @@ class CorsConfig(val corsProperties: CorsProperties) {
         configuration.allowedHeaders = listOf("*")
         configuration.exposedHeaders = listOf("Authorization", "Link")
 
-        logger.debug { "configuration=${configuration.toString()}" }
-
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
 

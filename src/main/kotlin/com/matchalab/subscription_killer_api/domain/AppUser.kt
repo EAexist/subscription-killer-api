@@ -2,6 +2,8 @@ package com.matchalab.subscription_killer_api.domain
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -12,6 +14,7 @@ import java.util.UUID
 class AppUser(
         @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: UUID? = null,
         var name: String,
+        @Enumerated(EnumType.STRING) var userRole: UserRoleType = UserRoleType.USER,
         @OneToMany(mappedBy = "appUser", cascade = [CascadeType.ALL], orphanRemoval = true)
         val googleAccounts: MutableList<GoogleAccount> = mutableListOf()
 ) {

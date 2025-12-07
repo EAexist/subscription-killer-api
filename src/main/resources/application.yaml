@@ -41,9 +41,11 @@ app:
       - https://localhost:3000
 logging:
   level:
+    com.matchalab.subscription_killer_api: DEBUG
     org:
       springframework:
         security: DEBUG
+        web.filter: DEBUG
 ---
 spring:
   config:
