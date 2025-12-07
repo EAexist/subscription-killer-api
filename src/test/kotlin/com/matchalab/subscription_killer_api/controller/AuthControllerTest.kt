@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
 import com.matchalab.subscription_killer_api.core.dto.LoginRequestDto
-import com.matchalab.subscription_killer_api.domain.AuthResult
 import com.matchalab.subscription_killer_api.service.AuthService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -49,15 +46,16 @@ class AuthControllerTest() {
     private val expectedAppUserResponseDto: AppUserResponseDto =
             AppUserResponseDto(fakeName, listOf(fakeGoogleAccountResponseDto))
 
-    @BeforeEach
-    fun setUp() {
-        `when`(authService.loginOrRegister("FAKE_VALID_FIRST_SEEN_TOKEN"))
-                .thenReturn(
-                        AuthResult.Registered(
-                                AppUserResponseDto(fakeName, listOf(fakeGoogleAccountResponseDto))
-                        )
-                )
-    }
+    // @BeforeEach
+    // fun setUp() {
+    //     `when`(authService.loginOrRegister("FAKE_VALID_FIRST_SEEN_TOKEN"))
+    //             .thenReturn(
+    //                     LoginOrRegisterResult.Registered(
+    //                             AppUserResponseDto(fakeName,
+    // listOf(fakeGoogleAccountResponseDto))
+    //                     )
+    //             )
+    // }
 
     @Test
     fun `should load Jackson in test context`() {
