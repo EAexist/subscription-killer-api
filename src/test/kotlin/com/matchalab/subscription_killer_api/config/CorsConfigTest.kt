@@ -1,6 +1,8 @@
 package com.matchalab.subscription_killer_api.config
 
 import com.matchalab.subscription_killer_api.controller.PingController
+import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.subscription_killer_api.service.TokenVerifierService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -10,6 +12,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient
 import org.springframework.web.context.WebApplicationContext
@@ -20,7 +24,14 @@ private val logger = KotlinLogging.logger {}
 
 @WebMvcTest(PingController::class)
 @Import(WebSecurityConfig::class, CorsConfig::class)
+@ContextConfiguration(classes = [CorsConfigTestConfig::class])
 class CorsConfigTest {
+
+    @MockitoBean
+    private lateinit var googleIdTokenAuthenticationEntryPoint:
+            GoogleIdTokenAuthenticationEntryPoint
+    @MockitoBean private lateinit var tokenVerifierService: TokenVerifierService
+    @MockitoBean private lateinit var appUserService: AppUserService
 
     @Autowired lateinit var wac: WebApplicationContext
     lateinit var client: WebTestClient
