@@ -52,6 +52,19 @@ dependencies {
 
     // https://github.com/oshai/kotlin-logging?tab=readme-ov-file#gradle
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+
+    // Google Api Gmail
+    implementation ("com.google.api-client:google-api-client:2.0.0")
+    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+    implementation ("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
+    implementation ("com.google.auth:google-auth-library-oauth2-http")
+
+    // kotlinx-coroutines-core
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    
+    // https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
