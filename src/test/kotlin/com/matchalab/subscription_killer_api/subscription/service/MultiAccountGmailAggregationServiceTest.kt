@@ -1,45 +1,52 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
-import com.matchalab.subscription_killer_api.subscription.GmailClientFactory
+import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
+import com.matchalab.subscription_killer_api.subscription.GmailClientFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.time.LocalDate
 import java.util.UUID
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.mockito.Mockito.`when`
-import com.google.api.services.gmail.model.Message
-import java.time.LocalDate
-import kotlinx.coroutines.test.runTest
-import org.mockito.kotlin.verify
+import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.ArgumentMatchers.any
+import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 
 private val logger = KotlinLogging.logger {}
 
+@ExtendWith(MockitoExtension::class)
 class MultiAccountGmailAggregationServiceTest() {
 
     @InjectMocks
-    private lateinit var multiAccountGmailAggregationService: MultiAccountGmailAggregationService
+    private lateinit var multiAccountGmailAggregationService:
+            MultiAccountGmailAggregationServiceImpl
 
-    @MockitoBean private lateinit var gmailClientFactory: GmailClientFactory
-    @MockitoBean private lateinit var appUserRepository: AppUserRepository
-    @MockitoBean private lateinit var gmailClientAdapterMockA: GmailClientAdapter
-    @MockitoBean private lateinit var gmailClientAdapterMockB: GmailClientAdapter
-    @MockitoBean private lateinit var gmailClientAdapterMockC: GmailClientAdapter
+    @Mock private lateinit var gmailClientFactory: GmailClientFactory
+    @Mock private lateinit var appUserRepository: AppUserRepository
+    @Mock private lateinit var gmailClientAdapterMockA: GmailClientAdapter
+    @Mock private lateinit var gmailClientAdapterMockB: GmailClientAdapter
+    @Mock private lateinit var gmailClientAdapterMockC: GmailClientAdapter
 
     private val FAKE_SUBJECT_KEYWORD: String = "FAKE_SUBJECT_KEYWORD"
+    private val FAKE_APP_USER_ID: UUID = UUID.fromString("11111111-2222-3333-4444-555555555555")
 
     private val FAKE_GOOGLE_ACCOUNT_SUBJECT_A = "FAKE_GOOGLE_ACCOUNT_SUBJECT_A"
     private val FAKE_GOOGLE_ACCOUNT_SUBJECT_B = "FAKE_GOOGLE_ACCOUNT_SUBJECT_B"
     private val FAKE_GOOGLE_ACCOUNT_SUBJECT_C = "FAKE_GOOGLE_ACCOUNT_SUBJECT_C"
 
-    private val FAKE_MESSAGE_A_1: Message = Message() 
-    private val FAKE_MESSAGE_B_1: Message = Message() 
-    private val FAKE_MESSAGE_B_2: Message = Message() 
-    private val FAKE_MESSAGE_B_3: Message = Message() 
+    private val FAKE_MESSAGE_A_1: Message = Message()
+    private val FAKE_MESSAGE_B_1: Message = Message()
+    private val FAKE_MESSAGE_B_2: Message = Message()
+    private val FAKE_MESSAGE_B_3: Message = Message()
 
     @BeforeEach
     fun setUp() {
@@ -53,40 +60,87 @@ class MultiAccountGmailAggregationServiceTest() {
         gmailClientAdapterMockC = mock(GmailClientAdapter::class.java)
 
         // Given
-        `when`(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_A))
+        whenever(appUserRepository.findGoogleAccountSubjectsByAppUserId(FAKE_APP_USER_ID))
+                .thenReturn(
+                        listOf(
+                                FAKE_GOOGLE_ACCOUNT_SUBJECT_A,
+                                FAKE_GOOGLE_ACCOUNT_SUBJECT_B,
+                                FAKE_GOOGLE_ACCOUNT_SUBJECT_C
+                        )
+                )
+
+        whenever(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_A))
                 .thenReturn(gmailClientAdapterMockA)
-                
-        `when`(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_B))
+
+        whenever(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_B))
                 .thenReturn(gmailClientAdapterMockB)
 
-        `when`(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_C))
+        whenever(gmailClientFactory.createAdapter(FAKE_GOOGLE_ACCOUNT_SUBJECT_C))
                 .thenReturn(gmailClientAdapterMockC)
 
-        `when`(gmailClientAdapterMockA.listMessagesBySenderAndSubject(any(), any(), any()))
+        whenever(
+                        gmailClientAdapterMockA.listMessagesBySenderAndSubject(
+                                any<String>(),
+                                any<String>(),
+                                any<LocalDate>()
+                        )
+                )
                 .thenReturn(listOf(FAKE_MESSAGE_A_1))
-                
-        `when`(gmailClientAdapterMockB.listMessagesBySenderAndSubject(any(), any(), any()))
+
+        whenever(
+                        gmailClientAdapterMockB.listMessagesBySenderAndSubject(
+                                any<String>(),
+                                any<String>(),
+                                any<LocalDate>()
+                        )
+                )
                 .thenReturn(listOf(FAKE_MESSAGE_B_1, FAKE_MESSAGE_B_2, FAKE_MESSAGE_B_3))
-                
-        `when`(gmailClientAdapterMockC.listMessagesBySenderAndSubject(any(), any(), any()))
+
+        whenever(
+                        gmailClientAdapterMockC.listMessagesBySenderAndSubject(
+                                any<String>(),
+                                any<String>(),
+                                any<LocalDate>()
+                        )
+                )
                 .thenReturn(listOf())
     }
 
     @Test
-    fun `given GmailClientFactory, listMessagesBySenderAndSubject should correctly aggregate all GmailClientAdapters' result concurrently`() = runTest {
+    fun `given GmailClientFactory, listMessagesBySenderAndSubject should correctly aggregate all GmailClientAdapters' result concurrently`() =
+            runTest {
 
-        // Given
-        val FAKE_SENDER_EMAIL: String ="info@account.netflix.com" , 
-        val FAKE_SEARCH_AFTER_THIS_DATE: LocalDate = LocalDate.now()
+                // Given
+                val principal = FAKE_APP_USER_ID.toString()
+                SecurityContextHolder.getContext().authentication =
+                        UsernamePasswordAuthenticationToken(
+                                principal,
+                                "{noop}",
+                                listOf(SimpleGrantedAuthority("ROLE_USER"))
+                        )
 
-        // When
-        val result: List<Message>? = multiAccountGmailAggregationService.listMessagesBySenderAndSubject(FAKE_SENDER_EMAIL, FAKE_SUBJECT_KEYWORD, FAKE_SEARCH_AFTER_THIS_DATE)
+                val FAKE_SENDER_EMAIL: String = "info@account.netflix.com"
+                val FAKE_SEARCH_AFTER_THIS_DATE: LocalDate = LocalDate.now()
 
-        // Then
-        logger.debug { "[multiAccountGmailAggregationService.listMessagesBySender] result: $result" }
-        assertThat(result).isNotNull().containsOnly(FAKE_MESSAGE_A_1, FAKE_MESSAGE_B_1, FAKE_MESSAGE_B_2, FAKE_MESSAGE_B_3)
-    }
+                // When
+                val result: List<Message>? =
+                        multiAccountGmailAggregationService.listMessagesBySenderAndSubject(
+                                FAKE_SENDER_EMAIL,
+                                FAKE_SUBJECT_KEYWORD,
+                                FAKE_SEARCH_AFTER_THIS_DATE
+                        )
 
-    @Test
-    fun `analysis_modules_should_be_applied_correctly_to_each_found_email_and_return_results`() {}
+                // Then
+                logger.debug {
+                    "[multiAccountGmailAggregationService.listMessagesBySender] result: $result"
+                }
+                assertThat(result)
+                        .isNotNull()
+                        .containsOnly(
+                                FAKE_MESSAGE_A_1,
+                                FAKE_MESSAGE_B_1,
+                                FAKE_MESSAGE_B_2,
+                                FAKE_MESSAGE_B_3
+                        )
+            }
 }
