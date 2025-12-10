@@ -8,9 +8,9 @@ export DB_USER=guest
 export DB_PASSWORD=hello_guest
 
 if [ ${#TEST_CLASSES[@]} -eq 0 ]; then
-    ./gradlew test -Dspring.profiles.active=local,development
+    ./gradlew test -Dspring.profiles.active=development
 else
-    ./gradlew test -Dspring.profiles.active=local,development --tests "${TEST_CLASSES[@]}"
+    ./gradlew test -Dspring.profiles.active=development --tests "${TEST_CLASSES[@]}"
 fi
 
 docker compose down
