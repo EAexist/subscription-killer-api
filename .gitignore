@@ -38,3 +38,15 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Deprecated ###
+.deprecated
+
+### Secrets ###
+*.tmp
+.certs
+.env
+src/test/resources/application-google-test.yaml
+
+### Secrets ###
+scripts/
