@@ -1,34 +1,27 @@
 package com.matchalab.subscription_killer_api.config
 
-import com.matchalab.subscription_killer_api.controller.PingController
-import com.matchalab.subscription_killer_api.service.MockTokenVerifierService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient
-import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 
 
 private val logger = KotlinLogging.logger {}
 
-@WebMvcTest(PingController::class)
-@Import(
-    WebSecurityConfig::class, CorsConfig::class, GoogleIdTokenAuthenticationEntryPoint::class,
-    MockTokenVerifierService::class
-)
-class WebSecurityConfigTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+class WebSecurityConfigIntegrationTest {
 
     @Autowired
-    lateinit var wac: WebApplicationContext
     lateinit var client: WebTestClient
 
     @Autowired
@@ -36,12 +29,12 @@ class WebSecurityConfigTest {
 
     @BeforeEach
     fun setUp() {
-        client =
-            MockMvcWebTestClient.bindToApplicationContext(wac)
-                .apply(springSecurity())
-                .configureClient()
-                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
-                .build()
+//        client =
+//            MockMvcWebTestClient.bindToApplicationContext(wac)
+//                .apply(springSecurity())
+//                .configureClient()
+//                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+//                .build()
     }
 
     @Test
@@ -64,7 +57,7 @@ class WebSecurityConfigTest {
     }
 
     @Test
-    fun `CORS should only allow subscription-killer frontend origins`() {
+    fun `should return 403 Forbidden for unknown origins`() {
         client.options()
             .uri("/ping")
             .header(HttpHeaders.ORIGIN, "https://www.google.com/")
@@ -79,9 +72,18 @@ class WebSecurityConfigTest {
             .exchange()
             .expectStatus()
             .isForbidden()
+    }
 
-        assertAllowedCorsGetRequest("https://localhost:3000")
-
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "https://localhost:3000",
+            "https://subscription-killer-git-main-matchalab-project.vercel.app",
+            "https://subscription-killer-git-staging-matchalab-project.vercel.app",
+        ]
+    )
+    fun `should only allow subscription-killer frontend origins`(origin: String) {
+        assertAllowedCorsGetRequest(origin)
     }
 
     fun assertAllowedCorsGetRequest(allowedOrigin: String) {
