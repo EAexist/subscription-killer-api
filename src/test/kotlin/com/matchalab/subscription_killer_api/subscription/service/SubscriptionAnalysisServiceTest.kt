@@ -1,147 +1,203 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
 import com.google.api.services.gmail.model.Message
-import com.matchalab.subscription_killer_api.repository.SubscriptionReportRepository
-import com.matchalab.subscription_killer_api.subscription.ServiceProviderType
-import com.matchalab.subscription_killer_api.subscription.SubscriptionReport
-import com.matchalab.subscription_killer_api.subscription.config.ProviderConfiguration
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionEmailAnalysisResultDto
+import com.matchalab.subscription_killer_api.config.TestDataFactory
+import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
+import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
+import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
+import com.matchalab.subscription_killer_api.subscription.*
+import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
-import com.matchalab.subscription_killer_api.subscription.providers.core.EmailAnalysisStrategy
-import com.matchalab.subscription_killer_api.subscription.providers.core.PaymentCycle
-import com.matchalab.subscription_killer_api.subscription.providers.core.PricingPlan
-import com.matchalab.subscription_killer_api.subscription.providers.core.ProviderMetadata
+import com.matchalab.subscription_killer_api.utils.*
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.LocalDateTime
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.core.io.ClassPathResource
+import java.time.Duration
+import java.time.Instant
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
 @ExtendWith(MockitoExtension::class)
-@ContextConfiguration(classes = [ProviderConfiguration::class])
-class SubscriptionAnalysisServiceTest() {
+class SubscriptionAnalysisServiceTest(
+) {
+    private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
 
-    @Autowired private lateinit var subscriptionAnalysisService: SubscriptionAnalysisService
+    private val googleAccountRepository = mockk<GoogleAccountRepository>()
 
-    @Mock private lateinit var mockSubscriptionReportRepository: SubscriptionReportRepository
-    @Mock private lateinit var mockNetflixEmailAnalysisStrategy: EmailAnalysisStrategy
-    @Mock private lateinit var mockCoupangStrategy: EmailAnalysisStrategy
+    private val serviceProviderService = mockk<ServiceProviderService>()
 
-    private class MockNetflixProviderMetaData : ProviderMetadata {
-        override val providerType = ServiceProviderType.NETFLIX
-        override val displayName = "Netflix"
-        override val paymentCycle = PaymentCycle.MONTHLY
-        override val plans = mapOf("스탠다드 광고형" to PricingPlan("스탠다드 광고형", BigDecimal(5500), 1))
-    }
+    private val multiAccountGmailAggregationService = mockk<MultiAccountGmailAggregationService>()
 
-    private class MockCoupangProviderMetaData : ProviderMetadata {
-        override val providerType = ServiceProviderType.COUPANG
-        override val displayName = "Coupang"
-        override val paymentCycle = PaymentCycle.MONTHLY
-        override val plans = mapOf("default" to PricingPlan("default", BigDecimal(4500), 1))
-    }
+    private val gmailClientFactory = mockk<GmailClientFactory>()
 
-    val FAKE_NETFLIX_providerType: ServiceProviderType = ServiceProviderType.NETFLIX
-    val FAKE_NETFLIX_subscribedSince: LocalDate = LocalDate.now().minusMonths(6)
-    val FAKE_NETFLIX_subscribedUntil: LocalDate? = null
-    val FAKE_NETFLIX_subscriptionStartMessage: Message = Message()
-    val FAKE_NETFLIX_plan: PricingPlan? = MockNetflixProviderMetaData().plans.values.first()
+    private val mockGmailClientAdapter = mockk<GmailClientAdapter>()
 
-    val FAKE_COUPANG_providerType: ServiceProviderType = ServiceProviderType.COUPANG
-    val FAKE_COUPANG_subscribedSince: LocalDate = LocalDate.now().minusMonths(12)
-    val FAKE_COUPANG_subscribedUntil: LocalDate? = LocalDate.now().minusMonths(3)
-    val FAKE_COUPANG_subscriptionStartMessage: Message = Message()
-    val FAKE_COUPANG_plan: PricingPlan? = MockCoupangProviderMetaData().plans.values.first()
+    private val testMailProperties = MailProperties(analysisMonths = 13L)
 
-    private val mockMetadataMap: Map<ServiceProviderType, ProviderMetadata> =
-            mapOf(
-                    ServiceProviderType.NETFLIX to MockNetflixProviderMetaData(),
-                    ServiceProviderType.COUPANG to MockCoupangProviderMetaData()
-            )
+    private val subscriptionAnalysisService = SubscriptionAnalysisService(
+        googleAccountRepository,
+        multiAccountGmailAggregationService,
+        serviceProviderService,
+        gmailClientFactory,
+        testMailProperties
+    )
+
+    private val mockNetflixServiceProvider: ServiceProvider =
+        dataFactory.createServiceProvider(
+            "Netflix",
+            mutableListOf(
+                EmailSource(
+                    null, "info@account.netflix.com", mutableMapOf(
+                        SubscriptionEventType.PAID_SUBSCRIPTION_START to EmailDetectionRule(
+                            SubscriptionEventType.PAID_SUBSCRIPTION_START,
+                            listOf("계정 정보 변경 확인"),
+                            snippetKeywords = listOf("새로운 결제 수단")
+                        ),
+                        SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to EmailDetectionRule(
+                            SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
+                            subjectRegex = "멤버십을 다시 시작하세요",
+                            snippetRegex = "멤버십이 보류 중",
+                        )
+                    )
+                )
+            ),
+        )
+
+    private val mockSketchfabServiceProvider: ServiceProvider =
+        dataFactory.createServiceProvider(
+            "Sketchfab",
+            mutableListOf(EmailSource(null, "notifications@sketchfab.com")),
+        )
+
+    val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A")
+    val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B")
+
+    lateinit var fakeGmailMessages: List<GmailMessage>
+
+    private val mockServiceProviders = listOf(mockNetflixServiceProvider, mockSketchfabServiceProvider)
 
     @BeforeEach
     fun setUp() {
-        val mockStrategies = listOf(mockNetflixEmailAnalysisStrategy, mockCoupangStrategy)
-        subscriptionAnalysisService =
-                SubscriptionAnalysisService(
-                        mockSubscriptionReportRepository,
-                        mockStrategies,
-                        mockMetadataMap
-                )
+
+        val jsonPath = "mocks/messages_netflix_sketchfab.json"
+        val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
+        fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
     }
 
     @Test
-    fun `given ProviderConfiguration should correctly create subscription report response dto`() =
-            runTest {
-                whenever(mockSubscriptionReportRepository.save(any<SubscriptionReport>()))
-                        .thenAnswer { it.getArgument<SubscriptionReport>(0) }
+    fun `given GmailClientFactory should correctly create subscription report response dto`() =
+        runTest {
+            val expectedSubscriptions: List<SubscriptionResponseDto> =
+                listOf(
+                    SubscriptionResponseDto(
+                        serviceProvider = mockNetflixServiceProvider.toDto(),
+                        hasSubscribedNewsletterOrAd = false,
+                        paidSince =
+                            DateTimeUtils.epochMilliToInstant(1752702283000),
+                        registeredSince = null,
+                        isNotSureIfPaymentIsOngoing = false,
+                    ),
+                    SubscriptionResponseDto(
+                        serviceProvider = mockSketchfabServiceProvider.toDto(),
+                        hasSubscribedNewsletterOrAd = false,
+                        paidSince = null,
+                        registeredSince = null,
+                        isNotSureIfPaymentIsOngoing = false,
+                    )
+                )
 
-                whenever(mockNetflixEmailAnalysisStrategy.analyze(any()))
-                        .thenReturn(
-                                SubscriptionEmailAnalysisResultDto(
-                                        FAKE_NETFLIX_providerType,
-                                        FAKE_NETFLIX_subscribedSince,
-                                        FAKE_NETFLIX_subscribedUntil,
-                                        FAKE_NETFLIX_subscriptionStartMessage,
-                                        FAKE_NETFLIX_plan?.name,
-                                )
+            val expectedSubscriptionReportResponseDto: SubscriptionReportResponseDto =
+                SubscriptionReportResponseDto(
+                    listOf(
+                        AccountReportDto(
+                            expectedSubscriptions,
+                            fakeGoogleAccountA.toResponseDto(),
+                            null
+                        ),
+                        AccountReportDto(
+                            expectedSubscriptions,
+                            fakeGoogleAccountB.toResponseDto(),
+                            null
                         )
+                    )
+                )
 
-                whenever(mockCoupangStrategy.analyze(any()))
-                        .thenReturn(
-                                SubscriptionEmailAnalysisResultDto(
-                                        FAKE_COUPANG_providerType,
-                                        FAKE_COUPANG_subscribedSince,
-                                        FAKE_COUPANG_subscribedUntil,
-                                        FAKE_COUPANG_subscriptionStartMessage,
-                                        null
-                                )
-                        )
+            every {
+                googleAccountRepository.findById(fakeGoogleAccountA.subject!!)
+            } answers { Optional.of(fakeGoogleAccountA) }
+            every {
+                googleAccountRepository.findById(fakeGoogleAccountB.subject!!)
+            } answers { Optional.of(fakeGoogleAccountB) }
 
-                val expectedSubscriptions: List<SubscriptionResponseDto> =
-                        listOf(
-                                SubscriptionResponseDto(
-                                        FAKE_NETFLIX_providerType,
-                                        FAKE_NETFLIX_subscribedSince,
-                                        FAKE_NETFLIX_subscribedUntil,
-                                        FAKE_NETFLIX_subscriptionStartMessage,
-                                        FAKE_NETFLIX_plan
-                                ),
-                                SubscriptionResponseDto(
-                                        FAKE_COUPANG_providerType,
-                                        FAKE_COUPANG_subscribedSince,
-                                        FAKE_COUPANG_subscribedUntil,
-                                        FAKE_COUPANG_subscriptionStartMessage,
-                                        FAKE_COUPANG_plan
-                                )
-                        )
-                val result: SubscriptionReportResponseDto? = subscriptionAnalysisService.analyze()
-                logger.debug { "[subscriptionAnalysisService.analyze] result: $result" }
-
-                assertThat(result).isNotNull()
-
-                assertThat(result?.subscriptions)
-                        .usingRecursiveComparison()
-                        .ignoringFields("id")
-                        .isEqualTo(expectedSubscriptions)
-
-                assertThat(result?.createdAt)
-                        .isBetween(
-                                LocalDateTime.now().minusMinutes(10),
-                                LocalDateTime.now().plusMinutes(10)
-                        )
+            every { googleAccountRepository.save(any<GoogleAccount>()) } answers {
+                firstArg<GoogleAccount>()
             }
+
+            every {
+                multiAccountGmailAggregationService.getGoogleAccountSubjects()
+            } answers {
+                listOfNotNull(fakeGoogleAccountA.subject, fakeGoogleAccountB.subject)
+            }
+
+            every {
+                serviceProviderService.findAll()
+            } returns
+                    mockServiceProviders
+
+            every {
+                serviceProviderService.findByActiveEmailAddressesIn(any())
+            } returns
+                    mockServiceProviders
+
+            every {
+                serviceProviderService.addEmailSourcesFromMessages(any())
+            } returns
+                    mockServiceProviders
+
+
+            every {
+                serviceProviderService.updateEmailDetectionRules(
+                    any<ServiceProvider>(),
+                    any<Map<String, List<GmailMessage>>>()
+                )
+            } answers {
+                firstArg()
+            }
+
+            every { gmailClientFactory.createAdapter(any<String>()) } returns (mockGmailClientAdapter)
+
+            coEvery { mockGmailClientAdapter.listMessageIds(any<String>()) } returns (fakeGmailMessages.map { it.id })
+
+            coEvery { mockGmailClientAdapter.getMessages(any<List<String>>(), any<MessageFetchPlan>()) } answers {
+                fakeGmailMessages
+            }
+
+            // When
+            val result: SubscriptionReportResponseDto = subscriptionAnalysisService.analyze()
+
+            // Then
+            logger.debug { "[subscriptionAnalysisService.analyze] result: $result" }
+
+            assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("accountReports.analyzedAt")
+                .isEqualTo(expectedSubscriptionReportResponseDto)
+
+            assertThat(result.accountReports).allSatisfy { accountReport ->
+                assertThat(accountReport.analyzedAt)
+                    .isBetween(Instant.now().minus(Duration.ofMinutes(10)), Instant.now())
+            }
+        }
 }
