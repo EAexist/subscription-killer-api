@@ -15,4 +15,7 @@ interface AppUserRepository : JpaRepository<AppUser, UUID> {
     """
     )
     fun findByGoogleAccounts_Subject(subject: String): AppUser?
+
+    @Query("SELECT ga.subject FROM AppUser u JOIN u.googleAccounts ga WHERE u.id = :appUserId")
+    fun findGoogleAccountSubjectsByAppUserId(appUserId: UUID): List<String>
 }

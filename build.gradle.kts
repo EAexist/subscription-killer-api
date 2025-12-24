@@ -11,11 +11,14 @@ group = "com.matchalab"
 version = "0.0.1-SNAPSHOT"
 
 description =
-        "This is api server for web app \"Subscription Killer\". It supports Next.js frontend. This secure restful api backend manages multi-account Google authentication, provides real-time status updates via STOMP WebSockets, and processes email data using the Gmail API."
+    "This is api server for web app \"Subscription Killer\". It supports Next.js frontend. This secure restful api backend manages multi-account Google authentication, provides real-time status updates via STOMP WebSockets, and processes email data using the Gmail API."
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.spring.io/milestone") }
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -31,7 +34,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
-    
+
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testImplementation("org.assertj:assertj-core:3.27.6")
 
@@ -54,21 +57,34 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 
     // Google Api Gmail
-    implementation ("com.google.api-client:google-api-client:2.0.0")
-    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
-    implementation ("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
-    implementation ("com.google.auth:google-auth-library-oauth2-http")
+    implementation("com.google.api-client:google-api-client:2.0.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+    implementation("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http")
 
     // kotlinx-coroutines-core
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    
-    // https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
-    
+    // https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
+
+    // https://mvnrepository.com/artifact/io.mockk/mockk
+    testImplementation("io.mockk:mockk:1.14.7")
+
+    // https://mvnrepository.com/artifact/com.ninja-squad/springmockk
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+
+    // AI
+    // https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-bom
+//    implementation(platform("org.springframework.ai:spring-ai-bom:2.0.0-M1"))
+    // https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-bom
+    implementation(platform("org.springframework.ai:spring-ai-bom:1.1.2"))
+    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
+
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
@@ -79,9 +95,17 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-tasks.withType<Test> { 
-    useJUnitPlatform() 
-systemProperty("spring.profiles.active", "test,local,development") 
+tasks.withType<Test> {
+    useJUnitPlatform {
+        // 'includeExternal' 파라미터가 없으면 해당 태그 제외
+        if (!project.hasProperty("includeGcp")) {
+            excludeTags("gcp")
+        }
+        if (!project.hasProperty("includeAi")) {
+            excludeTags("ai")
+        }
+    }
+    systemProperty("spring.profiles.active", "dev,test,gcp,google-test")
 }
 
 tasks.register<Zip>("buildZip") {
@@ -96,4 +120,4 @@ tasks.build {
 }
 
 // TODO : Use layers for dependencies.
- // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
+// https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers

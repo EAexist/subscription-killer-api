@@ -6,27 +6,25 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.matchalab.subscription_killer_api.config.GoogleClientProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.stereotype.Service
 import java.io.IOException
 import java.security.GeneralSecurityException
-import java.util.Collections
-import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Service
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
 @Service
-@Profile("gcp", "production")
 class GoogleIdTokenVerifierService(private val googleClientProperties: GoogleClientProperties) :
-        TokenVerifierService {
+    TokenVerifierService {
     override fun verifyToken(idToken: String): GoogleIdToken.Payload? {
 
         return try {
             val googleIdTokenVerifier =
-                    GoogleIdTokenVerifier.Builder(NetHttpTransport(), GsonFactory())
-                            .setAudience(
-                                    Collections.singletonList(googleClientProperties.webClientId)
-                            )
-                            .build()
+                GoogleIdTokenVerifier.Builder(NetHttpTransport(), GsonFactory())
+                    .setAudience(
+                        Collections.singletonList(googleClientProperties.clientId)
+                    )
+                    .build()
 
             googleIdTokenVerifier.verify(idToken).payload
         } catch (e: GeneralSecurityException) {

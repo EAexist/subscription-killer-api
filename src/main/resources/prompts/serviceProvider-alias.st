@@ -1,0 +1,1 @@
+ For each service, identify official name of the service. It must be the name that is used as representative name for from: of their emails sent to customers. if official korean name doesn't exist, don't provide korean name. Format: [{aliasNames: {"EN": "Netflix"}}, {aliasNames: {"EN": "Sketchfab"}}, {aliasNames: {"EN": "Coupang", "KO": "쿠팡"}}]

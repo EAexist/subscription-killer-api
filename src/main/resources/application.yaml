@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   application:
     name: subscription-killer-api
   datasource:
@@ -18,36 +20,63 @@ app:
       - DELETE
       - OPTIONS
     max-age: 3600
-
+  mail:
+    analysis-months: 13
+  prompts:
+    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/1-filter-and-categorize-emails.st
+    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/2-generalize-string-pattern.st
+    merge-email-detection-rules: classpath:/prompts/eventRuleUpdate/3-merge-event-rules.st
 ---
 spring:
   config:
     activate:
-      on-profile: production
+      on-profile: gcp
+  ai:
+    google:
+      genai:
+        project-id: ${GOOGLE_CLOUD_PROJECT}
+        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY}
+        chat:
+          options:
+            model: gemini-2.5-flash
+            temperature: 0.1
+    chat:
+      observations:
+        log-prompt: true
+        log-completion: true
 app:
-  cors:
-    allowed-origins:
-      - https://subscription-killer-git-main-matchalab-project.vercel.app
+  google:
+    client-id: ${APP_GOOGLE_CLIENT_ID}
+    client-secret: ${APP_GOOGLE_CLIENT_SECRET}
 ---
 spring:
   config:
     activate:
-      on-profile: development
+      on-profile: dev
 app:
   cors:
     allowed-origins:
       - https://subscription-killer-git-main-matchalab-project.vercel.app
       - https://subscription-killer-git-staging-matchalab-project.vercel.app
       - https://localhost:3000
+  mail:
+    analysis-months: 8
 logging:
   level:
     com.matchalab.subscription_killer_api: DEBUG
     org:
       springframework:
+        ai: DEBUG
         security: DEBUG
-        web.filter: DEBUG
+        web.reactive.function.client.ExchangeFunctions: DEBUG
+    web.filter: DEBUG
+    reactor.netty.http.client.HttpClient: DEBUG
 ---
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: prod
+app:
+  cors:
+    allowed-origins:
+      - https://subscription-killer-git-main-matchalab-project.vercel.app

@@ -1,0 +1,1 @@
+For each entry, verify if each email address found is currently active and used for official correspondence for notifications and subscription infos. if not, remove it and provide email address that is currently used.
