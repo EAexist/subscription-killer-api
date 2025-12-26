@@ -3,9 +3,14 @@ package com.matchalab.subscription_killer_api.subscription.service
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
-import com.matchalab.subscription_killer_api.subscription.*
+import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
+import com.matchalab.subscription_killer_api.subscription.EmailSource
+import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import com.matchalab.subscription_killer_api.utils.toReportDto
 import io.github.oshai.kotlinlogging.KotlinLogging
