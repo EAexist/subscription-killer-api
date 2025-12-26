@@ -11,7 +11,28 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${APP_GOOGLE_CLIENT_ID}
+            client-secret: ${APP_GOOGLE_CLIENT_SECRET}
+            client-authentication-method: client_secret_basic
+            scope:
+              - openid
+              - email
+              - profile
+              - https://www.googleapis.com/auth/gmail.readonly
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
+server:
+  forward-headers-strategy: framework
 app:
+  oauth2:
+    redirect-uri: http://localhost:3000/dashboard
   cors:
     allowed-methods:
       - GET
@@ -68,9 +89,9 @@ logging:
       springframework:
         ai: DEBUG
         security: DEBUG
-        web.reactive.function.client.ExchangeFunctions: DEBUG
+    #        web.reactive.function.client.ExchangeFunctions: DEBUG
     web.filter: DEBUG
-    reactor.netty.http.client.HttpClient: DEBUG
+#    reactor.netty.http.client.HttpClient: DEBUG
 ---
 spring:
   config:

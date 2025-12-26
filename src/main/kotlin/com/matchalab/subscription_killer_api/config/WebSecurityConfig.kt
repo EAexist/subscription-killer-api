@@ -3,6 +3,7 @@
 package com.matchalab.subscription_killer_api.config
 
 import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.subscription_killer_api.service.MultiAccountOAuth2AuthorizedClientService
 import com.matchalab.subscription_killer_api.service.TokenVerifierService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -22,25 +23,35 @@ import org.springframework.web.cors.CorsConfigurationSource
 @EnableWebSecurity(debug = true)
 @EnableConfigurationProperties(CorsProperties::class)
 open class WebSecurityConfig(
-        private val corsConfigurationSource: CorsConfigurationSource,
-        private val corsProperties: CorsProperties,
-        private val authenticationConfiguration: AuthenticationConfiguration,
-        private val googleIdTokenAuthenticationEntryPoint: GoogleIdTokenAuthenticationEntryPoint,
+    private val corsConfigurationSource: CorsConfigurationSource,
+    private val corsProperties: CorsProperties,
+    private val authenticationConfiguration: AuthenticationConfiguration,
+    private val googleIdTokenAuthenticationEntryPoint: GoogleIdTokenAuthenticationEntryPoint,
+    private val multiAccountOAuth2AuthorizedClientService: MultiAccountOAuth2AuthorizedClientService,
+    private val customSuccessHandler: CustomSuccessHandler
 ) {
 
     @Bean
     open fun filterChain(
-            http: HttpSecurity,
-            googleTokenAuthFilter: GoogleTokenAuthFilter,
-            authRequestBodyValidationFilter: AuthRequestBodyValidationFilter
+        http: HttpSecurity,
+        googleTokenAuthFilter: GoogleTokenAuthFilter,
+        authRequestBodyValidationFilter: AuthRequestBodyValidationFilter,
     ): SecurityFilterChain {
         http {
             cors { configurationSource = corsConfigurationSource }
             csrf { disable() }
             authorizeHttpRequests {
                 authorize(HttpMethod.OPTIONS, "/**", permitAll)
-                authorize(HttpMethod.POST, "/api/v1/auth", authenticated)
-                authorize(anyRequest, permitAll)
+                authorize(HttpMethod.GET, "/ping", permitAll)
+                authorize(HttpMethod.GET, "/login/**", permitAll)
+                authorize(anyRequest, authenticated)
+            }
+            oauth2Login {
+                authorizedClientService = multiAccountOAuth2AuthorizedClientService
+                authenticationSuccessHandler = customSuccessHandler
+//                authorizationEndpoint {
+//                    authorizationRequestResolver = customAuthorizationRequestResolver
+//                }
             }
             exceptionHandling { authenticationEntryPoint = googleIdTokenAuthenticationEntryPoint }
 
@@ -59,8 +70,8 @@ open class WebSecurityConfig(
 
     @Bean
     open fun googleIdTokenAuthenticationProvider(
-            tokenVerifierService: TokenVerifierService,
-            appUserService: AppUserService
+        tokenVerifierService: TokenVerifierService,
+        appUserService: AppUserService
     ): AuthenticationProvider {
         return GoogleIdTokenAuthenticationProvider(tokenVerifierService, appUserService)
     }

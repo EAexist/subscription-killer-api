@@ -10,6 +10,7 @@ class CustomUserDetails(val appUser: AppUser, val isNew: Boolean = false) : User
     companion object {
         private const val NO_PASSWORD = "{noop}"
     }
+
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority(appUser.userRole.authority))
     }
@@ -19,7 +20,7 @@ class CustomUserDetails(val appUser: AppUser, val isNew: Boolean = false) : User
     }
 
     override fun getUsername(): String {
-        return appUser.name
+        return appUser.id.toString()
     }
 
     override fun isAccountNonExpired(): Boolean {
