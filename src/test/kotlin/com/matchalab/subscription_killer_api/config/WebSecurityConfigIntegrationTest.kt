@@ -12,8 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login
+import org.springframework.session.SessionRepository
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -112,21 +112,17 @@ class WebSecurityConfigIntegrationTest {
     }
 
     @Test
-    fun `red phase - should persist oauth2 session in jdbc repository`() {
-        val webTestClient: WebTestClient = MockMvcWebTestClient.bindToApplicationContext(wac)
-            .apply {}
-            .build()
+    fun `when authenticated user logins should persist oauth2 session in jdbc repository`() {
 
         client
             .get()
-            .uri("/")
+            .uri("/api/v1/appUser")
             .attributes(oauth2Login())
             .exchange()
             .expectStatus().isOk
 
         val repository = wac.getBean(
-            ""
-//            SessionRepository::class.java
+            SessionRepository::class.java
         )
 
         assertThat(repository.javaClass.simpleName)
