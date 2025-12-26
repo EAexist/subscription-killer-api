@@ -82,6 +82,7 @@ constructor(
             GoogleAccount(
                 googleTestUserProperties.subject,
                 "testUserName",
+                "testUserEmail",
                 googleTestUserProperties.refreshToken,
                 googleTestUserProperties.accessToken,
                 googleTestUserProperties.expiresAt,

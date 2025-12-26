@@ -80,8 +80,8 @@ class SubscriptionAnalysisServiceTest(
             mutableListOf(EmailSource(null, "notifications@sketchfab.com")),
         )
 
-    val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A")
-    val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B")
+    val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A", "FAKE_EMAIL_A")
+    val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B", "FAKE_EMAIL_B")
 
     lateinit var fakeGmailMessages: List<GmailMessage>
 

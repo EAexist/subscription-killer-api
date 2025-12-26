@@ -33,12 +33,15 @@ class MultiAccountOAuth2AuthorizedClientService(
             googleAccountRepository.save(googleAccount)
         } else {
 
-            val attributes = (principal as? OAuth2AuthenticationToken)?.principal?.attributes ?: emptyMap()
-            val name = attributes["name"] as? String ?: "Google Account"
+            val attributes = (principal as? OAuth2AuthenticationToken)?.principal?.attributes
+                ?: throw (Exception("Principal attributes not found"))
+            val name: String = attributes["name"] as String
+            val email: String = attributes["email"] as String
 
             val newGoogleAccount: GoogleAccount = GoogleAccount(
                 subject = googleAccountSubject,
                 name = name,
+                email = email,
                 refreshToken = client.refreshToken?.tokenValue,
                 accessToken = client.accessToken.tokenValue,
                 expiresAt = client.accessToken.expiresAt
