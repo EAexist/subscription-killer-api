@@ -47,7 +47,7 @@ out/
 *.tmp
 .certs
 .env
-src/test/resources/application-google-test.yaml
+src/test/resources/application-test.yaml
 
 ### Secrets ###
 scripts/

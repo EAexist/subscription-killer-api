@@ -6,12 +6,12 @@ import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
-import com.matchalab.subscription_killer_api.subscription.service.ServiceProvider
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
