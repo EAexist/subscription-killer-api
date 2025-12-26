@@ -28,6 +28,9 @@ spring:
         provider:
           google:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
+  session:
+    jdbc:
+      initialize-schema: always
 server:
   forward-headers-strategy: framework
 app:

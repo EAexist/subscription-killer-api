@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import java.io.IOException
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
+import java.io.IOException
 
-@Component
+//@Component
 class AuthRequestBodyValidationFilter(
-        private val authenticationManager: AuthenticationManager,
-        private val objectMapper: ObjectMapper
+    private val authenticationManager: AuthenticationManager,
+    private val objectMapper: ObjectMapper
 ) : OncePerRequestFilter() {
 
-    private val REQUIRED_PATH_PREFIX = "/api/v1/auth"
+    private val REQUIRED_PATH_PREFIX = "/api/v1/appUser"
     private val REQUIRED_METHOD = "POST"
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
@@ -26,9 +25,9 @@ class AuthRequestBodyValidationFilter(
     }
 
     override fun doFilterInternal(
-            request: HttpServletRequest,
-            response: HttpServletResponse,
-            filterChain: FilterChain,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain,
     ) {
 
         logger.debug("AuthRequestBodyValidationFilter.doFilterInternal()")
@@ -60,6 +59,7 @@ class AuthRequestBodyValidationFilter(
 
         filterChain.doFilter(wrappedRequest, response)
     }
+
     private fun sendBadRequestResponse(response: HttpServletResponse, message: String) {
 
         logger.debug(message)

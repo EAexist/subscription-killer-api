@@ -10,17 +10,16 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
 
-@Component
+//@Component
 class GoogleTokenAuthFilter(
-        private val authenticationManager: AuthenticationManager,
-        private val objectMapper: ObjectMapper
+    private val authenticationManager: AuthenticationManager,
+    private val objectMapper: ObjectMapper
 ) : OncePerRequestFilter() {
 
-    private val REQUIRED_PATH_PREFIX = "/api/v1/auth"
+    private val REQUIRED_PATH_PREFIX = "/api/v1/appUser"
     private val REQUIRED_METHOD = "POST"
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
@@ -29,9 +28,9 @@ class GoogleTokenAuthFilter(
     }
 
     override fun doFilterInternal(
-            request: HttpServletRequest,
-            response: HttpServletResponse,
-            filterChain: FilterChain,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain,
     ) {
 
         logger.debug("GoogleTokenAuthFilter.doFilterInternal()")
@@ -45,23 +44,23 @@ class GoogleTokenAuthFilter(
             }
 
             val authResult =
-                    authenticationManager.authenticate(
-                            GoogleIdTokenAuthenticationToken(
-                                    idToken,
-                                    listOf(SimpleGrantedAuthority(UserRoleType.USER.authority))
-                            )
+                authenticationManager.authenticate(
+                    GoogleIdTokenAuthenticationToken(
+                        idToken,
+                        listOf(SimpleGrantedAuthority(UserRoleType.USER.authority))
                     )
+                )
 
             SecurityContextHolder.getContext().authentication = authResult
             logger.debug("authResult: ${authResult.toString()}")
         } catch (e: Exception) {
             val authException =
-                    if (e is AuthenticationException) e
-                    else
-                            BadCredentialsException(
-                                    "❌ Failed to process token request: ${e.message}",
-                                    e
-                            )
+                if (e is AuthenticationException) e
+                else
+                    BadCredentialsException(
+                        "❌ Failed to process token request: ${e.message}",
+                        e
+                    )
             throw authException
         }
 
@@ -69,7 +68,7 @@ class GoogleTokenAuthFilter(
     }
 
     private fun extractIdTokenFromRequestBody(
-            wrappedRequest: ContentCachingRequestWrapper
+        wrappedRequest: ContentCachingRequestWrapper
     ): String? {
 
         val bodyBytes = wrappedRequest.contentAsByteArray

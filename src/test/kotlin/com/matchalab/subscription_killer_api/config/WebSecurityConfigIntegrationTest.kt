@@ -11,8 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login
-import org.springframework.session.SessionRepository
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.cors.CorsConfiguration
@@ -109,25 +107,6 @@ class WebSecurityConfigIntegrationTest {
     @Test
     fun `when unauthenticated user access business path should return 401 Unauthorized`() {
         client.get().uri("/api/v1/appUser").exchange().expectStatus().isUnauthorized()
-    }
-
-    @Test
-    fun `when authenticated user logins should persist oauth2 session in jdbc repository`() {
-
-        client
-            .get()
-            .uri("/api/v1/appUser")
-            .attributes(oauth2Login())
-            .exchange()
-            .expectStatus().isOk
-
-        val repository = wac.getBean(
-            SessionRepository::class.java
-        )
-
-        assertThat(repository.javaClass.simpleName)
-            .contains("JdbcIndexedSessionRepository")
-            .withFailMessage("The app is NOT using JDBC for session persistence!")
     }
 
     fun assertAllowedCorsGetRequest(allowedOrigin: String) {

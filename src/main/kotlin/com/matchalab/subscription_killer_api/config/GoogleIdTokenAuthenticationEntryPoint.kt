@@ -6,25 +6,24 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
-import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class GoogleIdTokenAuthenticationEntryPoint(private val objectMapper: ObjectMapper) :
-        AuthenticationEntryPoint {
+    AuthenticationEntryPoint {
     override fun commence(
-            request: HttpServletRequest,
-            response: HttpServletResponse,
-            authException: AuthenticationException
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        authException: AuthenticationException
     ) {
         response.status = HttpServletResponse.SC_UNAUTHORIZED
         response.contentType = MediaType.APPLICATION_JSON_VALUE
 
         val body =
-                mapOf(
-                        "status" to HttpServletResponse.SC_UNAUTHORIZED,
-                        "error" to "Authentication Failed",
-                        "message" to authException.message
-                )
+            mapOf(
+                "status" to HttpServletResponse.SC_UNAUTHORIZED,
+                "error" to "Authentication Failed",
+                "message" to authException.message
+            )
         response.writer.write(objectMapper.writeValueAsString(body))
         response.writer.flush()
     }
