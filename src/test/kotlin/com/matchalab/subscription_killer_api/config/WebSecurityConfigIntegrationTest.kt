@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,9 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
-
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 private val logger = KotlinLogging.logger {}
 
@@ -25,16 +28,17 @@ class WebSecurityConfigIntegrationTest {
     lateinit var client: WebTestClient
 
     @Autowired
+    lateinit var wac: WebApplicationContext
+
+    @Autowired
     lateinit var corsConfigurationSource: CorsConfigurationSource
+
+    private val oauth2GoogleAuthorizationPath = "/oauth2/authorization/google"
+    private val oauth2GoogleRedirectedPath = "/login/oauth2/code/google"
+    private val testUserName = "testUserName"
 
     @BeforeEach
     fun setUp() {
-//        client =
-//            MockMvcWebTestClient.bindToApplicationContext(wac)
-//                .apply(springSecurity())
-//                .configureClient()
-//                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
-//                .build()
     }
 
     @Test
@@ -84,6 +88,25 @@ class WebSecurityConfigIntegrationTest {
     )
     fun `should only allow subscription-killer frontend origins`(origin: String) {
         assertAllowedCorsGetRequest(origin)
+    }
+
+    @Test
+    fun `when hitting authorization endpoint should redirect to Google with custom params`() {
+        client.get().uri(oauth2GoogleAuthorizationPath).exchange()
+            .expectStatus()
+            .is3xxRedirection()
+            .expectHeader().value(HttpHeaders.LOCATION) { location ->
+                assertThat(location).contains("accounts.google.com")
+                assertThat(location).contains("access_type=offline")
+                assertThat(location).contains("prompt=consent%20select_account")
+                assertThat(URLDecoder.decode(location, StandardCharsets.UTF_8))
+                    .contains("scope=openid email profile https://www.googleapis.com/auth/gmail.readonly")
+            }
+    }
+
+    @Test
+    fun `when unauthenticated user access business path should return 401 Unauthorized`() {
+        client.get().uri("/api/v1/subscriptions/analysis").exchange().expectStatus().isUnauthorized()
     }
 
     fun assertAllowedCorsGetRequest(allowedOrigin: String) {
