@@ -31,6 +31,7 @@ spring:
   session:
     jdbc:
       initialize-schema: always
+    timeout: 3d
 server:
   forward-headers-strategy: framework
 app:
@@ -92,9 +93,10 @@ logging:
       springframework:
         ai: DEBUG
         security: DEBUG
-    #        web.reactive.function.client.ExchangeFunctions: DEBUG
+        security.oauth2: DEBUG
+        security.oauth2.client: DEBUG
+        session: DEBUG
     web.filter: DEBUG
-#    reactor.netty.http.client.HttpClient: DEBUG
 ---
 spring:
   config:

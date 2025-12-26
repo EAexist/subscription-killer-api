@@ -107,7 +107,7 @@ tasks.withType<Test> {
             excludeTags("ai")
         }
     }
-    systemProperty("spring.profiles.active", "dev,test,gcp,google-test")
+    systemProperty("spring.profiles.active", "dev,test,gcp")
 }
 
 tasks.register<Zip>("buildZip") {

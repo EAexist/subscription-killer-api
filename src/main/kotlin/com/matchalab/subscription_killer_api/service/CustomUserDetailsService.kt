@@ -1,44 +1,33 @@
 package com.matchalab.subscription_killer_api.service
 
+import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.security.CustomUserDetails
+import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.util.UUID
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.stereotype.Service
+
 
 private val logger = KotlinLogging.logger {}
 
-// @Service
-class CustomUserDetailsService(private val appUserRepository: AppUserRepository) :
-        UserDetailsService {
+@Service
+class CustomOidcUserService(private val appUserRepository: AppUserRepository) : OidcUserService() {
 
-    companion object {
-        private const val NO_PASSWORD = "{noop}"
-    }
+    override fun loadUser(userRequest: OidcUserRequest?): OidcUser {
+        val oidcUser = super.loadUser(userRequest)
+        val googleSub = oidcUser.subject
 
-    override fun loadUserByUsername(username: String): UserDetails {
+        val appUser: AppUser = appUserRepository.findByGoogleAccounts_Subject(googleSub)
+            ?: throw OAuth2AuthenticationException("User not found")
 
-        val userId =
-                try {
-                    UUID.fromString(username)
-                } catch (e: IllegalArgumentException) {
-                    throw UsernameNotFoundException("Invalid user ID format: $username", e)
-                }
 
-        val appUser =
-                appUserRepository.findById(userId).orElseThrow {
-                    UsernameNotFoundException("User not found with ID: $username")
-                }
+        val authorities: Collection<SimpleGrantedAuthority> =
+            listOf(SimpleGrantedAuthority(appUser.userRole.authority))
 
-        logger.info { "appUser.id: ${appUser.id}\nuserAccount.userRole: ${appUser.userRole}" }
-
-        return CustomUserDetails(appUser)
-        // User.builder()
-        //         .username(appUser.id.toString()) // Username is the UUID string
-        //         .password(NO_PASSWORD)
-        //         .authorities(appUser.userRole.authority)
-        //         .build()
+        return CustomOidcUser(appUser.id, authorities, oidcUser)
     }
 }

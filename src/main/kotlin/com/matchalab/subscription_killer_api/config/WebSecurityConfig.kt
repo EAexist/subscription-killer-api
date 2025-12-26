@@ -2,6 +2,7 @@
 // https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#publish-authentication-manager-bean
 package com.matchalab.subscription_killer_api.config
 
+import com.matchalab.subscription_killer_api.service.CustomOidcUserService
 import com.matchalab.subscription_killer_api.service.MultiAccountOAuth2AuthorizedClientService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -24,7 +25,8 @@ open class WebSecurityConfig(
 //    private val authenticationConfiguration: AuthenticationConfiguration,
 //    private val googleIdTokenAuthenticationEntryPoint: GoogleIdTokenAuthenticationEntryPoint,
     private val multiAccountOAuth2AuthorizedClientService: MultiAccountOAuth2AuthorizedClientService,
-    private val customSuccessHandler: CustomSuccessHandler
+    private val customSuccessHandler: CustomSuccessHandler,
+    private val customOidcUserService: CustomOidcUserService
 ) {
 
     @Bean
@@ -45,6 +47,9 @@ open class WebSecurityConfig(
             oauth2Login {
                 authorizedClientService = multiAccountOAuth2AuthorizedClientService
                 authenticationSuccessHandler = customSuccessHandler
+                userInfoEndpoint {
+                    oidcUserService = customOidcUserService
+                }
 //                authorizationEndpoint {
 //                    authorizationRequestResolver = customAuthorizationRequestResolver
 //                }

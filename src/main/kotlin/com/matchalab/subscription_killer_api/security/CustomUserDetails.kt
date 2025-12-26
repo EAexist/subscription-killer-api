@@ -1,29 +1,41 @@
 package com.matchalab.subscription_killer_api.security
 
-import com.matchalab.subscription_killer_api.domain.AppUser
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.core.oidc.OidcIdToken
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import java.io.Serializable
+import java.util.*
 
-class CustomUserDetails(val appUser: AppUser, val isNew: Boolean = false) : UserDetails {
 
-    companion object {
-        private const val NO_PASSWORD = "{noop}"
+class CustomOidcUser(
+    val appUserId: UUID?,
+    val authoritiesInternal: Collection<GrantedAuthority>,
+    val oidcUser: OidcUser? = null
+) : OidcUser, Serializable {
+
+    override fun getName(): String? {
+        return appUserId?.toString()
+    }
+
+    // Delegate other OidcUser methods to oidcUser...
+    override fun getAttributes(): MutableMap<String?, Any?>? {
+        return oidcUser!!.attributes
     }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
-        return listOf(SimpleGrantedAuthority(appUser.userRole.authority))
+        return authoritiesInternal
     }
 
-    override fun getPassword(): String {
-        return NO_PASSWORD
+    override fun getClaims(): MutableMap<String?, Any?>? {
+        return oidcUser!!.claims
     }
 
-    override fun getUsername(): String {
-        return appUser.id.toString()
+    override fun getIdToken(): OidcIdToken? {
+        return oidcUser!!.idToken
     }
 
-    override fun isAccountNonExpired(): Boolean {
-        return true
+    override fun getUserInfo(): OidcUserInfo? {
+        return oidcUser!!.userInfo
     }
 }

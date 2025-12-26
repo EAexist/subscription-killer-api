@@ -12,11 +12,13 @@ private val logger = KotlinLogging.logger {}
 @RestController
 @RequestMapping("/api/v1/subscriptions")
 class SubscriptionAnalysisController(
-        private val subscriptionAnalysisService: SubscriptionAnalysisService
+    private val subscriptionAnalysisService: SubscriptionAnalysisService
 ) {
 
     @GetMapping("/analysis")
     suspend fun analyze(): SubscriptionReportResponseDto {
-        return subscriptionAnalysisService.analyze()
+        val result = subscriptionAnalysisService.analyze()
+        logger.debug { result.toString() }
+        return result
     }
 }
