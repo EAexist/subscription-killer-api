@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription.service
+package com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter
 
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback
 import com.google.api.client.googleapis.json.GoogleJsonError
@@ -11,10 +11,9 @@ import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.util.*
-
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,7 +21,7 @@ class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapte
 
     val userId = "me"
 
-    override suspend fun listMessageIds(query: String): List<String> = coroutineScope {
+    override suspend fun listMessageIds(query: String): List<String> = withContext(Dispatchers.IO) {
 
         logger.debug { "[listMessageIds] query: $query" }
 
@@ -60,34 +59,36 @@ class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapte
         messages.map { it.id }
     }
 
-    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
+    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
+        withContext(Dispatchers.IO) {
 
-        logger.debug { "fetching ${messageIds.size} messages" }
+            logger.debug { "fetching ${messageIds.size} messages" }
 
-        val results = Collections.synchronizedList(mutableListOf<Message>())
+            val results = mutableListOf<Message>()
 
-        val callback: JsonBatchCallback<Message?> = object : JsonBatchCallback<Message?>() {
-            override fun onSuccess(message: Message?, responseHeaders: HttpHeaders) {
-                message?.let { results.add(it) }
+            val callback = object : JsonBatchCallback<Message>() {
+                override fun onSuccess(message: Message?, responseHeaders: HttpHeaders) {
+                    message?.let { results.add(it) }
+                }
+
+                override fun onFailure(e: GoogleJsonError, responseHeaders: HttpHeaders?) {
+                    logger.error { "fetch failed ${e.message}" }
+                }
             }
 
-            override fun onFailure(e: GoogleJsonError, responseHeaders: HttpHeaders?) {
-                logger.error { "fetch failed ${e.message}" }
+            messageIds.chunked(100).forEach { chunk ->
+                executeGmailBatch(chunk, callback) { id ->
+                    gmailClient
+                        .users()
+                        .messages()
+                        .get("me", id)
+                        .setFormat(plan.format)
+                        .setFields(plan.fields)
+                        .setMetadataHeaders(plan.metadataHeaders)
+                }
             }
+            results.mapNotNull { it.toGmailMessage() }
         }
-
-        executeGmailBatch(messageIds, callback, {
-            gmailClient
-                .users()
-                .messages()
-                .get("me", it)
-                .setFormat(plan.format)
-                .setFields(plan.fields)
-                .setMetadataHeaders(plan.metadataHeaders)
-        })
-
-        return results.mapNotNull { it.toGmailMessage() }
-    }
 
     @Throws(IOException::class)
     fun <T> executeGmailBatch(

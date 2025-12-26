@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription.service
+package com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter
 
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage

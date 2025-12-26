@@ -1,5 +1,7 @@
-package com.matchalab.subscription_killer_api.subscription
+package com.matchalab.subscription_killer_api.subscription.service
 
+import com.matchalab.subscription_killer_api.subscription.EmailSource
+import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.providers.core.PaymentCycle
 import jakarta.persistence.*
 import java.util.*

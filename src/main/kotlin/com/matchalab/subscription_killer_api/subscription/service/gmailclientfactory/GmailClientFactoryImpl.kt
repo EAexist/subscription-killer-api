@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription
+package com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory
 
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication
 import com.google.api.client.auth.oauth2.TokenRequest
@@ -13,22 +13,23 @@ import com.google.auth.oauth2.UserCredentials
 import com.matchalab.subscription_killer_api.config.GoogleClientProperties
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
-import com.matchalab.subscription_killer_api.subscription.service.GmailClientAdapter
-import com.matchalab.subscription_killer_api.subscription.service.GmailClientAdapterImpl
-import org.springframework.stereotype.Component
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapterImpl
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Service
 import java.time.Instant
 
-//@Profile("gcp", "production")
-@Component
-class GmailClientFactory(
+@Profile("prod || gmail")
+@Service
+class GmailClientFactoryImpl(
     private val googleAccountRepository: GoogleAccountRepository,
     private val googleClientProperties: GoogleClientProperties,
-) {
+) : GmailClientFactory {
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
     private val jsonFactory = GsonFactory.getDefaultInstance()
     private val tokenServerUrl = "https://oauth2.googleapis.com/token"
 
-    fun createAdapter(credentialsIdentifier: String): GmailClientAdapter {
+    override fun createAdapter(credentialsIdentifier: String): GmailClientAdapter {
 
         val authenticatedGmailClient = createClient(credentialsIdentifier)
 
