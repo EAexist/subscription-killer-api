@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.subscription_killer_api.security.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

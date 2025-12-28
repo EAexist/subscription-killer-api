@@ -5,6 +5,7 @@ import com.matchalab.subscription_killer_api.repository.ServiceProviderRepositor
 import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.utils.toDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service

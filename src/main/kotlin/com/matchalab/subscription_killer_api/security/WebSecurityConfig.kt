@@ -1,7 +1,7 @@
-// https://docs.spring.io/spring-security/reference/servlet/configuration/kotlin.html
-// https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#publish-authentication-manager-bean
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.subscription_killer_api.security
 
+import com.matchalab.subscription_killer_api.security.config.CorsProperties
+import com.matchalab.subscription_killer_api.security.config.CustomSuccessHandler
 import com.matchalab.subscription_killer_api.service.CustomOidcUserService
 import com.matchalab.subscription_killer_api.service.MultiAccountOAuth2AuthorizedClientService
 import org.springframework.boot.context.properties.EnableConfigurationProperties

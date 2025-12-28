@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.subscription_killer_api.security.config
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
