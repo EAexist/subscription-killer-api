@@ -8,14 +8,29 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 
 
 @Component
 class DataInitializer(
+    private val transactionTemplate: TransactionTemplate,
     private val serviceProviderRepository: ServiceProviderRepository
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments) {
+        transactionTemplate.execute {
+            persistSampleData()
+        }
+    }
+
+    open fun persistSampleData() {
+        val providers = createServiceProvidersFromJson()
+        val existingNames = serviceProviderRepository.findAll().map { it.displayName }.toSet()
+
+        val newProviders = providers.filter { it.displayName !in existingNames }
+
+        if (newProviders.isNotEmpty()) {
+            serviceProviderRepository.saveAll(newProviders)
+        }
     }
 
     fun createServiceProvidersFromJson(jsonPath: String = "static/service-provider.json"): List<ServiceProvider> {
@@ -34,10 +49,6 @@ class DataInitializer(
         }
     }
 
-    @Transactional
-    open fun persistSampleData(path: String = "static/service-provider.json"): List<ServiceProvider> {
-        return serviceProviderRepository.saveAll(createServiceProvidersFromJson(path))
-    }
 
     data class ServiceProviderJson(
         val aliasNames: Map<String, String>,
