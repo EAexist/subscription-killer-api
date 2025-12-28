@@ -7,13 +7,11 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
-import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.ServiceProviderService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -23,7 +21,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.transaction.annotation.Transactional
@@ -31,10 +28,10 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@Tag("ai")
-@Tag("gcp")
+//@Tag("ai")
+//@Tag("gcp")
 @SpringBootTest()
-@ActiveProfiles("dev", "gcp", "test")
+//@ActiveProfiles("dev", "gcp", "test")
 @AutoConfigureMockMvc
 @Transactional
 @EnableConfigurationProperties(GoogleTestUserProperties::class)
@@ -55,7 +52,6 @@ constructor(
 
     @BeforeEach
     fun setUp() {
-        testDataFactory.persistSampleData()
         customClient =
             client.mutate().codecs { configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true) }
                 .defaultHeader(HttpHeaders.ORIGIN, "https://localhost:3000")
@@ -69,7 +65,7 @@ constructor(
     }
 
     @Test
-    fun `should return 200 OK and analysis result when user has ongoing subscriptions`() {
+    fun `when analyze subscription and then fetch should return the analyzed result for both requests`() {
 
         val testAppUser =
             AppUser(
@@ -90,11 +86,6 @@ constructor(
             )
         )
         val testAppUserId: UUID = appUserRepository.save(testAppUser).id ?: UUID.randomUUID()
-
-        val testServiceProviders: List<ServiceProvider> = listOf()
-
-//        val savedServiceProviders: List<ServiceProvider> = serviceProviderService.saveAll(testServiceProviders)
-        serviceProviderService.saveAll(testServiceProviders)
 
         // Given
         val principal = testAppUserId.toString()
@@ -122,5 +113,6 @@ constructor(
                     }
                 }
             }
+
     }
 }
