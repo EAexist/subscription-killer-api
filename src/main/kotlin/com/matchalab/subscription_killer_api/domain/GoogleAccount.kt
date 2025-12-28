@@ -50,7 +50,8 @@ class GoogleAccount(
         subscription.googleAccount = this
     }
 
-    fun addAllSubscriptions(subscriptions: List<Subscription>) {
-        subscriptions.forEach { this.addSubscription(it) }
+    fun updateSubscriptions(subscriptions: List<Subscription>) {
+        this.subscriptions.clear()
+        subscriptions.forEach { addSubscription(it) }
     }
 }
