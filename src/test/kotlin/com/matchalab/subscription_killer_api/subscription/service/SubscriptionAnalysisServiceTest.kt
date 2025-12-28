@@ -92,7 +92,7 @@ class SubscriptionAnalysisServiceTest(
     @BeforeEach
     fun setUp() {
 
-        val jsonPath = "mocks/messages_netflix_sketchfab.json"
+        val jsonPath = "static/messages_netflix_sketchfab.json"
         val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
         fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
     }

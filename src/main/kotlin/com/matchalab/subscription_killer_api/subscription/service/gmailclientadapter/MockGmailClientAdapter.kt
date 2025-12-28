@@ -15,7 +15,7 @@ private val logger = KotlinLogging.logger {}
 @Component
 class MockGmailClientAdapter() : GmailClientAdapter {
 
-    val jsonPath = "mocks/messages_netflix_sketchfab.json"
+    val jsonPath = "static/messages_netflix_sketchfab.json"
     val sampleMessages =
         readMessages(ClassPathResource(jsonPath).inputStream).mapNotNull { it.toGmailMessage() }.associateBy { it.id }
 

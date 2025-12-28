@@ -67,7 +67,7 @@ class ServiceProviderServiceTest() {
     )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {
-        val jsonPath = "mocks/messages_netflix_sketchfab.json"
+        val jsonPath = "static/messages_netflix_sketchfab.json"
         readMessages(ClassPathResource(jsonPath).inputStream).mapNotNull { it.toGmailMessage() }
     }
 
