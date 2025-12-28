@@ -36,7 +36,7 @@ open class TestDataFactory(
     ) =
         EmailSource(null, targetAddress, (eventRules ?: mutableMapOf()))
 
-    fun createServiceProvidersFromJson(jsonPath: String = "service-provider.json"): List<ServiceProvider> {
+    fun createServiceProvidersFromJson(jsonPath: String = "static/service-provider.json"): List<ServiceProvider> {
         val dtos: List<ServiceProviderJson> = readJsonList(ClassPathResource(jsonPath).inputStream)
 
         return dtos.map { dto ->
@@ -53,7 +53,7 @@ open class TestDataFactory(
     }
 
     @Transactional
-    open fun persistSampleData(path: String = "service-provider.json"): List<ServiceProvider> {
+    open fun persistSampleData(path: String = "static/service-provider.json"): List<ServiceProvider> {
         return serviceProviderRepository.saveAll(createServiceProvidersFromJson(path))
     }
 }

@@ -10,6 +10,8 @@ import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.coEvery
@@ -80,8 +82,8 @@ class SubscriptionAnalysisServiceTest(
             mutableListOf(EmailSource(null, "notifications@sketchfab.com")),
         )
 
-    val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A")
-    val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B")
+    val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A", "FAKE_EMAIL_A")
+    val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B", "FAKE_EMAIL_B")
 
     lateinit var fakeGmailMessages: List<GmailMessage>
 
@@ -90,7 +92,7 @@ class SubscriptionAnalysisServiceTest(
     @BeforeEach
     fun setUp() {
 
-        val jsonPath = "mocks/messages_netflix_sketchfab.json"
+        val jsonPath = "static/messages_netflix_sketchfab.json"
         val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
         fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
     }

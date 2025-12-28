@@ -9,6 +9,7 @@ import java.time.Instant
 class GoogleAccount(
     @Id var subject: String? = null,
     var name: String,
+    var email: String,
 
     // Google OAuth
     @Column(columnDefinition = "TEXT")
@@ -17,7 +18,7 @@ class GoogleAccount(
 
     @Column(columnDefinition = "TEXT")
     var accessToken: String? = null,
-    
+
     var expiresAt: Instant? = null,
     var scope: String? = null,
 
@@ -35,6 +36,7 @@ class GoogleAccount(
         payload: GoogleIdToken.Payload
     ) : this(
         subject = payload.subject,
+        email = payload.email,
         name = payload.get("name") as? String ?: "Unknown",
     )
 
@@ -48,7 +50,8 @@ class GoogleAccount(
         subscription.googleAccount = this
     }
 
-    fun addAllSubscriptions(subscriptions: List<Subscription>) {
-        subscriptions.forEach { this.addSubscription(it) }
+    fun updateSubscriptions(subscriptions: List<Subscription>) {
+        this.subscriptions.clear()
+        subscriptions.forEach { addSubscription(it) }
     }
 }

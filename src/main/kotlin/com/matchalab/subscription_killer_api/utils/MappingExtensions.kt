@@ -25,10 +25,7 @@ fun AppUser.toResponseDto(): AppUserResponseDto {
 
 fun GoogleAccount.toResponseDto(): GoogleAccountResponseDto {
     return GoogleAccountResponseDto(
-        subject = this.subject
-            ?: throw IllegalStateException(
-                "Google Account subject cannot be null for DTO mapping."
-            ),
+        email = this.email,
         name = this.name,
     )
 }

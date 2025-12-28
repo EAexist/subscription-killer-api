@@ -34,7 +34,7 @@ private val logger = KotlinLogging.logger {}
 @Tag("ai")
 @Tag("gcp")
 @SpringBootTest()
-@ActiveProfiles("dev", "gcp", "google-test")
+@ActiveProfiles("dev", "gcp", "test")
 @AutoConfigureMockMvc
 @Transactional
 @EnableConfigurationProperties(GoogleTestUserProperties::class)
@@ -82,6 +82,7 @@ constructor(
             GoogleAccount(
                 googleTestUserProperties.subject,
                 "testUserName",
+                "testUserEmail",
                 googleTestUserProperties.refreshToken,
                 googleTestUserProperties.accessToken,
                 googleTestUserProperties.expiresAt,

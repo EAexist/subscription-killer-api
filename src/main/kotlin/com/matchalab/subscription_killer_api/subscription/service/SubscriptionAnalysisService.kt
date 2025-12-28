@@ -56,8 +56,9 @@ class SubscriptionAnalysisService(
                             "Google Account not found for subject=$subject"
                         )
                     }
+                // @TOOD Prevent Frequent Re-analysis
                 val subscriptions: List<Subscription> = analyzeSingleGoogleAccount(subject)
-                googleAccount.addAllSubscriptions(subscriptions)
+                googleAccount.updateSubscriptions(subscriptions)
                 googleAccount.analyzedAt = Instant.now()
 
                 val updatedGoogleAccount: GoogleAccount =
