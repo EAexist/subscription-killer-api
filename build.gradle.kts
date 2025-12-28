@@ -87,6 +87,9 @@ dependencies {
     implementation(platform("org.springframework.ai:spring-ai-bom:1.1.2"))
     implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
 
+    // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
+    testImplementation("io.projectreactor:reactor-test:3.8.1")
+
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
