@@ -7,9 +7,13 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
+import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisStep
+import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisStepUpdateDto
+import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionAnalysisResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.ServiceProviderService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,13 +22,18 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Flux
+import reactor.test.StepVerifier
 import java.util.*
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -65,7 +74,7 @@ constructor(
     }
 
     @Test
-    fun `when analyze subscription and then fetch should return the analyzed result for both requests`() {
+    fun `when valid analysis request should trigger async pipeline and return 202 Accepted`() {
 
         val testAppUser =
             AppUser(
@@ -95,24 +104,120 @@ constructor(
                 "{noop}",
                 listOf(SimpleGrantedAuthority("ROLE_USER"))
             )
+
+        customClient
+            .post()
+            .uri("/reports/analysis")
+            .exchange()
+            .expectStatus()
+            .isAccepted()
+            .expectBody<SubscriptionAnalysisResponseDto>().isEqualTo(SubscriptionAnalysisResponseDto())
+    }
+
+    @Test
+    fun `when subscribed analysis server-sent event should return progress`() {
+
+        val testAppUser =
+            AppUser(
+                null,
+                "testUserName",
+                UserRoleType.USER,
+                mutableListOf<GoogleAccount>()
+            )
+        testAppUser.addGoogleAccount(
+            GoogleAccount(
+                googleTestUserProperties.subject,
+                "testUserName",
+                "testUserEmail",
+                googleTestUserProperties.refreshToken,
+                googleTestUserProperties.accessToken,
+                googleTestUserProperties.expiresAt,
+                googleTestUserProperties.scope
+            )
+        )
+        val testAppUserId: UUID = appUserRepository.save(testAppUser).id ?: UUID.randomUUID()
+
+        // Given
+        val principal = testAppUserId.toString()
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(
+                principal,
+                "{noop}",
+                listOf(SimpleGrantedAuthority("ROLE_USER"))
+            )
+
+        val eventStream: Flux<AnalysisStepUpdateDto> = customClient.get()
+            .uri("/reports/analysis/progress")
+            .accept(MediaType.TEXT_EVENT_STREAM)
+            .exchange()
+            .expectStatus().isOk()
+            .returnResult<AnalysisStepUpdateDto>()
+            .responseBody
+
+        customClient
+            .post()
+            .uri("/reports/analysis")
+            .exchange()
+            .expectStatus()
+            .isAccepted()
+            .expectBody<SubscriptionAnalysisResponseDto>().isEqualTo(SubscriptionAnalysisResponseDto())
+
+        StepVerifier.create(eventStream)
+            .assertNext { assertThat(it.step).isEqualTo(AnalysisStep.FETCHING_EMAIL) }
+            .assertNext { assertThat(it.step).isEqualTo(AnalysisStep.BUILDING_DETECTION_RULE) }
+            .assertNext { assertThat(it.step).isEqualTo(AnalysisStep.DETECTING_SUBSCRIPTION) }
+            .assertNext { assertThat(it.step).isEqualTo(AnalysisStep.COMPLETED) }
+            .thenCancel()
+            .verify()
+    }
+
+    @Test
+    fun `when request subscription report should return report`() {
+
+        val testAppUser =
+            AppUser(
+                null,
+                "testUserName",
+                UserRoleType.USER,
+                mutableListOf<GoogleAccount>()
+            )
+        testAppUser.addGoogleAccount(
+            GoogleAccount(
+                googleTestUserProperties.subject,
+                "testUserName",
+                "testUserEmail",
+                googleTestUserProperties.refreshToken,
+                googleTestUserProperties.accessToken,
+                googleTestUserProperties.expiresAt,
+                googleTestUserProperties.scope
+            )
+        )
+        val testAppUserId: UUID = appUserRepository.save(testAppUser).id ?: UUID.randomUUID()
+
+        // Given
+        val principal = testAppUserId.toString()
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(
+                principal,
+                "{noop}",
+                listOf(SimpleGrantedAuthority("ROLE_USER"))
+            )
+
+        // When, Then
+//        val expectedReport = SubscriptionReportResponseDto(listOf())
         customClient
             .get()
-            .uri("/subscriptions/analysis")
+            .uri("/reports")
             .exchange()
             .expectStatus()
             .isOk()
             .expectBody<SubscriptionReportResponseDto>()
-            .consumeWith { response ->
-                logger.debug { "response: $response" }
-                val accountReports = response.responseBody?.accountReports ?: emptyList()
-                assert(accountReports.isNotEmpty())
+            .consumeWith { it ->
+                val body = it.responseBody
+                assertThat(body).isNotNull()
+                assertThat(body?.accountReports).isNotEmpty()
 
-                accountReports.forEach { report ->
-                    assert(report.subscriptions.isNotEmpty()) {
-                        "Account ${report.googleAccount.name} has no subscriptions"
-                    }
-                }
+                logger.debug { body }
             }
-
     }
 }
