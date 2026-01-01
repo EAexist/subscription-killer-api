@@ -124,14 +124,14 @@ class ServiceProviderServiceTest() {
             }
 
             every {
-                mockServiceProviderRepository.findByAliasName(netflixDisplayName)
+                mockServiceProviderRepository.findByAliasNameWithEmailSources(netflixDisplayName)
             } returns
                     dataFactory.createServiceProvider(
                         netflixDisplayName, null
                     )
 
             every {
-                mockServiceProviderRepository.findByAliasName(sketchfabDisplayName)
+                mockServiceProviderRepository.findByAliasNameWithEmailSources(sketchfabDisplayName)
             } returns
                     dataFactory.createServiceProvider(
                         sketchfabDisplayName, null

@@ -25,6 +25,10 @@ class ServiceProviderService(
         return serviceProviderRepository.findAll()
     }
 
+    fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider> {
+        return serviceProviderRepository.findAllWithEmailSourcesAndAliases()
+    }
+
     fun save(serviceProvider: ServiceProvider): ServiceProvider {
         return serviceProviderRepository.save(serviceProvider)
     }
@@ -33,8 +37,8 @@ class ServiceProviderService(
         return serviceProviderRepository.saveAll(serviceProviders)
     }
 
-    fun findByActiveEmailAddressesIn(addresses: List<String>): List<ServiceProvider> {
-        return serviceProviderRepository.findByActiveEmailAddressesIn(addresses)
+    fun findByActiveEmailAddressesInWithEmailSources(addresses: List<String>): List<ServiceProvider> {
+        return serviceProviderRepository.findByActiveEmailAddressesInWithEmailSources(addresses)
     }
 
     fun addEmailSourcesFromMessages(messages: List<GmailMessage>): List<ServiceProvider> {
@@ -61,8 +65,8 @@ class ServiceProviderService(
 
         aliasNameToNewEmails.forEach { (aliasName, emails) ->
             //@TODO Optimize
-            val emailOwningServiceProvider = serviceProviderRepository.findByAliasName(aliasName)
-            emailOwningServiceProvider?.let { serviceProvider ->
+            val emailOwningServiceProviders = serviceProviderRepository.findByAliasNameWithEmailSources(aliasName)
+            emailOwningServiceProviders?.let { serviceProvider ->
                 serviceProvider.addAllEmailSources(emails.map { EmailSource(null, it) })
                 updatedProviders.add(serviceProvider)
             }

@@ -5,9 +5,13 @@ import java.util.*
 
 @Entity
 class AppUser(
+
     @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: UUID? = null,
     var name: String,
-    @Enumerated(EnumType.STRING) var userRole: UserRoleType = UserRoleType.USER,
+
+    @Enumerated(EnumType.STRING)
+    var userRole: UserRoleType = UserRoleType.USER,
+    
     @OneToMany(mappedBy = "appUser", cascade = [CascadeType.ALL], orphanRemoval = true)
     var googleAccounts: MutableList<GoogleAccount> = mutableListOf()
 ) {

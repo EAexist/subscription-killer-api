@@ -6,6 +6,7 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
+import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
@@ -32,6 +33,8 @@ private val logger = KotlinLogging.logger {}
 
 @ExtendWith(MockitoExtension::class)
 class SubscriptionAnalysisServiceTest(
+//    private val gmailClientFactory: GmailClientFactory,
+//    private val gmailClientAdapter: GmailClientAdapter,
 ) {
     private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
 
@@ -39,21 +42,26 @@ class SubscriptionAnalysisServiceTest(
 
     private val serviceProviderService = mockk<ServiceProviderService>()
 
-    private val multiAccountGmailAggregationService = mockk<MultiAccountGmailAggregationService>()
+    private val appUserService = mockk<AppUserService>()
 
     private val gmailClientFactory = mockk<GmailClientFactory>()
 
     private val mockGmailClientAdapter = mockk<GmailClientAdapter>()
 
+    private val progressService = mockk<ProgressService>(relaxUnitFun = true)
+
     private val testMailProperties = MailProperties(analysisMonths = 13L)
 
     private val subscriptionAnalysisService = SubscriptionAnalysisService(
         googleAccountRepository,
-        multiAccountGmailAggregationService,
+        appUserService,
         serviceProviderService,
         gmailClientFactory,
-        testMailProperties
+        testMailProperties,
+        progressService
     )
+
+    private val testAppUserId: UUID = UUID.randomUUID()
 
     private val mockNetflixServiceProvider: ServiceProvider =
         dataFactory.createServiceProvider(
@@ -136,29 +144,29 @@ class SubscriptionAnalysisServiceTest(
                 )
 
             every {
-                googleAccountRepository.findById(fakeGoogleAccountA.subject!!)
-            } answers { Optional.of(fakeGoogleAccountA) }
+                googleAccountRepository.findByIdWithSubscriptionsAndProviders(fakeGoogleAccountA.subject!!)
+            } answers { fakeGoogleAccountA }
             every {
-                googleAccountRepository.findById(fakeGoogleAccountB.subject!!)
-            } answers { Optional.of(fakeGoogleAccountB) }
+                googleAccountRepository.findByIdWithSubscriptionsAndProviders(fakeGoogleAccountB.subject!!)
+            } answers { fakeGoogleAccountB }
 
             every { googleAccountRepository.save(any<GoogleAccount>()) } answers {
                 firstArg<GoogleAccount>()
             }
 
             every {
-                multiAccountGmailAggregationService.getGoogleAccountSubjects()
+                appUserService.findGoogleAccountSubjectsByAppUserId(any<UUID>())
             } answers {
                 listOfNotNull(fakeGoogleAccountA.subject, fakeGoogleAccountB.subject)
             }
 
             every {
-                serviceProviderService.findAll()
+                serviceProviderService.findAllWithEmailSourcesAndAliases()
             } returns
                     mockServiceProviders
 
             every {
-                serviceProviderService.findByActiveEmailAddressesIn(any())
+                serviceProviderService.findByActiveEmailAddressesInWithEmailSources(any())
             } returns
                     mockServiceProviders
 
@@ -186,7 +194,7 @@ class SubscriptionAnalysisServiceTest(
             }
 
             // When
-            val result: SubscriptionReportResponseDto = subscriptionAnalysisService.analyze()
+            val result: SubscriptionReportResponseDto = subscriptionAnalysisService.analyze(testAppUserId)
 
             // Then
             logger.debug { "[subscriptionAnalysisService.analyze] result: $result" }

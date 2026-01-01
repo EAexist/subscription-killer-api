@@ -96,6 +96,9 @@ logging:
         security.oauth2: DEBUG
         security.oauth2.client: DEBUG
         session: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type.descriptor.sql.BasicBinder: TRACE
     web.filter: DEBUG
 ---
 spring:

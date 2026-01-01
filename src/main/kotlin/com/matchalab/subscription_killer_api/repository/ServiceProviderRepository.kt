@@ -10,14 +10,23 @@ import java.util.*
 
 interface ServiceProviderRepository : JpaRepository<ServiceProvider, UUID> {
 
+    fun findByDisplayName(displayName: String): ServiceProvider?
+
     @Query("SELECT sp FROM ServiceProvider sp JOIN sp.aliasNames a WHERE KEY(a) = :locale AND VALUE(a) = :aliasName")
     fun findByLocaleAndAlias(
         @Param("locale") locale: LocaleType?,
         @Param("aliasName") aliasName: String?
     ): ServiceProvider?
 
-    @Query("SELECT sp FROM ServiceProvider sp JOIN sp.aliasNames a WHERE VALUE(a) = :aliasName")
-    fun findByAliasName(@Param("aliasName") aliasName: String?): ServiceProvider?
+    @Query(
+        """
+        SELECT DISTINCT sp FROM ServiceProvider sp 
+        LEFT JOIN FETCH sp.emailSources 
+        JOIN sp.aliasNames a 
+        WHERE VALUE(a) = :aliasName
+    """
+    )
+    fun findByAliasNameWithEmailSources(@Param("aliasName") aliasName: String?): ServiceProvider?
 
     @Query(
         """
@@ -32,10 +41,22 @@ interface ServiceProviderRepository : JpaRepository<ServiceProvider, UUID> {
         """
         SELECT DISTINCT sp 
         FROM ServiceProvider sp 
-        JOIN sp.emailSources es 
+        JOIN FETCH sp.emailSources es 
         WHERE es.isActive = true 
         AND es.targetAddress IN :addressList
     """
     )
-    fun findByActiveEmailAddressesIn(addressList: List<String>): List<ServiceProvider>
+    fun findByActiveEmailAddressesInWithEmailSources(addressList: List<String>): List<ServiceProvider>
+
+    @Query("SELECT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.emailSources WHERE sp.id = :id")
+    fun findByIdWithEmailSources(id: UUID): ServiceProvider?
+
+    @Query(
+        """
+    SELECT DISTINCT sp FROM ServiceProvider sp 
+    LEFT JOIN FETCH sp.emailSources 
+    LEFT JOIN FETCH sp.aliasNames
+"""
+    )
+    fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider>
 }
