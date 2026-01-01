@@ -90,6 +90,8 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation("io.projectreactor:reactor-test:3.8.1")
 
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
