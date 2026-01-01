@@ -91,7 +91,10 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test:3.8.1")
 
     implementation("org.springframework.boot:spring-boot-starter-aop")
-
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-observation")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.github.micrometer:context-propagation-kotlin:1.0.2")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
