@@ -6,9 +6,8 @@ import java.util.*
 
 @Entity
 class ServiceProvider(
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id")
     var id: UUID? = null,
-
     val displayName: String,
 
     @ElementCollection
@@ -34,8 +33,11 @@ class ServiceProvider(
     val paymentCycle: PaymentCycle? = null,
 
     @OneToMany(mappedBy = "serviceProvider", cascade = [CascadeType.ALL])
-    val subscriptions: List<Subscription> = mutableListOf(),
+    val subscriptions: MutableList<Subscription> = mutableListOf(),
 ) {
+    val requiredId: UUID
+        get() = checkNotNull(id) { "🚨 Entity must be saved before accessing ID" }
+
     val activeEmailSources: List<EmailSource> get() = emailSources.filter { it.isActive }
     val emailSearchAddresses: List<String> get() = activeEmailSources.map { it.targetAddress }
     val emailSearchAliasNames: Map<String, String>? get() = if (isEmailDetectionRuleComplete()) aliasNames else null

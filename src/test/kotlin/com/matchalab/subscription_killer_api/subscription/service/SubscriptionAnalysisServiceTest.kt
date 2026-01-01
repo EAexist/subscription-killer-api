@@ -8,8 +8,6 @@ import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
-import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
@@ -18,6 +16,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -28,6 +27,7 @@ import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -127,22 +127,6 @@ class SubscriptionAnalysisServiceTest(
                     )
                 )
 
-            val expectedSubscriptionReportResponseDto: SubscriptionReportResponseDto =
-                SubscriptionReportResponseDto(
-                    listOf(
-                        AccountReportDto(
-                            expectedSubscriptions,
-                            fakeGoogleAccountA.toResponseDto(),
-                            null
-                        ),
-                        AccountReportDto(
-                            expectedSubscriptions,
-                            fakeGoogleAccountB.toResponseDto(),
-                            null
-                        )
-                    )
-                )
-
             every {
                 googleAccountRepository.findByIdWithSubscriptionsAndProviders(fakeGoogleAccountA.subject!!)
             } answers { fakeGoogleAccountA }
@@ -159,6 +143,16 @@ class SubscriptionAnalysisServiceTest(
             } answers {
                 listOfNotNull(fakeGoogleAccountA.subject, fakeGoogleAccountB.subject)
             }
+
+            every {
+                serviceProviderService.findByIdWithSubscriptions(mockNetflixServiceProvider.requiredId)
+            } returns
+                    mockNetflixServiceProvider
+
+            every {
+                serviceProviderService.findByIdWithSubscriptions(mockSketchfabServiceProvider.requiredId)
+            } returns
+                    mockSketchfabServiceProvider
 
             every {
                 serviceProviderService.findAllWithEmailSourcesAndAliases()
@@ -194,19 +188,22 @@ class SubscriptionAnalysisServiceTest(
             }
 
             // When
-            val result: SubscriptionReportResponseDto = subscriptionAnalysisService.analyze(testAppUserId)
+            subscriptionAnalysisService.analyze(testAppUserId)
+
+            val capturedAccounts = mutableListOf<GoogleAccount>()
+
+            verify(exactly = 2) {
+                googleAccountRepository.save(capture(capturedAccounts))
+            }
 
             // Then
-            logger.debug { "[subscriptionAnalysisService.analyze] result: $result" }
+            logger.debug { "[subscriptionAnalysisService.analyze] capturedAccounts: $capturedAccounts" }
 
-            assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .ignoringFields("accountReports.analyzedAt")
-                .isEqualTo(expectedSubscriptionReportResponseDto)
-
-            assertThat(result.accountReports).allSatisfy { accountReport ->
-                assertThat(accountReport.analyzedAt)
+            assertThat(capturedAccounts).allSatisfy { capturedAccount ->
+                assertThat(capturedAccount.subscriptions.map { it.toResponseDto() }).isNotEmpty()
+                    .usingRecursiveComparison()
+                    .isEqualTo(expectedSubscriptions)
+                assertThat(capturedAccount.analyzedAt)
                     .isBetween(Instant.now().minus(Duration.ofMinutes(10)), Instant.now())
             }
         }

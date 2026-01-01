@@ -151,17 +151,15 @@ constructor(
     fun `when subscribed analysis server-sent event should return progress`() {
 
         // When, Then
-        val result = authedClient.get()
+        val eventStream: Flux<AnalysisProgressStatusDto> = authedClient.get()
             .uri("/api/v1/reports/analysis/progress")
             .accept(MediaType.TEXT_EVENT_STREAM)
             .exchange()
             .expectStatus().isOk()
             .returnResult<AnalysisProgressStatusDto>()
-//            .responseBody.doOnNext { logger.debug { "\uD83D\uDE80 [Flux Event] $it" } }
-
-        val eventStream: Flux<AnalysisProgressStatusDto> = result.responseBody.doOnNext { status ->
-            println("\uD83D\uDC1E Received status: $status")
-        }
+            .responseBody.doOnNext { status ->
+                println("\uD83D\uDC1E Received status: $status")
+            }
 
         StepVerifier.create(eventStream).expectSubscription()
             .then {

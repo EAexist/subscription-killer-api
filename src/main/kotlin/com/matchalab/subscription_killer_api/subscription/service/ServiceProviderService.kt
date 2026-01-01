@@ -9,6 +9,7 @@ import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.utils.toDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -21,8 +22,8 @@ class ServiceProviderService(
 ) {
     val maxNumberOfEmailDetectionRuleAnalysis: Long = 40
 
-    fun findAll(): List<ServiceProvider> {
-        return serviceProviderRepository.findAll()
+    fun findByIdWithSubscriptions(id: UUID): ServiceProvider? {
+        return serviceProviderRepository.findByIdWithSubscriptions(id)
     }
 
     fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider> {
@@ -85,8 +86,7 @@ class ServiceProviderService(
         logger.debug { "[updateEmailDetectionRules]" }
 
         val isEmailDetectionRuleAnalysisAvailable =
-            provider.id?.let { subscriptionRepository.countByServiceProviderId(it) < maxNumberOfEmailDetectionRuleAnalysis }
-                ?: false
+            subscriptionRepository.countByServiceProviderId(provider.requiredId) < maxNumberOfEmailDetectionRuleAnalysis
 
         if ((!provider.isEmailDetectionRuleComplete()) && isEmailDetectionRuleAnalysisAvailable) {
             provider.emailSources.forEach { emailSource ->
@@ -114,4 +114,15 @@ class ServiceProviderService(
         return save(provider)
     }
 
+//    fun findByIdOrNull(id: UUID): ServiceProvider? {
+//        return serviceProviderRepository.findByIdOrNull(id)
+//    }
+//
+//    fun findAll(): List<ServiceProvider> {
+//        return serviceProviderRepository.findAll()
+//    }
+//
+//    fun fetchWithEmailSources(providers: List<ServiceProvider>): List<ServiceProvider> {
+//        return serviceProviderRepository.fetchWithEmailSources(providers)
+//    }
 }

@@ -7,12 +7,9 @@ import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisProgressStatusDto
 import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisStatusType
-import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
-import com.matchalab.subscription_killer_api.utils.toReportDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -20,7 +17,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -50,37 +46,53 @@ class SubscriptionAnalysisService(
         val isNotSureIfPaymentIsOngoing: Boolean = false,
     )
 
-    @Transactional
-    suspend fun analyze(appUserId: UUID): SubscriptionReportResponseDto {
+    data class SubscriptionDto(
+        val serviceProviderId: UUID,
+        val registeredSince: Instant?,
+        val paidSince: Instant?,
+        val isNotSureIfPaymentIsOngoing: Boolean,
+        val hasSubscribedNewsletterOrAd: Boolean
+    )
+
+    suspend fun analyze(appUserId: UUID) {
 
         val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
-        val accountReports: List<AccountReportDto> = coroutineScope {
+        coroutineScope {
             googleAccountSubjects.map { subject ->
                 async(Dispatchers.IO) {
-                    val googleAccount: GoogleAccount =
-                        googleAccountRepository.findByIdWithSubscriptionsAndProviders(subject)
-                            ?: throw IllegalStateException(
-                                "Google Account not found for subject=$subject"
-                            )
                     // @TOOD Prevent Frequent Re-analysis
-                    val subscriptions: List<Subscription> = analyzeSingleGoogleAccount(appUserId, subject)
-                    googleAccount.updateSubscriptions(subscriptions)
-                    googleAccount.analyzedAt = Instant.now()
-
-                    val updatedGoogleAccount: GoogleAccount =
-                        googleAccountRepository.save(googleAccount)
-
-                    val accountReport: AccountReportDto = updatedGoogleAccount.toReportDto()
-                    accountReport
+                    val subscriptionDtos: List<SubscriptionDto> = analyzeSingleGoogleAccount(appUserId, subject)
+                    saveAndMapToDto(subject, subscriptionDtos)
                 }
             }
         }.awaitAll()
-
-        return SubscriptionReportResponseDto(accountReports)
     }
 
-    suspend fun analyzeSingleGoogleAccount(appUserId: UUID, googleAccountSubject: String): List<Subscription> {
+    fun saveAndMapToDto(subject: String, subscriptionDtos: List<SubscriptionDto>) {
+        val googleAccount: GoogleAccount =
+            googleAccountRepository.findByIdWithSubscriptionsAndProviders(subject)
+                ?: throw IllegalStateException(
+                    "Google Account not found for subject=$subject"
+                )
+        subscriptionDtos.forEach { it ->
+            val serviceProvider =
+                serviceProviderService.findByIdWithSubscriptions(it.serviceProviderId) ?: throw IllegalStateException()
+            val subscription = Subscription(
+                registeredSince = it.registeredSince,
+                hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd,
+                paidSince = it.paidSince,
+                isNotSureIfPaymentIsOngoing = it.isNotSureIfPaymentIsOngoing,
+                serviceProvider = serviceProvider,
+                googleAccount = googleAccount
+            )
+            subscription.associateWithParents(serviceProvider, googleAccount)
+        }
+        googleAccount.analyzedAt = Instant.now()
+        googleAccountRepository.save(googleAccount)
+    }
+
+    suspend fun analyzeSingleGoogleAccount(appUserId: UUID, googleAccountSubject: String): List<SubscriptionDto> {
         try {
 
             logger.debug { "[analyzeSingleGoogleAccount] googleAccountSubject: $googleAccountSubject" }
@@ -133,10 +145,11 @@ class SubscriptionAnalysisService(
                     messages.groupBy { it.senderEmail }
                 }
 
-            val subscriptions: List<Subscription> = coroutineScope {
+            val subscriptions: List<SubscriptionDto> = coroutineScope {
                 serviceProviderToAddressToMessages.mapNotNull { (serviceProvider, addressToMessages) ->
                     async(Dispatchers.IO) {
-                        val subscription = analyzeServiceProvider(serviceProvider, addressToMessages)
+                        val subscriptionDto: SubscriptionDto =
+                            analyzeServiceProvider(serviceProvider, addressToMessages)
                         progressService.setProgress(
                             appUserId,
                             googleAccountSubject,
@@ -145,7 +158,7 @@ class SubscriptionAnalysisService(
                                 mapOf("serviceProviderDisplayName" to serviceProvider.displayName)
                             )
                         )
-                        subscription
+                        subscriptionDto
                     }
                 }.awaitAll().filterNotNull()
             }
@@ -166,7 +179,7 @@ class SubscriptionAnalysisService(
     fun analyzeServiceProvider(
         serviceProvider: ServiceProvider,
         addressToMessages: Map<String, List<GmailMessage>>
-    ): Subscription {
+    ): SubscriptionDto {
         logger.debug { "[analyzeServiceProvider]" }
 
         val updatedServiceProvider: ServiceProvider =
@@ -175,13 +188,12 @@ class SubscriptionAnalysisService(
         val registeredSince: Instant? = computeRegisteredSince()
         val paidSinceResult: PaidSinceDto = computePaidSince(updatedServiceProvider, addressToMessages)
         val hasSubscribedNewsletterOrAd: Boolean = false
-
-        return Subscription(
+        return SubscriptionDto(
+            serviceProviderId = updatedServiceProvider.requiredId,
             registeredSince = registeredSince,
             hasSubscribedNewsletterOrAd = hasSubscribedNewsletterOrAd,
             paidSince = paidSinceResult.paidSince,
             isNotSureIfPaymentIsOngoing = paidSinceResult.isNotSureIfPaymentIsOngoing,
-            serviceProvider = updatedServiceProvider,
         )
     }
 

@@ -10,6 +10,15 @@ interface GoogleAccountRepository : JpaRepository<GoogleAccount, String> {
         """
         SELECT DISTINCT ga FROM GoogleAccount ga 
         LEFT JOIN FETCH ga.subscriptions s
+        WHERE ga.subject = :subject
+    """
+    )
+    fun findByIdWithSubscriptions(subject: String): GoogleAccount?
+
+    @Query(
+        """
+        SELECT DISTINCT ga FROM GoogleAccount ga 
+        LEFT JOIN FETCH ga.subscriptions s
         LEFT JOIN FETCH s.serviceProvider 
         WHERE ga.subject = :subject
     """

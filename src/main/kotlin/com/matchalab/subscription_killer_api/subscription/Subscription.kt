@@ -26,9 +26,17 @@ class Subscription(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_provider_id", nullable = false)
-    val serviceProvider: ServiceProvider,
+    var serviceProvider: ServiceProvider,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "google_account_id", nullable = false)
     var googleAccount: GoogleAccount? = null,
-) {}
+) {
+    fun associateWithParents(serviceProvider: ServiceProvider, googleAccount: GoogleAccount) {
+        this.serviceProvider = serviceProvider
+        serviceProvider.subscriptions.add(this)
+
+        this.googleAccount = googleAccount
+        googleAccount.subscriptions.add(this)
+    }
+}

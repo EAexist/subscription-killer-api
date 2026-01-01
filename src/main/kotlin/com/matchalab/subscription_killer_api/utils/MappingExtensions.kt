@@ -48,6 +48,13 @@ fun Subscription.toResponseDto(): SubscriptionResponseDto {
     )
 }
 
+fun ServiceProvider.toDto(): ServiceProviderDto {
+    return ServiceProviderDto(
+        this.displayName,
+        this.isEmailDetectionRuleAvailable()
+    )
+}
+
 fun Message.toGmailMessage(): GmailMessage? {
 
 //    logger.debug { "Message.toGmailMessage() Message: ${this.toString()}" }
@@ -75,9 +82,3 @@ fun Message.toGmailMessage(): GmailMessage? {
 fun GmailMessage.toSummaryDto(): GmailMessageSummaryDto =
     GmailMessageSummaryDto(this.subject, this.snippet)
 
-fun ServiceProvider.toDto(): ServiceProviderDto {
-    return ServiceProviderDto(
-        this.displayName,
-        this.isEmailDetectionRuleAvailable()
-    )
-}
