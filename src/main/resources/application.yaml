@@ -78,6 +78,8 @@ spring:
   config:
     activate:
       on-profile: dev
+  reactor:
+    context-propagation: auto
 app:
   cors:
     allowed-origins:
@@ -88,7 +90,7 @@ app:
     analysis-months: 8
 logging:
   pattern:
-  #    level: "%5p [${spring.threads.virtual.enabled:}] %-40.40logger{39} : %m%n"
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     com.matchalab.subscription_killer_api: DEBUG
     org:
@@ -102,6 +104,14 @@ logging:
         SQL: DEBUG
 #        type.descriptor.sql.BasicBinder: TRACE
 #    web.filter: DEBUG
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
 ---
 spring:
   config:

@@ -9,92 +9,115 @@ import com.google.api.services.gmail.model.ListMessagesResponse
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.utils.observeSuspend
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.micrometer.observation.annotation.Observed
-import kotlinx.coroutines.Dispatchers
+import io.micrometer.observation.ObservationRegistry
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.IOException
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-open class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapter {
+open class GmailClientAdapterImpl(
+    private val gmailClient: Gmail,
+    private val observationRegistry: ObservationRegistry
+) : GmailClientAdapter {
 
     private val userId = "me"
-    private val mutex = Mutex() // Forces sequential execution
+    private val semaphore = Semaphore(5)
+    private val getRequestChunkSize = 100
 
-    @Observed
-    open override suspend fun listMessageIds(query: String): List<String> = withContext(Dispatchers.IO) {
+    open override suspend fun listMessageIds(query: String): List<String> {
+        val parent = observationRegistry.currentObservation
 
-        logger.debug { "\uD83D\uDE80 query: $query" }
+        return observationRegistry.observeSuspend(
+            "gmail.listMessageIds",
+            parent,
+            "gmail.query" to query
+        ) {
 
-        val messages = mutableListOf<Message>()
-        var pageToken: String? = null
+            logger.debug { "\uD83D\uDE80 query: $query" }
 
-        do {
-            val listResponse: ListMessagesResponse =
-                try {
-                    gmailClient
-                        .users()
-                        .messages()
-                        .list(userId)
-                        .setQ(query)
-                        .setPageToken(pageToken)
-                        .setMaxResults(1L)
-                        .execute()
-                } catch (e: Exception) {
-                    println("Error listing messages: ${e.message}")
+            val messageIds = mutableListOf<String>()
+            var pageToken: String? = null
+
+            do {
+                val listResponse: ListMessagesResponse =
+                    try {
+                        gmailClient
+                            .users()
+                            .messages()
+                            .list(userId)
+                            .setQ(query)
+                            .setPageToken(pageToken)
+                            .setMaxResults(500L)
+                            .execute()
+                    } catch (e: Exception) {
+                        println("Error listing messages: ${e.message}")
+                        break
+                    }
+
+                val pageMessages = listResponse.messages ?: emptyList()
+                pageToken = listResponse.nextPageToken
+
+                if (pageMessages.isEmpty()) {
                     break
                 }
 
-            val pageMessages = listResponse.messages ?: emptyList()
-            pageToken = listResponse.nextPageToken
+                pageMessages.forEach { message -> message?.let { messageIds.add(it.id) } }
 
-            if (pageMessages.isEmpty()) {
-                break
-            }
-
-            pageMessages.filterNotNull().forEach { messages.add(it) }
-        } while (pageToken != null)
+            } while (pageToken != null)
 
 
-        logger.debug { "[listMessageIds] fetched ${messages.size} messages" }
-        messages.map { it.id }
+            logger.debug { "[listMessageIds] fetched ${messageIds.size} messages" }
+            messageIds
+        }
     }
 
-    @Observed
-    open override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
-        withContext(Dispatchers.IO) {
-            val results = Collections.synchronizedList(mutableListOf<Message>())
+    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
 
-            messageIds.chunked(25).forEach { chunk ->
-                // 1. Ensure only one batch processes at a time
-                mutex.withLock {
-                    retryWithBackoff {
-                        executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
-                            override fun onSuccess(m: Message?, h: HttpHeaders) {
-                                m?.let { results.add(it) }
-                            }
+        val parent = observationRegistry.currentObservation
 
-                            override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
-                                if (e.code == 429) throw RateLimitException(e.message)
-                                else logger.error { "Permanent failure: ${e.message}" }
+        return observationRegistry.observeSuspend<List<GmailMessage>>(
+            "gmail.getMessages",
+            parent,
+            "gmail.fields" to plan.fields
+        ) {
+            coroutineScope {
+                messageIds.chunked(getRequestChunkSize)
+                    .map { chunk ->
+                        async {
+                            semaphore.withPermit {
+                                retryWithBackoff {
+                                    val chunkResults = mutableListOf<Message>()
+                                    executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
+                                        override fun onSuccess(m: Message?, h: HttpHeaders) {
+                                            m?.let { chunkResults.add(it) }
+                                        }
+
+                                        override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
+                                            if (e.code == 429) throw RateLimitException(e.message)
+                                        }
+                                    }) { id ->
+                                        gmailClient.users().messages().get(userId, id)
+                                            .setFormat(plan.format)
+                                            .setFields(plan.fields)
+                                    }
+                                    chunkResults
+                                }
                             }
-                        }) { id ->
-                            gmailClient.users().messages().get("me", id)
-                                .setFormat(plan.format)
-                                .setFields(plan.fields)
                         }
-                    }
-                    delay(100)
-                }
+                    }.awaitAll()
+                    .flatten()
+                    .mapNotNull { it.toGmailMessage() }
             }
-            results.mapNotNull { it.toGmailMessage() }
         }
+    }
 
     suspend fun <T> retryWithBackoff(
         maxRetries: Int = 5,

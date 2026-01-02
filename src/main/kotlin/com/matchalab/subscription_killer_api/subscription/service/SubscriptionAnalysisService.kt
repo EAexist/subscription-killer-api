@@ -11,7 +11,10 @@ import com.matchalab.subscription_killer_api.subscription.progress.service.Progr
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
+import com.matchalab.subscription_killer_api.utils.observe
+import com.matchalab.subscription_killer_api.utils.observeSuspend
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.ObservationRegistry
 import io.micrometer.observation.annotation.Observed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -37,7 +40,8 @@ class SubscriptionAnalysisService(
     private val serviceProviderService: ServiceProviderService,
     private val clientFactory: GmailClientFactory,
     private val mailProperties: MailProperties,
-    private val progressService: ProgressService
+    private val progressService: ProgressService,
+    private val observationRegistry: ObservationRegistry,
 ) {
 
     val after: Instant = DateTimeUtils.minusMonthsFromInstant(Instant.now(), mailProperties.analysisMonths)
@@ -56,7 +60,6 @@ class SubscriptionAnalysisService(
         val hasSubscribedNewsletterOrAd: Boolean
     )
 
-    @Observed
     suspend fun analyze(appUserId: UUID) {
 
         val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
@@ -104,125 +107,137 @@ class SubscriptionAnalysisService(
 
     @Observed
     suspend fun analyzeSingleGoogleAccount(appUserId: UUID, googleAccountSubject: String): List<SubscriptionDto> {
-        try {
 
-            logger.debug { "\n\uD83D\uDE80 [analyzeSingleGoogleAccount] googleAccountSubject: $googleAccountSubject" }
+        val parent = observationRegistry.currentObservation
 
-            // List Gmail Messages
-            val gmailClientAdapter: GmailClientAdapter =
-                clientFactory.createAdapter(googleAccountSubject)
-            val afterPart: String = "after:${after.epochSecond}"
+        return observationRegistry.observeSuspend(
+            "analysis.account",
+            parent,
+            "googleAccount.subject" to googleAccountSubject
+        ) {
+            try {
 
-            val allServiceProviders: List<ServiceProvider> = serviceProviderService.findAllWithEmailSourcesAndAliases()
+                logger.debug { "\n\uD83D\uDE80 [analyzeSingleGoogleAccount] googleAccountSubject: $googleAccountSubject" }
 
-            val allEmailAddressesAndAliasNames: List<String> = allServiceProviders.flatMap {
-                it.emailSearchAddresses + (it.emailSearchAliasNames?.values ?: emptyList())
-            }
+                // List Gmail Messages
+                val gmailClientAdapter: GmailClientAdapter =
+                    clientFactory.createAdapter(googleAccountSubject)
+                val afterPart: String = "after:${after.epochSecond}"
 
-            if (allEmailAddressesAndAliasNames.isEmpty()) {
-                return emptyList()
-            }
+                val allServiceProviders: List<ServiceProvider> =
+                    serviceProviderService.findAllWithEmailSourcesAndAliases()
 
-            val fromPart = allEmailAddressesAndAliasNames.joinToString(separator = " OR ") {
-                "from:\"$it\""
-            }
-            val listMessageQuery = String.format("%s (%s)", afterPart, fromPart)
-            val allMessageIds: List<String> = gmailClientAdapter.listMessageIds(listMessageQuery)
-
-            val allMessages: List<GmailMessage> =
-                gmailClientAdapter.getMessages(allMessageIds, MessageFetchPlan.INTERNAL_DATE_SNIPPET_FROM_SUBJECT)
-
-            progressService.setProgress(
-                appUserId,
-                googleAccountSubject, AnalysisProgressStatus.EMAIL_FETCHED
-            )
-
-            // Add New Email Addresses identified from aliasNames
-            // @TODO: optimize
-            serviceProviderService.addEmailSourcesFromMessages(allMessages)
-
-            logger.debug {
-                "\uD83D\uDC1E [analyzeSingleGoogleAccount] allServiceProviders:\n${
-                    serviceProviderService.findAllWithEmailSources().joinToString("\n") {
-                        "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
-                    }
-                }"
-            }
-
-            // Analyze Subscription Status
-            val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
-            val serviceProviders = serviceProviderService.findByActiveEmailAddressesInWithEmailSources(uniqueAddresses)
-
-            logger.debug {
-                "\uD83D\uDC1E [analyzeSingleGoogleAccount] serviceProviders:\n${
-                    serviceProviders.joinToString("\n") {
-                        "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
-                    }
-                }"
-            }
-
-            val addressToServiceProvider = serviceProviders.flatMap { serviceProvider ->
-                serviceProvider.emailSources.map { it.targetAddress to serviceProvider }
-            }.toMap()
-
-            logger.debug {
-                "\uD83D\uDC1E [analyzeSingleGoogleAccount] senderEmails:\n${
-                    allMessages.joinToString(", ") {
-                        it.senderEmail
-                    }
-                }"
-            }
-
-            logger.debug {
-                "\uD83D\uDC1E [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
-                    addressToServiceProvider.entries.joinToString(
-                        "\n"
-                    ) { (key, value) -> "  $key -> $value" }
-                }"
-            }
-
-            val serviceProviderToAddressToMessages = allMessages
-                .mapNotNull { message ->
-                    addressToServiceProvider[message.senderEmail]?.let {
-                        (it to message)
-                    }
-                }.groupBy({ it.first }, { it.second })
-                .mapValues { (_, messages) ->
-                    messages.groupBy { it.senderEmail }
+                val allEmailAddressesAndAliasNames: List<String> = allServiceProviders.flatMap {
+                    it.emailSearchAddresses + (it.emailSearchAliasNames?.values ?: emptyList())
                 }
 
-            val subscriptions: List<SubscriptionDto> = coroutineScope {
-                serviceProviderToAddressToMessages.mapNotNull { (serviceProvider, addressToMessages) ->
-                    async(Dispatchers.IO) {
-                        progressService.setServiceProviderProgress(
-                            appUserId,
-                            googleAccountSubject,
-                            serviceProvider.id!!,
-                            ServiceProviderAnalysisProgressStatus.STARTED
-                        )
-                        val subscriptionDto: SubscriptionDto =
-                            analyzeServiceProvider(serviceProvider, addressToMessages)
-                        progressService.setServiceProviderProgress(
-                            appUserId,
-                            googleAccountSubject,
-                            serviceProvider.id!!,
-                            ServiceProviderAnalysisProgressStatus.COMPLETED
-                        )
-                        subscriptionDto
+                if (allEmailAddressesAndAliasNames.isEmpty()) {
+                    return@observeSuspend emptyList()
+                }
+
+                val fromPart = allEmailAddressesAndAliasNames.joinToString(separator = " OR ") {
+                    "from:\"$it\""
+                }
+                val listMessageQuery = String.format("%s (%s)", afterPart, fromPart)
+                val allMessageIds: List<String> = gmailClientAdapter.listMessageIds(listMessageQuery)
+
+                val allMessages: List<GmailMessage> =
+                    gmailClientAdapter.getMessages(allMessageIds, MessageFetchPlan.INTERNAL_DATE_SNIPPET_FROM_SUBJECT)
+
+                progressService.setProgress(
+                    appUserId,
+                    googleAccountSubject, AnalysisProgressStatus.EMAIL_FETCHED
+                )
+
+                // Add New Email Addresses identified from aliasNames
+                // @TODO: optimize
+                serviceProviderService.addEmailSourcesFromMessages(allMessages)
+
+//                logger.debug {
+//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] allServiceProviders:\n${
+//                        serviceProviderService.findAllWithEmailSources().joinToString("\n") {
+//                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
+//                        }
+//                    }"
+//                }
+
+                // Analyze Subscription Status
+                val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
+                val serviceProviders =
+                    serviceProviderService.findByActiveEmailAddressesInWithEmailSources(uniqueAddresses)
+
+//                logger.debug {
+//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] serviceProviders:\n${
+//                        serviceProviders.joinToString("\n") {
+//                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
+//                        }
+//                    }"
+//                }
+
+                val addressToServiceProvider = serviceProviders.flatMap { serviceProvider ->
+                    serviceProvider.emailSources.map { it.targetAddress to serviceProvider }
+                }.toMap()
+
+//                logger.debug {
+//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] senderEmails:\n${
+//                        allMessages.joinToString(", ") {
+//                            it.senderEmail
+//                        }
+//                    }"
+//                }
+//
+//                logger.debug {
+//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
+//                        addressToServiceProvider.entries.joinToString(
+//                            "\n"
+//                        ) { (key, value) -> "  $key -> $value" }
+//                    }"
+//                }
+
+                val serviceProviderToAddressToMessages = allMessages
+                    .mapNotNull { message ->
+                        addressToServiceProvider[message.senderEmail]?.let {
+                            (it to message)
+                        }
+                    }.groupBy({ it.first }, { it.second })
+                    .mapValues { (_, messages) ->
+                        messages.groupBy { it.senderEmail }
                     }
-                }.awaitAll().filterNotNull()
+
+                val subscriptions: List<SubscriptionDto> =
+                    coroutineScope {
+                        serviceProviderToAddressToMessages.mapNotNull { (serviceProvider, addressToMessages) ->
+                            async(Dispatchers.IO) {
+                                progressService.setServiceProviderProgress(
+                                    appUserId,
+                                    googleAccountSubject,
+                                    serviceProvider.id!!,
+                                    ServiceProviderAnalysisProgressStatus.STARTED
+                                )
+                                val subscriptionDto: SubscriptionDto =
+                                    analyzeServiceProvider(serviceProvider, addressToMessages)
+                                progressService.setServiceProviderProgress(
+                                    appUserId,
+                                    googleAccountSubject,
+                                    serviceProvider.id!!,
+                                    ServiceProviderAnalysisProgressStatus.COMPLETED
+                                )
+                                subscriptionDto
+                            }
+                        }.awaitAll()
+                    }
+
+                progressService.setProgress(
+                    appUserId,
+                    googleAccountSubject,
+                    AnalysisProgressStatus.EMAIL_ACCOUNT_ANALYSIS_COMPLETED
+                )
+
+                subscriptions
+            } catch (e: Exception) {
+                logger.error(e) { "Error searching account $googleAccountSubject: ${e.message}" }
+                emptyList()
             }
-
-            progressService.setProgress(
-                appUserId,
-                googleAccountSubject,
-                AnalysisProgressStatus.EMAIL_ACCOUNT_ANALYSIS_COMPLETED
-            )
-
-            return subscriptions
-        } catch (e: Exception) {
-            logger.error(e) { "Error searching account $googleAccountSubject: ${e.message}" }
-            return emptyList()
         }
     }
 
@@ -230,21 +245,38 @@ class SubscriptionAnalysisService(
         serviceProvider: ServiceProvider,
         addressToMessages: Map<String, List<GmailMessage>>
     ): SubscriptionDto {
-        logger.debug { "\uD83D\uDE80 [analyzeServiceProvider]" }
 
-        val updatedServiceProvider: ServiceProvider =
-            serviceProviderService.updateEmailDetectionRules(serviceProvider, addressToMessages)
+        val parent = observationRegistry.currentObservation
 
-        val registeredSince: Instant? = computeRegisteredSince()
-        val paidSinceResult: PaidSinceDto = computePaidSince(updatedServiceProvider, addressToMessages)
-        val hasSubscribedNewsletterOrAd: Boolean = false
-        return SubscriptionDto(
-            serviceProviderId = updatedServiceProvider.requiredId,
-            registeredSince = registeredSince,
-            hasSubscribedNewsletterOrAd = hasSubscribedNewsletterOrAd,
-            paidSince = paidSinceResult.paidSince,
-            isNotSureIfPaymentIsOngoing = paidSinceResult.isNotSureIfPaymentIsOngoing,
-        )
+        return observationRegistry.observe(
+            "analysis.serviceProvider",
+            parent,
+            "serviceProvider.displayName" to serviceProvider.displayName
+        ) {
+
+            logger.debug { "\uD83D\uDE80 [analyzeServiceProvider] displayName=${serviceProvider.displayName}" }
+            val parent = observationRegistry.currentObservation
+
+//            val updatedServiceProvider: ServiceProvider = observationRegistry.observe(
+//                "serviceProvider.updateRules",
+//                parent
+//            ) {
+            val updatedServiceProvider: ServiceProvider =
+                serviceProviderService.updateEmailDetectionRules(serviceProvider, addressToMessages)
+//            }
+
+            val registeredSince: Instant? = computeRegisteredSince()
+            val paidSinceResult: PaidSinceDto = computePaidSince(updatedServiceProvider, addressToMessages)
+            val hasSubscribedNewsletterOrAd: Boolean = false
+
+            SubscriptionDto(
+                serviceProviderId = updatedServiceProvider.requiredId,
+                registeredSince = registeredSince,
+                hasSubscribedNewsletterOrAd = hasSubscribedNewsletterOrAd,
+                paidSince = paidSinceResult.paidSince,
+                isNotSureIfPaymentIsOngoing = paidSinceResult.isNotSureIfPaymentIsOngoing,
+            )
+        }
     }
 
     fun computeRegisteredSince(

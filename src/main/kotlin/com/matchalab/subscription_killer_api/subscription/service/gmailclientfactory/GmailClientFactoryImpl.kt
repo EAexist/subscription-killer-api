@@ -15,6 +15,8 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapterImpl
+import com.matchalab.subscription_killer_api.utils.observe
+import io.micrometer.observation.ObservationRegistry
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -24,6 +26,7 @@ import java.time.Instant
 class GmailClientFactoryImpl(
     private val googleAccountRepository: GoogleAccountRepository,
     private val googleClientProperties: GoogleClientProperties,
+    private val observationRegistry: ObservationRegistry
 ) : GmailClientFactory {
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
     private val jsonFactory = GsonFactory.getDefaultInstance()
@@ -33,43 +36,53 @@ class GmailClientFactoryImpl(
 
         val authenticatedGmailClient = createClient(credentialsIdentifier)
 
-        return GmailClientAdapterImpl(authenticatedGmailClient)
+        return GmailClientAdapterImpl(authenticatedGmailClient, observationRegistry)
     }
 
     fun createClient(subject: String): Gmail {
-        val googleAccount: GoogleAccount =
-            googleAccountRepository.findById(subject).orElseThrow {
-                IllegalStateException("Google Account not found for subject=$subject")
+
+        val parent = observationRegistry.currentObservation
+
+        return observationRegistry.observe(
+            "gmail.createClient",
+            parent,
+            "googleAccount.subject" to subject
+        ) {
+
+            val googleAccount: GoogleAccount =
+                googleAccountRepository.findById(subject).orElseThrow {
+                    IllegalStateException("Google Account not found for subject=$subject")
+                }
+
+            val oldRefreshToken: String =
+                googleAccount.refreshToken
+                    ?: throw IllegalStateException("Refresh Token missing for subject=$subject")
+
+            val tokenResponse: TokenResponse = refreshTokens(oldRefreshToken)
+
+            val newRefreshToken = tokenResponse.refreshToken
+            val expireadAt: Instant = Instant.now().plusSeconds(tokenResponse.expiresInSeconds)
+            if (newRefreshToken != null && newRefreshToken != oldRefreshToken) {
+                //Encryption
+                googleAccount.updateRefreshToken(newRefreshToken, expireadAt)
+                googleAccountRepository.save(googleAccount)
             }
 
-        val oldRefreshToken: String =
-            googleAccount.refreshToken
-                ?: throw IllegalStateException("Refresh Token missing for subject=$subject")
+            val accessToken: AccessToken = AccessToken(tokenResponse.accessToken, null)
+            val currentRefreshToken = newRefreshToken ?: oldRefreshToken
 
-        val tokenResponse: TokenResponse = refreshTokens(oldRefreshToken)
+            val userCredentials: UserCredentials =
+                UserCredentials.newBuilder()
+                    .setClientId(googleClientProperties.clientId)
+                    .setClientSecret(googleClientProperties.clientSecret)
+                    .setAccessToken(accessToken) // 갱신된 Access Token 사용
+                    .setRefreshToken(currentRefreshToken) // 최신 Refresh Token 사용
+                    .build()
 
-        val newRefreshToken = tokenResponse.refreshToken
-        val expireadAt: Instant = Instant.now().plusSeconds(tokenResponse.expiresInSeconds)
-        if (newRefreshToken != null && newRefreshToken != oldRefreshToken) {
-            //Encryption
-            googleAccount.updateRefreshToken(newRefreshToken, expireadAt)
-            googleAccountRepository.save(googleAccount)
-        }
-
-        val accessToken: AccessToken = AccessToken(tokenResponse.accessToken, null)
-        val currentRefreshToken = newRefreshToken ?: oldRefreshToken
-
-        val userCredentials: UserCredentials =
-            UserCredentials.newBuilder()
-                .setClientId(googleClientProperties.clientId)
-                .setClientSecret(googleClientProperties.clientSecret)
-                .setAccessToken(accessToken) // 갱신된 Access Token 사용
-                .setRefreshToken(currentRefreshToken) // 최신 Refresh Token 사용
+            Gmail.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(userCredentials))
+                .setApplicationName("Your-Multi-User-Gmail-App")
                 .build()
-
-        return Gmail.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(userCredentials))
-            .setApplicationName("Your-Multi-User-Gmail-App")
-            .build()
+        }
     }
 
     /**

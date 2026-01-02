@@ -17,12 +17,15 @@ import com.matchalab.subscription_killer_api.subscription.progress.dto.AppUserAn
 import com.matchalab.subscription_killer_api.subscription.progress.dto.ServiceProviderAnalysisProgressUpdate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityNotFoundException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.ParameterizedTypeReference
@@ -52,6 +55,7 @@ private val logger = KotlinLogging.logger {}
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @EnableConfigurationProperties(GoogleTestUserProperties::class)
+@AutoConfigureObservability
 class SubscriptionControllerIntegrationTest
 @Autowired
 constructor(
@@ -150,7 +154,7 @@ constructor(
     }
 
     @Test
-    fun `when subscribed analysis server-sent event should return progress`() {
+    fun `when subscribed analysis server-sent event should return progress`() = runTest {
 
         // When, Then
         authedClient.post()
@@ -192,6 +196,9 @@ constructor(
             }
             .expectComplete()
             .verify(Duration.ofSeconds(120))
+
+        println("Test finished, waiting for Zipkin flush...")
+        delay(5000)
     }
 
     @Test

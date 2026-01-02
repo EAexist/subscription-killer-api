@@ -6,7 +6,10 @@ import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReport
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionAnalysisService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionReportService
+import com.matchalab.subscription_killer_api.utils.observeSuspend
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.core.instrument.kotlin.asContextElement
+import io.micrometer.observation.ObservationRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.util.*
 
-
 private val logger = KotlinLogging.logger {}
 
 @RestController
@@ -25,7 +27,8 @@ private val logger = KotlinLogging.logger {}
 class SubscriptionReportController(
     private val analysisService: SubscriptionAnalysisService,
     private val progressService: ProgressService,
-    private val reportService: SubscriptionReportService
+    private val reportService: SubscriptionReportService,
+    private val observationRegistry: ObservationRegistry
 ) {
 
     @GetMapping
@@ -40,9 +43,19 @@ class SubscriptionReportController(
     @PostMapping("/analysis")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): SubscriptionAnalysisResponseDto {
+
         progressService.initializeProgress(appUserId)
-        CoroutineScope(Dispatchers.IO).launch {
-            analysisService.analyze(appUserId)
+        
+        val parent = observationRegistry.currentObservation
+
+        CoroutineScope(Dispatchers.IO + observationRegistry.asContextElement()).launch {
+            observationRegistry.observeSuspend(
+                "analysis.task",
+                parent,
+                "user.id" to appUserId.toString()
+            ) {
+                analysisService.analyze(appUserId)
+            }
         }
         return SubscriptionAnalysisResponseDto()
     }

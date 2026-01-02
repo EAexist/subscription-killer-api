@@ -14,6 +14,7 @@ import com.matchalab.subscription_killer_api.subscription.service.gmailclientada
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.*
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.ObservationRegistry
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -59,7 +60,8 @@ class SubscriptionAnalysisServiceTest(
         serviceProviderService,
         gmailClientFactory,
         testMailProperties,
-        progressService
+        progressService,
+        ObservationRegistry.NOOP
     )
 
     private val testAppUserId: UUID = UUID.randomUUID()
