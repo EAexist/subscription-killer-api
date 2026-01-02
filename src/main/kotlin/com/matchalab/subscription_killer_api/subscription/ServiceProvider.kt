@@ -8,8 +8,9 @@ import java.util.*
 class ServiceProvider(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id")
     var id: UUID? = null,
-    val displayName: String,
-    val logoDevSuffix: String,
+    var displayName: String,
+    var logoDevSuffix: String,
+    var websiteUrl: String,
 
     @ElementCollection
     @CollectionTable(

@@ -6,5 +6,6 @@ data class ServiceProviderResponseDto(
     val id: UUID,
     val displayName: String,
     val logoDevSuffix: String,
+    val websiteUrl: String,
     val canAnalyzePayment: Boolean
 ) {}

@@ -53,6 +53,7 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
         this.id!!,
         this.displayName,
         this.logoDevSuffix,
+        this.websiteUrl,
         this.isEmailDetectionRuleAvailable()
     )
 }

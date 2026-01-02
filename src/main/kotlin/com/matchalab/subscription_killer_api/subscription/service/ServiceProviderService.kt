@@ -65,6 +65,7 @@ class ServiceProviderService(
                 id = it.id!!,
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
+                websiteUrl = it.websiteUrl,
                 canAnalyzePayment = it.isEmailDetectionRuleAvailable()
             )
         }
@@ -76,6 +77,7 @@ class ServiceProviderService(
                 id = it.id!!,
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
+                websiteUrl = it.websiteUrl,
                 canAnalyzePayment = it.isEmailDetectionRuleAvailable()
             )
         }

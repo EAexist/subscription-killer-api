@@ -24,6 +24,7 @@ open class TestDataFactory(
             UUID.randomUUID(),
             displayName,
             "$displayName.com",
+            "www.$displayName.com",
             mutableMapOf(LocaleType.EN.name to displayName),
             emailSources ?: mutableListOf<EmailSource>()
         )
