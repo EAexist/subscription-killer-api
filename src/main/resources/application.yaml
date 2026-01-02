@@ -88,6 +88,7 @@ app:
       - https://localhost:3000
   mail:
     analysis-months: 8
+  min-request-interval-hours: 72
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
