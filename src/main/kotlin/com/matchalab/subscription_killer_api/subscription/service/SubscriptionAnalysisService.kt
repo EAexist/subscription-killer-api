@@ -5,12 +5,14 @@ import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
-import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisProgressStatusDto
-import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisStatusType
+import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
+import com.matchalab.subscription_killer_api.subscription.progress.ServiceProviderAnalysisProgressStatus
+import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.annotation.Observed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -54,6 +56,7 @@ class SubscriptionAnalysisService(
         val hasSubscribedNewsletterOrAd: Boolean
     )
 
+    @Observed
     suspend fun analyze(appUserId: UUID) {
 
         val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
@@ -67,6 +70,13 @@ class SubscriptionAnalysisService(
                 }
             }
         }.awaitAll()
+
+        progressService.setProgress(
+            appUserId,
+            googleAccountSubjects.first(),
+            AnalysisProgressStatus.COMPLETED
+        )
+
     }
 
     fun saveAndMapToDto(subject: String, subscriptionDtos: List<SubscriptionDto>) {
@@ -92,10 +102,11 @@ class SubscriptionAnalysisService(
         googleAccountRepository.save(googleAccount)
     }
 
+    @Observed
     suspend fun analyzeSingleGoogleAccount(appUserId: UUID, googleAccountSubject: String): List<SubscriptionDto> {
         try {
 
-            logger.debug { "[analyzeSingleGoogleAccount] googleAccountSubject: $googleAccountSubject" }
+            logger.debug { "\n\uD83D\uDE80 [analyzeSingleGoogleAccount] googleAccountSubject: $googleAccountSubject" }
 
             // List Gmail Messages
             val gmailClientAdapter: GmailClientAdapter =
@@ -123,24 +134,59 @@ class SubscriptionAnalysisService(
 
             progressService.setProgress(
                 appUserId,
-                googleAccountSubject,
-                AnalysisProgressStatusDto(AnalysisStatusType.EMAIL_FETCHED)
+                googleAccountSubject, AnalysisProgressStatus.EMAIL_FETCHED
             )
 
             // Add New Email Addresses identified from aliasNames
             // @TODO: optimize
             serviceProviderService.addEmailSourcesFromMessages(allMessages)
 
+            logger.debug {
+                "\uD83D\uDC1E [analyzeSingleGoogleAccount] allServiceProviders:\n${
+                    serviceProviderService.findAllWithEmailSources().joinToString("\n") {
+                        "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
+                    }
+                }"
+            }
+
             // Analyze Subscription Status
             val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
             val serviceProviders = serviceProviderService.findByActiveEmailAddressesInWithEmailSources(uniqueAddresses)
+
+            logger.debug {
+                "\uD83D\uDC1E [analyzeSingleGoogleAccount] serviceProviders:\n${
+                    serviceProviders.joinToString("\n") {
+                        "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
+                    }
+                }"
+            }
 
             val addressToServiceProvider = serviceProviders.flatMap { serviceProvider ->
                 serviceProvider.emailSources.map { it.targetAddress to serviceProvider }
             }.toMap()
 
+            logger.debug {
+                "\uD83D\uDC1E [analyzeSingleGoogleAccount] senderEmails:\n${
+                    allMessages.joinToString(", ") {
+                        it.senderEmail
+                    }
+                }"
+            }
+
+            logger.debug {
+                "\uD83D\uDC1E [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
+                    addressToServiceProvider.entries.joinToString(
+                        "\n"
+                    ) { (key, value) -> "  $key -> $value" }
+                }"
+            }
+
             val serviceProviderToAddressToMessages = allMessages
-                .groupBy { message -> addressToServiceProvider[message.senderEmail]!! }
+                .mapNotNull { message ->
+                    addressToServiceProvider[message.senderEmail]?.let {
+                        (it to message)
+                    }
+                }.groupBy({ it.first }, { it.second })
                 .mapValues { (_, messages) ->
                     messages.groupBy { it.senderEmail }
                 }
@@ -148,15 +194,19 @@ class SubscriptionAnalysisService(
             val subscriptions: List<SubscriptionDto> = coroutineScope {
                 serviceProviderToAddressToMessages.mapNotNull { (serviceProvider, addressToMessages) ->
                     async(Dispatchers.IO) {
-                        val subscriptionDto: SubscriptionDto =
-                            analyzeServiceProvider(serviceProvider, addressToMessages)
-                        progressService.setProgress(
+                        progressService.setServiceProviderProgress(
                             appUserId,
                             googleAccountSubject,
-                            AnalysisProgressStatusDto(
-                                AnalysisStatusType.SERVICE_PROVIDER_ANALYSIS_COMPLETED,
-                                mapOf("serviceProviderDisplayName" to serviceProvider.displayName)
-                            )
+                            serviceProvider.id!!,
+                            ServiceProviderAnalysisProgressStatus.STARTED
+                        )
+                        val subscriptionDto: SubscriptionDto =
+                            analyzeServiceProvider(serviceProvider, addressToMessages)
+                        progressService.setServiceProviderProgress(
+                            appUserId,
+                            googleAccountSubject,
+                            serviceProvider.id!!,
+                            ServiceProviderAnalysisProgressStatus.COMPLETED
                         )
                         subscriptionDto
                     }
@@ -166,7 +216,7 @@ class SubscriptionAnalysisService(
             progressService.setProgress(
                 appUserId,
                 googleAccountSubject,
-                AnalysisProgressStatusDto(AnalysisStatusType.COMPLETED)
+                AnalysisProgressStatus.EMAIL_ACCOUNT_ANALYSIS_COMPLETED
             )
 
             return subscriptions
@@ -180,7 +230,7 @@ class SubscriptionAnalysisService(
         serviceProvider: ServiceProvider,
         addressToMessages: Map<String, List<GmailMessage>>
     ): SubscriptionDto {
-        logger.debug { "[analyzeServiceProvider]" }
+        logger.debug { "\uD83D\uDE80 [analyzeServiceProvider]" }
 
         val updatedServiceProvider: ServiceProvider =
             serviceProviderService.updateEmailDetectionRules(serviceProvider, addressToMessages)

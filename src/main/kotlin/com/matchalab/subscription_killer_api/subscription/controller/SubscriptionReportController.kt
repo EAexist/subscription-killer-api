@@ -3,7 +3,7 @@ package com.matchalab.subscription_killer_api.subscription.controller
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionAnalysisResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
-import com.matchalab.subscription_killer_api.subscription.service.ProgressService
+import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionAnalysisService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionReportService
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -40,15 +40,20 @@ class SubscriptionReportController(
     @PostMapping("/analysis")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): SubscriptionAnalysisResponseDto {
+        progressService.initializeProgress(appUserId)
         CoroutineScope(Dispatchers.IO).launch {
             analysisService.analyze(appUserId)
         }
-        progressService.initializeProgress(appUserId)
         return SubscriptionAnalysisResponseDto()
     }
 
     @GetMapping("/analysis/progress", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun subscribeProgress(@AuthenticatedUser appUserId: UUID): SseEmitter {
-        return progressService.createEmitter(appUserId)
+    fun subscribeProgress(@AuthenticatedUser appUserId: UUID): ResponseEntity<SseEmitter> {
+        val isOnProgress = progressService.isOnProgress(appUserId)
+        return if (isOnProgress) {
+            ResponseEntity.ok(progressService.createEmitter(appUserId))
+        } else {
+            ResponseEntity.noContent().build()
+        }
     }
 }

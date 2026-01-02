@@ -1,9 +1,9 @@
 package com.matchalab.subscription_killer_api.subscription.dto
 
-import com.matchalab.subscription_killer_api.subscription.providers.core.PaymentCycle
+import java.util.*
 
 data class ServiceProviderResponseDto(
-        val serviceEmail: String,
-        val displayName: String,
-        val paymentCycle: PaymentCycle,
+    val id: UUID,
+    val displayName: String,
+    val canAnalyzePayment: Boolean
 ) {}

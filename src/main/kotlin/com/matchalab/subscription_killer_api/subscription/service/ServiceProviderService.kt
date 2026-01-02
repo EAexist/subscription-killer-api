@@ -6,9 +6,10 @@ import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.utils.toDto
+import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -20,14 +21,30 @@ class ServiceProviderService(
     private val emailSourceRepository: EmailSourceRepository,
     private val emailDetectionRuleService: EmailDetectionRuleService,
 ) {
+    interface ServiceProviderProjection {
+        val id: UUID
+        val displayName: String
+        val canAnalyzePayment: Boolean
+    }
+
     val maxNumberOfEmailDetectionRuleAnalysis: Long = 40
 
     fun findByIdWithSubscriptions(id: UUID): ServiceProvider? {
         return serviceProviderRepository.findByIdWithSubscriptions(id)
     }
 
+    fun findAllWithEmailSources(): List<ServiceProvider> {
+        return serviceProviderRepository.findAllWithEmailSources()
+    }
+
+    fun findAllWithAliases(): List<ServiceProvider> {
+        return serviceProviderRepository.findAllWithAliases()
+    }
+
+    @Transactional(readOnly = true)
     fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider> {
-        return serviceProviderRepository.findAllWithEmailSourcesAndAliases()
+        val providers = findAllWithEmailSources()
+        return findAllWithAliases()
     }
 
     fun save(serviceProvider: ServiceProvider): ServiceProvider {
@@ -40,6 +57,26 @@ class ServiceProviderService(
 
     fun findByActiveEmailAddressesInWithEmailSources(addresses: List<String>): List<ServiceProvider> {
         return serviceProviderRepository.findByActiveEmailAddressesInWithEmailSources(addresses)
+    }
+
+    fun findDtoById(id: UUID): ServiceProviderResponseDto? {
+        return serviceProviderRepository.findWithEmailSourceById(id)?.let {
+            ServiceProviderResponseDto(
+                id = it.id!!,
+                displayName = it.displayName,
+                canAnalyzePayment = it.isEmailDetectionRuleAvailable()
+            )
+        }
+    }
+
+    fun findAllDtoById(ids: List<UUID>): List<ServiceProviderResponseDto> {
+        return serviceProviderRepository.findWithEmailSourceAllByIdIn(ids).map {
+            ServiceProviderResponseDto(
+                id = it.id!!,
+                displayName = it.displayName,
+                canAnalyzePayment = it.isEmailDetectionRuleAvailable()
+            )
+        }
     }
 
     fun addEmailSourcesFromMessages(messages: List<GmailMessage>): List<ServiceProvider> {
@@ -57,6 +94,11 @@ class ServiceProviderService(
         val addressesInMessages = namedSenders.map { it.email }.distinct()
         val existingAddresses = emailSourceRepository.findExistingAddresses(addressesInMessages)
         val newSenders = namedSenders.filter { !existingAddresses.contains(it.email) }
+
+        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
+        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
+        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] newSenders: $newSenders" }
+
 
         val aliasNameToNewEmails = newSenders.groupBy(
             { it.name!! },
@@ -83,7 +125,7 @@ class ServiceProviderService(
         addressToMessages: Map<String, List<GmailMessage>>
     ): ServiceProvider {
 
-        logger.debug { "[updateEmailDetectionRules]" }
+        logger.debug { "\uD83D\uDE80 [updateEmailDetectionRules]" }
 
         val isEmailDetectionRuleAnalysisAvailable =
             subscriptionRepository.countByServiceProviderId(provider.requiredId) < maxNumberOfEmailDetectionRuleAnalysis
@@ -99,8 +141,6 @@ class ServiceProviderService(
                 }
             }
         }
-
-        logger.info { "[updateEmailDetectionRules] provider: ${provider.toDto()}" }
 
         //@TODO If Rule is Complete, flag unused emailSources as disabled
         if (provider.isEmailDetectionRuleComplete()) {

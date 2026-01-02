@@ -2,6 +2,7 @@ package com.matchalab.subscription_killer_api.repository
 
 import com.matchalab.subscription_killer_api.domain.LocaleType
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -48,14 +49,28 @@ interface ServiceProviderRepository : JpaRepository<ServiceProvider, UUID> {
     )
     fun findByActiveEmailAddressesInWithEmailSources(addressList: List<String>): List<ServiceProvider>
 
-    @Query(
-        """
-    SELECT DISTINCT sp FROM ServiceProvider sp 
-    LEFT JOIN FETCH sp.emailSources 
-    LEFT JOIN FETCH sp.aliasNames
-"""
-    )
-    fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider>
+//    @Query(
+//        """
+//    SELECT DISTINCT sp FROM ServiceProvider sp
+//    LEFT JOIN FETCH sp.emailSources
+//    LEFT JOIN FETCH sp.aliasNames
+//"""
+//    )
+//    fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider>
+
+    // Step 1: Fetch with one collection
+    @Query("SELECT DISTINCT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.emailSources")
+    fun findAllWithEmailSources(): List<ServiceProvider>
+
+    // Step 2: Fetch the aliases for those providers (Hibernate populates the cache)
+    @Query("SELECT DISTINCT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.aliasNames")
+    fun findAllWithAliases(): List<ServiceProvider>
+
+    @EntityGraph(attributePaths = ["emailSources"])
+    fun findWithEmailSourceAllByIdIn(ids: Iterable<UUID>): List<ServiceProvider>
+
+    @EntityGraph(attributePaths = ["emailSources"])
+    fun findWithEmailSourceById(id: UUID): ServiceProvider?
 
 //    @Query(
 //        """

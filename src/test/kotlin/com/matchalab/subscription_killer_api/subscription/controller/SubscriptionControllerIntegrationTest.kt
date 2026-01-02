@@ -9,10 +9,12 @@ import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.subscription.Subscription
-import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisProgressStatusDto
-import com.matchalab.subscription_killer_api.subscription.analysisStep.AnalysisStatusType
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionAnalysisResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
+import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
+import com.matchalab.subscription_killer_api.subscription.progress.dto.AnalysisProgressUpdate
+import com.matchalab.subscription_killer_api.subscription.progress.dto.AppUserAnalysisProgressUpdate
+import com.matchalab.subscription_killer_api.subscription.progress.dto.ServiceProviderAnalysisProgressUpdate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -34,7 +37,6 @@ import org.springframework.session.Session
 import org.springframework.session.SessionRepository
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
-import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.transaction.support.TransactionTemplate
 import reactor.core.publisher.Flux
 import reactor.test.StepVerifier
@@ -151,29 +153,45 @@ constructor(
     fun `when subscribed analysis server-sent event should return progress`() {
 
         // When, Then
-        val eventStream: Flux<AnalysisProgressStatusDto> = authedClient.get()
+        authedClient.post()
+            .uri("/api/v1/reports/analysis")
+            .exchange()
+            .expectStatus().isAccepted
+
+        val eventStream: Flux<AnalysisProgressUpdate> = authedClient.get()
             .uri("/api/v1/reports/analysis/progress")
             .accept(MediaType.TEXT_EVENT_STREAM)
             .exchange()
             .expectStatus().isOk()
-            .returnResult<AnalysisProgressStatusDto>()
-            .responseBody.doOnNext { status ->
-                println("\uD83D\uDC1E Received status: $status")
-            }
+            .returnResult(object : ParameterizedTypeReference<AnalysisProgressUpdate>() {})
+            .responseBody.doOnNext { logger.debug { "\uD83D\uDC1E eventStream: $it" } }
 
         StepVerifier.create(eventStream).expectSubscription()
-            .then {
-                authedClient.post()
-                    .uri("/api/v1/reports/analysis")
-                    .exchange()
-                    .expectStatus().isAccepted
+            .assertNext { update ->
+                assertThat(update).isInstanceOf(AppUserAnalysisProgressUpdate::class.java)
+                val appUpdate = update as AppUserAnalysisProgressUpdate
+                assertThat(appUpdate.status).isEqualTo(AnalysisProgressStatus.STARTED)
             }
-//            .assertNext { assertThat(it.type).isEqualTo(AnalysisStatusType.STARTED) }
-            .assertNext { assertThat(it.type).isEqualTo(AnalysisStatusType.EMAIL_FETCHED) }
-            .thenConsumeWhile { it.type == AnalysisStatusType.SERVICE_PROVIDER_ANALYSIS_COMPLETED }
-            .assertNext { assertThat(it.type).isEqualTo(AnalysisStatusType.COMPLETED) }
-            .thenCancel()
-            .verify(Duration.ofSeconds(20))
+            .assertNext { update ->
+                assertThat(update).isInstanceOf(AppUserAnalysisProgressUpdate::class.java)
+                val appUpdate = update as AppUserAnalysisProgressUpdate
+                assertThat(appUpdate.status).isEqualTo(AnalysisProgressStatus.EMAIL_FETCHED)
+            }
+            .thenConsumeWhile { update ->
+                update is ServiceProviderAnalysisProgressUpdate
+            }
+            .assertNext { update ->
+                assertThat(update).isInstanceOf(AppUserAnalysisProgressUpdate::class.java)
+                val appUpdate = update as AppUserAnalysisProgressUpdate
+                assertThat(appUpdate.status).isEqualTo(AnalysisProgressStatus.EMAIL_ACCOUNT_ANALYSIS_COMPLETED)
+            }
+            .assertNext { update ->
+                assertThat(update).isInstanceOf(AppUserAnalysisProgressUpdate::class.java)
+                val appUpdate = update as AppUserAnalysisProgressUpdate
+                assertThat(appUpdate.status).isEqualTo(AnalysisProgressStatus.COMPLETED)
+            }
+            .expectComplete()
+            .verify(Duration.ofSeconds(120))
     }
 
     @Test

@@ -72,7 +72,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     // https://mvnrepository.com/artifact/io.mockk/mockk
     testImplementation("io.mockk:mockk:1.14.7")
@@ -90,11 +90,12 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation("io.projectreactor:reactor-test:3.8.1")
 
+    // Micrometer Observation
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
-    implementation("io.github.micrometer:context-propagation-kotlin:1.0.2")
+    implementation("io.micrometer:context-propagation")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
@@ -115,7 +116,7 @@ tasks.withType<Test> {
             excludeTags("ai")
         }
     }
-    systemProperty("spring.profiles.active", "dev,test,gcp")
+    systemProperty("spring.profiles.active", System.getProperty("spring.profiles.active", "dev,test,gcp"))
 }
 
 tasks.register<Zip>("buildZip") {

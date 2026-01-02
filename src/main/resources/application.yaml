@@ -67,8 +67,8 @@ spring:
             temperature: 0.1
     chat:
       observations:
-        log-prompt: true
-        log-completion: true
+        log-prompt: false
+        log-completion: false
 app:
   google:
     client-id: ${APP_GOOGLE_CLIENT_ID}
@@ -87,19 +87,21 @@ app:
   mail:
     analysis-months: 8
 logging:
+  pattern:
+  #    level: "%5p [${spring.threads.virtual.enabled:}] %-40.40logger{39} : %m%n"
   level:
     com.matchalab.subscription_killer_api: DEBUG
     org:
       springframework:
-        ai: DEBUG
-        security: DEBUG
-        security.oauth2: DEBUG
-        security.oauth2.client: DEBUG
-        session: DEBUG
+      #        ai: DEBUG
+      #        security: DEBUG
+      #        security.oauth2: DEBUG
+      #        security.oauth2.client: DEBUG
+      #        session: DEBUG
       hibernate:
         SQL: DEBUG
-        type.descriptor.sql.BasicBinder: TRACE
-    web.filter: DEBUG
+#        type.descriptor.sql.BasicBinder: TRACE
+#    web.filter: DEBUG
 ---
 spring:
   config:

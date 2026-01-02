@@ -56,18 +56,16 @@ class MultiAccountOAuth2AuthorizedClientService(
     override fun <T : OAuth2AuthorizedClient> loadAuthorizedClient(
         clientRegistrationId: String,
         principalName: String
-    ): T {
+    ): T? {
 
-        val clientRegistration = clientRegistrationRepository.findByRegistrationId(clientRegistrationId)
+        val clientRegistration = clientRegistrationRepository.findByRegistrationId(clientRegistrationId) ?: return null
         var googleAccount: GoogleAccount
 
         val (appUserIdString, googleAccountSubject) = principalName.split(":", limit = 2)
 
 
         if (googleAccountSubject.isNotEmpty()) {
-            googleAccount = googleAccountRepository.findById(googleAccountSubject).orElseThrow {
-                IllegalStateException("No Google Account linked for user $googleAccountSubject")
-            }
+            googleAccount = googleAccountRepository.findByIdOrNull(googleAccountSubject) ?: return null
         } else {
             val appUserId =
                 UUID.fromString(appUserIdString)
@@ -94,7 +92,17 @@ class MultiAccountOAuth2AuthorizedClientService(
     }
 
     override fun removeAuthorizedClient(clientRegistrationId: String, principalName: String) {
-        val userId = UUID.fromString(principalName)
-        appUserRepository.deleteById(userId)
+        val googleAccountSubject = if (principalName.contains(":")) {
+            principalName.split(":")[1]
+        } else {
+            principalName
+        }
+
+        googleAccountRepository.findByIdOrNull(googleAccountSubject)?.let { account ->
+            account.accessToken = null
+            account.refreshToken = null
+            account.expiresAt = null
+            googleAccountRepository.save(account)
+        }
     }
 }

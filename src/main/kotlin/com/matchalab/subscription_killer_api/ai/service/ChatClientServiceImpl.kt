@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.ai.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.annotation.Observed
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
@@ -14,15 +15,18 @@ class ChatClientServiceImpl(
     private val chatClientBuilder: ChatClient.Builder
 ) : ChatClientService {
 
+    private val maxPromptPreviewLength = 100
     private val chatClient: ChatClient = chatClientBuilder.build()
 
-    override fun <T : Any> call(
+    @Observed
+    open override fun <T : Any> call(
         promptTemplateStream: Resource,
         params: Map<String, Any>,
         responseType: Class<T>
     ): T {
 
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
+        val promptPreview = promptTemplate.replace(Regex("\\s+"), " ").take(maxPromptPreviewLength)
 
         return runCatching {
             requireNotNull(
@@ -33,6 +37,9 @@ class ChatClientServiceImpl(
                     }
                     .call()
                     .entity(responseType))
+        }.onSuccess { entity ->
+            val entityString = entity.toString()
+            logger.info { "✨ [Call Result]\n    prompt: $promptPreview,\n    result: $entityString" }
         }.onFailure { e ->
             println("AI Call Failed: ${e.message}")
         }.getOrThrow()

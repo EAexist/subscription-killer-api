@@ -4,12 +4,14 @@ import com.matchalab.subscription_killer_api.repository.ServiceProviderRepositor
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.utils.readJsonList
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import org.springframework.transaction.support.TransactionTemplate
 
+private val logger = KotlinLogging.logger {}
 
 @Component
 class DataInitializer(
@@ -31,6 +33,9 @@ class DataInitializer(
         if (newProviders.isNotEmpty()) {
             serviceProviderRepository.saveAll(newProviders)
         }
+//        serviceProviderRepository.findAll().forEach { sp ->
+//            logger.debug { "\uD83D\uDC1E provider.emailSources: ${sp.emailSources.joinToString(", ") { it.targetAddress }}" }
+//        }
     }
 
     fun createServiceProvidersFromJson(jsonPath: String = "static/service-provider.json"): List<ServiceProvider> {
@@ -45,6 +50,7 @@ class DataInitializer(
                 EmailSource(targetAddress = it, serviceProvider = provider)
             }
             provider.emailSources.addAll(sources)
+
             provider
         }
     }

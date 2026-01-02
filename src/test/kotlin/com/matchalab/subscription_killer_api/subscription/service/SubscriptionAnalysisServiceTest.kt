@@ -9,6 +9,7 @@ import com.matchalab.subscription_killer_api.repository.ServiceProviderRepositor
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
+import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.*

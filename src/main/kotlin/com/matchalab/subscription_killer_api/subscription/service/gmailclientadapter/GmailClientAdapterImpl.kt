@@ -11,17 +11,24 @@ import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.annotation.Observed
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapter {
+open class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapter {
 
-    val userId = "me"
+    private val userId = "me"
+    private val mutex = Mutex() // Forces sequential execution
 
-    override suspend fun listMessageIds(query: String): List<String> = withContext(Dispatchers.IO) {
+    @Observed
+    open override suspend fun listMessageIds(query: String): List<String> = withContext(Dispatchers.IO) {
 
         logger.debug { "\uD83D\uDE80 query: $query" }
 
@@ -59,36 +66,56 @@ class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapte
         messages.map { it.id }
     }
 
-    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
+    @Observed
+    open override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
         withContext(Dispatchers.IO) {
+            val results = Collections.synchronizedList(mutableListOf<Message>())
 
-            logger.debug { "\uD83D\uDE80 fetching ${messageIds.size} messages" }
+            messageIds.chunked(25).forEach { chunk ->
+                // 1. Ensure only one batch processes at a time
+                mutex.withLock {
+                    retryWithBackoff {
+                        executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
+                            override fun onSuccess(m: Message?, h: HttpHeaders) {
+                                m?.let { results.add(it) }
+                            }
 
-            val results = mutableListOf<Message>()
-
-            val callback = object : JsonBatchCallback<Message>() {
-                override fun onSuccess(message: Message?, responseHeaders: HttpHeaders) {
-                    message?.let { results.add(it) }
-                }
-
-                override fun onFailure(e: GoogleJsonError, responseHeaders: HttpHeaders?) {
-                    logger.error { "fetch failed ${e.message}" }
-                }
-            }
-
-            messageIds.chunked(100).forEach { chunk ->
-                executeGmailBatch(chunk, callback) { id ->
-                    gmailClient
-                        .users()
-                        .messages()
-                        .get("me", id)
-                        .setFormat(plan.format)
-                        .setFields(plan.fields)
-                        .setMetadataHeaders(plan.metadataHeaders)
+                            override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
+                                if (e.code == 429) throw RateLimitException(e.message)
+                                else logger.error { "Permanent failure: ${e.message}" }
+                            }
+                        }) { id ->
+                            gmailClient.users().messages().get("me", id)
+                                .setFormat(plan.format)
+                                .setFields(plan.fields)
+                        }
+                    }
+                    delay(100)
                 }
             }
             results.mapNotNull { it.toGmailMessage() }
         }
+
+    suspend fun <T> retryWithBackoff(
+        maxRetries: Int = 5,
+        initialDelay: Long = 1000,
+        block: suspend () -> T
+    ): T {
+        var currentDelay = initialDelay
+        repeat(maxRetries) { attempt ->
+            try {
+                return block()
+            } catch (e: RateLimitException) {
+                if (attempt == maxRetries - 1) throw e
+                delay(currentDelay)
+                currentDelay *= 2
+            }
+        }
+        return block()
+    }
+
+    class RateLimitException(message: String) : Exception(message)
+
 
     @Throws(IOException::class)
     fun <T> executeGmailBatch(
@@ -111,4 +138,34 @@ class GmailClientAdapterImpl(private val gmailClient: Gmail) : GmailClientAdapte
         } catch (e: Exception) {
         }
     }
+//    open override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
+//        withContext(Dispatchers.IO) {
+//
+//            logger.debug { "\uD83D\uDE80 fetching ${messageIds.size} messages" }
+//
+//            val results = mutableListOf<Message>()
+//
+//            val callback = object : JsonBatchCallback<Message>() {
+//                override fun onSuccess(message: Message?, responseHeaders: HttpHeaders) {
+//                    message?.let { results.add(it) }
+//                }
+//
+//                override fun onFailure(e: GoogleJsonError, responseHeaders: HttpHeaders?) {
+//                    logger.error { "fetch failed ${e.message}" }
+//                }
+//            }
+//
+//            messageIds.chunked(100).forEach { chunk ->
+//                executeGmailBatch(chunk, callback) { id ->
+//                    gmailClient
+//                        .users()
+//                        .messages()
+//                        .get("me", id)
+//                        .setFormat(plan.format)
+//                        .setFields(plan.fields)
+//                        .setMetadataHeaders(plan.metadataHeaders)
+//                }
+//            }
+//            results.mapNotNull { it.toGmailMessage() }
+//        }
 }

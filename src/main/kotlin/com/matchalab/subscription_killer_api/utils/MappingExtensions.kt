@@ -9,7 +9,7 @@ import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
-import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderDto
+import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -48,8 +48,9 @@ fun Subscription.toResponseDto(): SubscriptionResponseDto {
     )
 }
 
-fun ServiceProvider.toDto(): ServiceProviderDto {
-    return ServiceProviderDto(
+fun ServiceProvider.toDto(): ServiceProviderResponseDto {
+    return ServiceProviderResponseDto(
+        this.id!!,
         this.displayName,
         this.isEmailDetectionRuleAvailable()
     )
