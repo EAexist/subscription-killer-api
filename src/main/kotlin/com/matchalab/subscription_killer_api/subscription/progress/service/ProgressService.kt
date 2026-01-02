@@ -88,9 +88,9 @@ class ProgressService(
 
         val totalStatus: AnalysisProgressStatus? =
             if (status === AnalysisProgressStatus.COMPLETED) AnalysisProgressStatus.COMPLETED else progresses[appUserId]?.values?.minBy { it.status.sortOrder }?.status
-        val update: AppUserAnalysisProgressUpdate? = totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
+        val progressUpdate: AppUserAnalysisProgressUpdate? = totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
 
-        update?.let { update ->
+        progressUpdate?.let { update ->
             emitters[appUserId]?.let { emitter ->
                 try {
                     emitter.send(

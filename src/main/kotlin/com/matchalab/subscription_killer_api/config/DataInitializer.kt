@@ -44,6 +44,7 @@ class DataInitializer(
         return dtos.map { dto ->
             val provider = ServiceProvider(
                 displayName = dto.aliasNames["EN"] ?: "Unknown",
+                logoDevSuffix = dto.logoDevSuffix,
                 aliasNames = dto.aliasNames.toMutableMap()
             )
             val sources = dto.emailAddresses.map {
@@ -58,6 +59,7 @@ class DataInitializer(
 
     data class ServiceProviderJson(
         val aliasNames: Map<String, String>,
+        val logoDevSuffix: String,
         val emailAddresses: List<String>
     )
 

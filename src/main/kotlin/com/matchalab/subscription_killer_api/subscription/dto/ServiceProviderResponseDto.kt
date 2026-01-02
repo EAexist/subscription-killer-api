@@ -5,5 +5,6 @@ import java.util.*
 data class ServiceProviderResponseDto(
     val id: UUID,
     val displayName: String,
+    val logoDevSuffix: String,
     val canAnalyzePayment: Boolean
 ) {}

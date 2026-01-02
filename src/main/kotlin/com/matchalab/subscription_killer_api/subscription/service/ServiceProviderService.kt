@@ -43,7 +43,7 @@ class ServiceProviderService(
 
     @Transactional(readOnly = true)
     fun findAllWithEmailSourcesAndAliases(): List<ServiceProvider> {
-        val providers = findAllWithEmailSources()
+        findAllWithEmailSources()
         return findAllWithAliases()
     }
 
@@ -64,6 +64,7 @@ class ServiceProviderService(
             ServiceProviderResponseDto(
                 id = it.id!!,
                 displayName = it.displayName,
+                logoDevSuffix = it.logoDevSuffix,
                 canAnalyzePayment = it.isEmailDetectionRuleAvailable()
             )
         }
@@ -74,6 +75,7 @@ class ServiceProviderService(
             ServiceProviderResponseDto(
                 id = it.id!!,
                 displayName = it.displayName,
+                logoDevSuffix = it.logoDevSuffix,
                 canAnalyzePayment = it.isEmailDetectionRuleAvailable()
             )
         }

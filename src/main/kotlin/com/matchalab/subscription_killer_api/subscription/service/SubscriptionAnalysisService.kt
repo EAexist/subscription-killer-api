@@ -255,7 +255,7 @@ class SubscriptionAnalysisService(
         ) {
 
             logger.debug { "\uD83D\uDE80 [analyzeServiceProvider] displayName=${serviceProvider.displayName}" }
-            val parent = observationRegistry.currentObservation
+//            val parent = observationRegistry.currentObservation
 
 //            val updatedServiceProvider: ServiceProvider = observationRegistry.observe(
 //                "serviceProvider.updateRules",

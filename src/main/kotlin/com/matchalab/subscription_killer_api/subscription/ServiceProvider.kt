@@ -9,6 +9,7 @@ class ServiceProvider(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id")
     var id: UUID? = null,
     val displayName: String,
+    val logoDevSuffix: String,
 
     @ElementCollection
     @CollectionTable(

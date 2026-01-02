@@ -89,6 +89,7 @@ class ServiceProviderServiceTest() {
             ServiceProvider(
                 provider.id ?: UUID.randomUUID(),
                 provider.displayName,
+                provider.logoDevSuffix,
                 provider.aliasNames,
                 provider.emailSources,
                 provider.paymentCycle,
@@ -103,6 +104,7 @@ class ServiceProviderServiceTest() {
                 ServiceProvider(
                     it.id ?: UUID.randomUUID(),
                     it.displayName,
+                    it.logoDevSuffix,
                     it.aliasNames,
                     it.emailSources,
                     it.paymentCycle,
