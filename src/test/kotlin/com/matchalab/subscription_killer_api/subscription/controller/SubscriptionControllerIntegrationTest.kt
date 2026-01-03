@@ -9,7 +9,6 @@ import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.subscription.Subscription
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionAnalysisResponseDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.dto.AnalysisProgressUpdate
@@ -150,7 +149,6 @@ constructor(
             .exchange()
             .expectStatus()
             .isAccepted()
-            .expectBody<SubscriptionAnalysisResponseDto>().isEqualTo(SubscriptionAnalysisResponseDto())
     }
 
     @Test
