@@ -73,6 +73,9 @@ app:
   google:
     client-id: ${APP_GOOGLE_CLIENT_ID}
     client-secret: ${APP_GOOGLE_CLIENT_SECRET}
+    token-server-url: https://oauth2.googleapis.com/token
+    token-refresh-threshold-seconds: 300
+    
 ---
 spring:
   config:

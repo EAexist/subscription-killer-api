@@ -3,5 +3,5 @@ package com.matchalab.subscription_killer_api.subscription.service.gmailclientfa
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 
 interface GmailClientFactory {
-    fun createAdapter(credentialsIdentifier: String): GmailClientAdapter
+    fun createAdapter(subject: String): GmailClientAdapter
 }

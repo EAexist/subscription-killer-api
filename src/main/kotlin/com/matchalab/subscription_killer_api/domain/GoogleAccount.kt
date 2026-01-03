@@ -40,7 +40,12 @@ class GoogleAccount(
         name = payload.get("name") as? String ?: "Unknown",
     )
 
-    fun updateRefreshToken(refreshToken: String, expiresAt: Instant?) {
+    fun updateRefreshToken(refreshToken: String) {
+        this.refreshToken = refreshToken
+//        this.expiresAt = expiresAt
+    }
+
+    fun updateAccessToken(refreshToken: String, expiresAt: Instant?) {
         this.refreshToken = refreshToken
         this.expiresAt = expiresAt
     }

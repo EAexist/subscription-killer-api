@@ -20,6 +20,7 @@ import io.micrometer.observation.ObservationRegistry
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 
 @Profile("prod || gmail")
 @Service
@@ -30,16 +31,18 @@ class GmailClientFactoryImpl(
 ) : GmailClientFactory {
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
     private val jsonFactory = GsonFactory.getDefaultInstance()
-    private val tokenServerUrl = "https://oauth2.googleapis.com/token"
 
-    override fun createAdapter(credentialsIdentifier: String): GmailClientAdapter {
+    private val adapterCache = ConcurrentHashMap<String, GmailClientAdapter>()
 
-        val authenticatedGmailClient = createClient(credentialsIdentifier)
+    override fun createAdapter(subject: String): GmailClientAdapter {
 
-        return GmailClientAdapterImpl(authenticatedGmailClient, observationRegistry)
+        return adapterCache.getOrPut(subject) {
+            val authenticatedGmailClient = createClient(subject)
+            GmailClientAdapterImpl(authenticatedGmailClient, observationRegistry)
+        }
     }
 
-    fun createClient(subject: String): Gmail {
+    private fun createClient(subject: String): Gmail {
 
         val parent = observationRegistry.currentObservation
 
@@ -48,35 +51,17 @@ class GmailClientFactoryImpl(
             parent,
             "googleAccount.subject" to subject
         ) {
+            val googleAccount: GoogleAccount = requestTokenRotationIfNeeded(subject)
 
-            val googleAccount: GoogleAccount =
-                googleAccountRepository.findById(subject).orElseThrow {
-                    IllegalStateException("Google Account not found for subject=$subject")
-                }
-
-            val oldRefreshToken: String =
-                googleAccount.refreshToken
-                    ?: throw IllegalStateException("Refresh Token missing for subject=$subject")
-
-            val tokenResponse: TokenResponse = refreshTokens(oldRefreshToken)
-
-            val newRefreshToken = tokenResponse.refreshToken
-            val expireadAt: Instant = Instant.now().plusSeconds(tokenResponse.expiresInSeconds)
-            if (newRefreshToken != null && newRefreshToken != oldRefreshToken) {
-                //Encryption
-                googleAccount.updateRefreshToken(newRefreshToken, expireadAt)
-                googleAccountRepository.save(googleAccount)
-            }
-
-            val accessToken: AccessToken = AccessToken(tokenResponse.accessToken, null)
-            val currentRefreshToken = newRefreshToken ?: oldRefreshToken
+            val accessToken: AccessToken = AccessToken(googleAccount.accessToken, null)
+            val refreshToken = googleAccount.refreshToken
 
             val userCredentials: UserCredentials =
                 UserCredentials.newBuilder()
                     .setClientId(googleClientProperties.clientId)
                     .setClientSecret(googleClientProperties.clientSecret)
-                    .setAccessToken(accessToken) // 갱신된 Access Token 사용
-                    .setRefreshToken(currentRefreshToken) // 최신 Refresh Token 사용
+                    .setAccessToken(accessToken)
+                    .setRefreshToken(refreshToken)
                     .build()
 
             Gmail.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(userCredentials))
@@ -85,17 +70,38 @@ class GmailClientFactoryImpl(
         }
     }
 
-    /**
-     * Refresh Token을 사용하여 Access Token을 갱신하고, 응답에서 새로운 Refresh Token이 있는지 확인합니다.
-     * @return 갱신된 Access/Refresh Token을 포함하는 TokenResponse
-     */
-    fun refreshTokens(refreshToken: String): TokenResponse {
+    private fun requestTokenRotationIfNeeded(subject: String): GoogleAccount {
+        val account = googleAccountRepository.findById(subject)
+            .orElseThrow { IllegalStateException("Account $subject not found") }
+
+        val isExpiringSoon =
+            account.expiresAt?.isBefore(Instant.now().plusSeconds(googleClientProperties.tokenRefreshThresholdSeconds))
+                ?: true
+
+        if (isExpiringSoon) {
+            val tokenResponse = requestTokenRotation(account.refreshToken!!)
+
+            val newRefreshToken = tokenResponse.refreshToken
+            if (newRefreshToken != null) {
+                account.updateRefreshToken(newRefreshToken)
+            }
+            val accessToken = tokenResponse.accessToken
+            val expiresAt = Instant.now().plusSeconds(tokenResponse.expiresInSeconds)
+
+            account.updateAccessToken(accessToken, expiresAt)
+            return googleAccountRepository.save(account)
+        }
+
+        return account
+    }
+
+    private fun requestTokenRotation(refreshToken: String): TokenResponse {
 
         val tokenRequest: TokenRequest =
             TokenRequest(
                 httpTransport,
                 jsonFactory,
-                GenericUrl(tokenServerUrl),
+                GenericUrl(googleClientProperties.tokenServerUrl),
                 "refresh_token"
             )
                 .setClientAuthentication(
