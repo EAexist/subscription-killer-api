@@ -7,7 +7,9 @@
     "emailAddresses": [
       "info@account.netflix.com",
       "info@mailer.netflix.com"
-    ]
+    ],
+    "websiteUrl": "www.netflix.com",
+    "logoDevSuffix": "netflix.com"
   },
   {
     "aliasNames": {
@@ -15,7 +17,9 @@
     },
     "emailAddresses": [
       "notifications@sketchfab.com"
-    ]
+    ],
+    "websiteUrl": "www.sketchfab.com",
+    "logoDevSuffix": "sketchfab.com"
   },
   {
     "aliasNames": {
@@ -24,7 +28,9 @@
     },
     "emailAddresses": [
       "no-reply@spotify.com"
-    ]
+    ],
+    "websiteUrl": "www.spotify.com",
+    "logoDevSuffix": "spotify.com"
   },
   {
     "aliasNames": {
@@ -33,7 +39,9 @@
     },
     "emailAddresses": [
       "disneyplus@mail.disneyplus.com"
-    ]
+    ],
+    "websiteUrl": "www.disneyplus.com",
+    "logoDevSuffix": "disneyplus.com"
   },
   {
     "aliasNames": {
@@ -43,7 +51,9 @@
     "emailAddresses": [
       "msa@communication.microsoft.com",
       "microsoft-noreply@microsoft.com"
-    ]
+    ],
+    "websiteUrl": "www.microsoft.com",
+    "logoDevSuffix": "microsoft.com"
   },
   {
     "aliasNames": {
@@ -52,7 +62,9 @@
     },
     "emailAddresses": [
       "mail@adobetransactions.com"
-    ]
+    ],
+    "websiteUrl": "www.adobe.com",
+    "logoDevSuffix": "adobe.com"
   },
   {
     "aliasNames": {
@@ -61,7 +73,9 @@
     "emailAddresses": [
       "shipment-tracking@amazon.com",
       "order-update@amazon.com"
-    ]
+    ],
+    "websiteUrl": "www.amazon.com",
+    "logoDevSuffix": "amazon.com"
   },
   {
     "aliasNames": {
@@ -70,7 +84,9 @@
     },
     "emailAddresses": [
       "noreply@youtube.com"
-    ]
+    ],
+    "websiteUrl": "www.youtube.com",
+    "logoDevSuffix": "youtube.com"
   },
   {
     "aliasNames": {
@@ -78,7 +94,9 @@
     },
     "emailAddresses": [
       "noreply@tm.openai.com"
-    ]
+    ],
+    "websiteUrl": "www.openai.com",
+    "logoDevSuffix": "openai.com"
   },
   {
     "aliasNames": {
@@ -86,7 +104,9 @@
     },
     "emailAddresses": [
       "notifications@canva.com"
-    ]
+    ],
+    "websiteUrl": "www.canva.com",
+    "logoDevSuffix": "canva.com"
   },
   {
     "aliasNames": {
@@ -96,7 +116,9 @@
     "emailAddresses": [
       "messages-noreply@linkedin.com",
       "notifications-noreply@linkedin.com"
-    ]
+    ],
+    "websiteUrl": "www.linkedin.com",
+    "logoDevSuffix": "linkedin.com"
   },
   {
     "aliasNames": {
@@ -104,7 +126,9 @@
     },
     "emailAddresses": [
       "no-reply@shopify.com"
-    ]
+    ],
+    "websiteUrl": "www.shopify.com",
+    "logoDevSuffix": "shopify.com"
   },
   {
     "aliasNames": {
@@ -112,7 +136,9 @@
     },
     "emailAddresses": [
       "no-reply@slack.com"
-    ]
+    ],
+    "websiteUrl": "www.slack.com",
+    "logoDevSuffix": "slack.com"
   },
   {
     "aliasNames": {
@@ -120,7 +146,9 @@
     },
     "emailAddresses": [
       "no-reply@zoom.us"
-    ]
+    ],
+    "websiteUrl": "www.zoom.us",
+    "logoDevSuffix": "zoom.us"
   },
   {
     "aliasNames": {
@@ -129,7 +157,9 @@
     },
     "emailAddresses": [
       "xbox@stayingconnected.xbox.com"
-    ]
+    ],
+    "websiteUrl": "www.xbox.com",
+    "logoDevSuffix": "xbox.com"
   },
   {
     "aliasNames": {
@@ -138,7 +168,9 @@
     },
     "emailAddresses": [
       "sony@email.sonyentertainmentnetwork.com"
-    ]
+    ],
+    "websiteUrl": "www.playstation.com",
+    "logoDevSuffix": "playstation.com"
   },
   {
     "aliasNames": {
@@ -146,7 +178,9 @@
     },
     "emailAddresses": [
       "hulu@hulumail.com"
-    ]
+    ],
+    "websiteUrl": "www.hulu.com",
+    "logoDevSuffix": "hulu.com"
   },
   {
     "aliasNames": {
@@ -156,7 +190,9 @@
     "emailAddresses": [
       "appleid@id.apple.com",
       "no_reply@email.apple.com"
-    ]
+    ],
+    "websiteUrl": "www.apple.com",
+    "logoDevSuffix": "apple.com"
   },
   {
     "aliasNames": {
@@ -164,7 +200,9 @@
     },
     "emailAddresses": [
       "no-reply@dropbox.com"
-    ]
+    ],
+    "websiteUrl": "www.dropbox.com",
+    "logoDevSuffix": "dropbox.com"
   },
   {
     "aliasNames": {
@@ -172,7 +210,9 @@
     },
     "emailAddresses": [
       "no-reply@crunchyroll.com"
-    ]
+    ],
+    "websiteUrl": "www.crunchyroll.com",
+    "logoDevSuffix": "crunchyroll.com"
   },
   {
     "aliasNames": {
@@ -181,6 +221,8 @@
     },
     "emailAddresses": [
       "help@coupang.com"
-    ]
+    ],
+    "websiteUrl": "www.coupang.com",
+    "logoDevSuffix": "coupang.com"
   }
 ]
