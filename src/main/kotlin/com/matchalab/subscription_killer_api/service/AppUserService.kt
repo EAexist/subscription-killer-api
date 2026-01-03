@@ -1,10 +1,12 @@
 package com.matchalab.subscription_killer_api.service
 
 import com.matchalab.subscription_killer_api.domain.AppUser
+import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -13,20 +15,6 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class AppUserService(private val appUserRepository: AppUserRepository) {
-//    fun getAppUserId(): UUID {
-//        val context: SecurityContext = SecurityContextHolder.getContext()
-//        val authentication: Authentication? = context.authentication
-//        if (authentication == null || !authentication.isAuthenticated) {
-//            throw AccessDeniedException("User is not authenticated.")
-//        }
-//
-//        logger.debug { "\uD83D\uDE80 authentication: ${authentication.toString()}" }
-//        logger.debug { "\uD83D\uDE80 name: ${authentication.name}" }
-//
-//        val appUserId: UUID = UUID.fromString(authentication.name)
-//
-//        return appUserId
-//    }
 
     fun findByIdOrNull(appUserId: UUID): AppUser? {
         return appUserRepository.findByIdOrNull(appUserId)
@@ -45,6 +33,21 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
 
     fun findByIdWithAccounts(appUserId: UUID): AppUser? {
         return appUserRepository.findByIdWithAccounts(appUserId)
+    }
+
+    fun findByGoogleAccounts_Subject(googleSub: String): AppUser? {
+        return appUserRepository.findByGoogleAccounts_Subject(googleSub)
+    }
+
+    fun register(user: OidcUser): AppUser {
+        val appUser = AppUser(
+            name = user.givenName
+        )
+        appUser.addGoogleAccount(GoogleAccount(subject = user.name, name = user.givenName, email = user.email))
+
+        return appUserRepository.save(
+            appUser
+        )
     }
 
 //    fun getAppUser(): AppUser {

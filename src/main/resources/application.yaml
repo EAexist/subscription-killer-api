@@ -36,7 +36,7 @@ server:
   forward-headers-strategy: framework
 app:
   oauth2:
-    redirect-uri: http://localhost:3000/dashboard
+    redirect-uri: http://localhost:3000/report
   cors:
     allowed-methods:
       - GET
@@ -47,6 +47,7 @@ app:
     max-age: 3600
   mail:
     analysis-months: 13
+  min-request-interval-hours: 72
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/1-filter-and-categorize-emails.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/2-generalize-string-pattern.st
@@ -75,7 +76,7 @@ app:
     client-secret: ${APP_GOOGLE_CLIENT_SECRET}
     token-server-url: https://oauth2.googleapis.com/token
     token-refresh-threshold-seconds: 300
-    
+
 ---
 spring:
   config:
@@ -90,20 +91,19 @@ app:
       - https://subscription-killer-git-staging-matchalab-project.vercel.app
       - https://localhost:3000
   mail:
-    analysis-months: 8
-  min-request-interval-hours: 72
+    analysis-months: 13
 logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  #  pattern:
+  #    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     com.matchalab.subscription_killer_api: DEBUG
     org:
       springframework:
-      #        ai: DEBUG
-      #        security: DEBUG
-      #        security.oauth2: DEBUG
-      #        security.oauth2.client: DEBUG
-      #        session: DEBUG
+        #        ai: DEBUG
+        security: DEBUG
+        security.oauth2: DEBUG
+        security.oauth2.client: DEBUG
+        session: DEBUG
       hibernate:
         SQL: DEBUG
 #        type.descriptor.sql.BasicBinder: TRACE

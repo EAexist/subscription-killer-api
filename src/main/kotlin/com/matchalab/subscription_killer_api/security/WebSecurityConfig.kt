@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableConfigurationProperties(CorsProperties::class)
 open class WebSecurityConfig(
     private val corsConfigurationSource: CorsConfigurationSource,

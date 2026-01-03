@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.domain
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import com.matchalab.subscription_killer_api.subscription.Subscription
 import jakarta.persistence.*
 import java.time.Instant
@@ -32,13 +31,13 @@ class GoogleAccount(
     @JoinColumn(name = "app_user_id", nullable = false)
     var appUser: AppUser? = null
 ) {
-    constructor(
-        payload: GoogleIdToken.Payload
-    ) : this(
-        subject = payload.subject,
-        email = payload.email,
-        name = payload.get("name") as? String ?: "Unknown",
-    )
+//    constructor(
+//        payload: GoogleIdToken.Payload
+//    ) : this(
+//        subject = payload.subject,
+//        email = payload.email,
+//        name = payload.get("name") as? String ?: "Unknown",
+//    )
 
     fun updateRefreshToken(refreshToken: String) {
         this.refreshToken = refreshToken
