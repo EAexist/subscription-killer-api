@@ -99,9 +99,9 @@ class ServiceProviderService(
         val existingAddresses = emailSourceRepository.findExistingAddresses(addressesInMessages)
         val newSenders = namedSenders.filter { !existingAddresses.contains(it.email) }
 
-        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
-        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
-        logger.debug { "\uD83D\uDC1E [addEmailSourcesFromMessages] newSenders: $newSenders" }
+        logger.debug { "🔊 [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
+        logger.debug { "🔊 [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
+        logger.debug { "🔊 [addEmailSourcesFromMessages] newSenders: $newSenders" }
 
 
         val aliasNameToNewEmails = newSenders.groupBy(

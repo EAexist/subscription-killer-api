@@ -126,6 +126,10 @@ tasks.register<Zip>("buildZip") {
     into("lib") { from(configurations.compileClasspath) }
 }
 
+tasks.withType<JavaExec> {
+    jvmArgs("-Dfile.encoding=UTF-8")
+}
+
 tasks.build {
     dependsOn(tasks.getByName("buildZip"))
 }

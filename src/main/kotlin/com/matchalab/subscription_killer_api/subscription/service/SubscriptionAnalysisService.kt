@@ -153,46 +153,46 @@ class SubscriptionAnalysisService(
                 // @TODO: optimize
                 serviceProviderService.addEmailSourcesFromMessages(allMessages)
 
-//                logger.debug {
-//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] allServiceProviders:\n${
-//                        serviceProviderService.findAllWithEmailSources().joinToString("\n") {
-//                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
-//                        }
-//                    }"
-//                }
+                logger.debug {
+                    "🔊 [analyzeSingleGoogleAccount] allServiceProviders:\n${
+                        serviceProviderService.findAllWithEmailSources().joinToString("\n") {
+                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
+                        }
+                    }"
+                }
 
                 // Analyze Subscription Status
                 val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
                 val serviceProviders =
                     serviceProviderService.findByActiveEmailAddressesInWithEmailSources(uniqueAddresses)
 
-//                logger.debug {
-//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] serviceProviders:\n${
-//                        serviceProviders.joinToString("\n") {
-//                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
-//                        }
-//                    }"
-//                }
+                logger.debug {
+                    "🔊 [analyzeSingleGoogleAccount] serviceProviders:\n${
+                        serviceProviders.joinToString("\n") {
+                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
+                        }
+                    }"
+                }
 
                 val addressToServiceProvider = serviceProviders.flatMap { serviceProvider ->
                     serviceProvider.emailSources.map { it.targetAddress to serviceProvider }
                 }.toMap()
 
-//                logger.debug {
-//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] senderEmails:\n${
-//                        allMessages.joinToString(", ") {
-//                            it.senderEmail
-//                        }
-//                    }"
-//                }
-//
-//                logger.debug {
-//                    "\uD83D\uDC1E [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
-//                        addressToServiceProvider.entries.joinToString(
-//                            "\n"
-//                        ) { (key, value) -> "  $key -> $value" }
-//                    }"
-//                }
+                logger.debug {
+                    "🔊 [analyzeSingleGoogleAccount] senderEmails:\n${
+                        allMessages.joinToString(", ") {
+                            it.senderEmail
+                        }
+                    }"
+                }
+
+                logger.debug {
+                    "🔊 [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
+                        addressToServiceProvider.entries.joinToString(
+                            "\n"
+                        ) { (key, value) -> "  $key -> $value" }
+                    }"
+                }
 
                 val serviceProviderToAddressToMessages = allMessages
                     .mapNotNull { message ->
@@ -203,6 +203,13 @@ class SubscriptionAnalysisService(
                     .mapValues { (_, messages) ->
                         messages.groupBy { it.senderEmail }
                     }
+                logger.debug {
+                    "🔊 [analyzeSingleGoogleAccount] serviceProviderToAddressToMessages:\n${
+                        serviceProviderToAddressToMessages.entries.joinToString(
+                            "\n"
+                        ) { (key, value) -> "  $key -> $value" }
+                    }"
+                }
 
                 val subscriptions: List<SubscriptionDto> =
                     coroutineScope {

@@ -166,7 +166,7 @@ constructor(
             .exchange()
             .expectStatus().isOk()
             .returnResult(object : ParameterizedTypeReference<AnalysisProgressUpdate>() {})
-            .responseBody.doOnNext { logger.debug { "\uD83D\uDC1E eventStream: $it" } }
+            .responseBody.doOnNext { logger.debug { "🔊 eventStream: $it" } }
 
         StepVerifier.create(eventStream).expectSubscription()
             .assertNext { update ->

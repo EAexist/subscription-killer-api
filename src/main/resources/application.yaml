@@ -52,6 +52,9 @@ app:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/1-filter-and-categorize-emails.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/2-generalize-string-pattern.st
     merge-email-detection-rules: classpath:/prompts/eventRuleUpdate/3-merge-event-rules.st
+logging:
+  charset:
+    console: UTF-8
 ---
 spring:
   config:
@@ -90,11 +93,12 @@ app:
       - https://subscription-killer-git-main-matchalab-project.vercel.app
       - https://subscription-killer-git-staging-matchalab-project.vercel.app
       - https://localhost:3000
+      - http://localhost:3000
   mail:
     analysis-months: 13
 logging:
-  #  pattern:
-  #    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
   level:
     com.matchalab.subscription_killer_api: DEBUG
     org:
