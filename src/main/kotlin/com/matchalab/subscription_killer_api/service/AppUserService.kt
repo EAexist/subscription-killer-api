@@ -56,7 +56,7 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
 
 //    fun getAppUser(): AppUser {
 //        val count = appUserRepository.count()
-//        logger.debug { "\uD83D\uDE80 Total users in DB: $count" }
+//        logger.debug { "\uD83D\uDE80 | Total users in DB: $count" }
 //        val appUserId = getAppUserId()
 //        return appUserRepository.findById(appUserId)
 //            .orElseThrow { EntityNotFoundException("User not found with id $appUserId") }

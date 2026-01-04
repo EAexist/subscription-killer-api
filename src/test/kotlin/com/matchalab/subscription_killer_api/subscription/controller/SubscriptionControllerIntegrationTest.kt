@@ -166,7 +166,7 @@ constructor(
             .exchange()
             .expectStatus().isOk()
             .returnResult(object : ParameterizedTypeReference<AnalysisProgressUpdate>() {})
-            .responseBody.doOnNext { logger.debug { "🔊 eventStream: $it" } }
+            .responseBody.doOnNext { logger.debug { "🔊 | eventStream: $it" } }
 
         StepVerifier.create(eventStream).expectSubscription()
             .assertNext { update ->
@@ -243,7 +243,7 @@ constructor(
                 assertThat(body).isNotNull()
                 assertThat(body?.accountReports).isNotEmpty()
 
-                logger.debug { "\uD83D\uDE80 /api/v1/reports Response body: $body" }
+                logger.debug { "\uD83D\uDE80 | /api/v1/reports Response body: $body" }
             }
     }
 

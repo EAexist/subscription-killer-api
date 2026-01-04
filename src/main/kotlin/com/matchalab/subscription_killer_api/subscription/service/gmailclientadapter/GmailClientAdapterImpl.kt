@@ -41,7 +41,7 @@ open class GmailClientAdapterImpl(
             "gmail.query" to query
         ) {
 
-            logger.debug { "\uD83D\uDE80 [listMessageIds] query: $query" }
+            logger.debug { "\uD83D\uDE80 | [listMessageIds] query: $query" }
 
             val messageIds = mutableListOf<String>()
             var pageToken: String? = null
@@ -164,7 +164,7 @@ open class GmailClientAdapterImpl(
 //    open override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =
 //        withContext(Dispatchers.IO) {
 //
-//            logger.debug { "\uD83D\uDE80 fetching ${messageIds.size} messages" }
+//            logger.debug { "\uD83D\uDE80 | fetching ${messageIds.size} messages" }
 //
 //            val results = mutableListOf<Message>()
 //

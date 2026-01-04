@@ -34,7 +34,7 @@ class DataInitializer(
             serviceProviderRepository.saveAll(newProviders)
         }
 //        serviceProviderRepository.findAll().forEach { sp ->
-//            logger.debug { "🔊 provider.emailSources: ${sp.emailSources.joinToString(", ") { it.targetAddress }}" }
+//            logger.debug { "🔊 | provider.emailSources: ${sp.emailSources.joinToString(", ") { it.targetAddress }}" }
 //        }
     }
 

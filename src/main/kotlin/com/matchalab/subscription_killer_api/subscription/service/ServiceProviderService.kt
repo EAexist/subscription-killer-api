@@ -99,9 +99,9 @@ class ServiceProviderService(
         val existingAddresses = emailSourceRepository.findExistingAddresses(addressesInMessages)
         val newSenders = namedSenders.filter { !existingAddresses.contains(it.email) }
 
-        logger.debug { "🔊 [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
-        logger.debug { "🔊 [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
-        logger.debug { "🔊 [addEmailSourcesFromMessages] newSenders: $newSenders" }
+        logger.debug { "🔊 | [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
+        logger.debug { "🔊 | [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
+        logger.debug { "🔊 | [addEmailSourcesFromMessages] newSenders: $newSenders" }
 
 
         val aliasNameToNewEmails = newSenders.groupBy(
@@ -129,7 +129,7 @@ class ServiceProviderService(
         addressToMessages: Map<String, List<GmailMessage>>
     ): ServiceProvider {
 
-        logger.debug { "\uD83D\uDE80 [updateEmailDetectionRules]" }
+        logger.debug { "\uD83D\uDE80 | [updateEmailDetectionRules]" }
 
         val isEmailDetectionRuleAnalysisAvailable =
             subscriptionRepository.countByServiceProviderId(provider.requiredId) < maxNumberOfEmailDetectionRuleAnalysis

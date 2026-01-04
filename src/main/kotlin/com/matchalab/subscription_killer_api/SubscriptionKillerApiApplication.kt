@@ -20,7 +20,7 @@ class SubscriptionKillerApiApplication {
     @EventListener(ApplicationReadyEvent::class)
     fun logStartupInfo() {
         logger.info { "System Encoding: ${Charset.defaultCharset().displayName()}" }
-        logger.info { "Encoding Test: 한글 ✅ ❌ ⚠️ 🔊 🔑 🔍" }
+        logger.info { "Encoding Test: 한글 ✅ ❌ ⚠️ 🔊 | 🔑 🔍" }
     }
 
     // /*
