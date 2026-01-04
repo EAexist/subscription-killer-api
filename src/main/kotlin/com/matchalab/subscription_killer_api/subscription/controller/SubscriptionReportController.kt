@@ -51,7 +51,7 @@ class SubscriptionReportController(
         } ?: ResponseEntity.noContent().build()
     }
 
-    @PostMapping("/analysis")
+    @PostMapping("/updates")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): ResponseEntity<Any> {
 
@@ -100,7 +100,7 @@ class SubscriptionReportController(
         return ResponseEntity.accepted().build()
     }
 
-    @GetMapping("/analysis/progress", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    @GetMapping("/updates", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun subscribeProgress(@AuthenticatedUser appUserId: UUID): ResponseEntity<SseEmitter> {
         val isOnProgress = progressService.isOnProgress(appUserId)
         return if (isOnProgress) {

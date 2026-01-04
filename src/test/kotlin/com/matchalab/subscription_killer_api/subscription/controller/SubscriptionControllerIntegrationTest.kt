@@ -145,7 +145,7 @@ constructor(
         // When, Then
         authedClient
             .post()
-            .uri("/api/v1/reports/analysis")
+            .uri("/api/v1/reports/updates")
             .exchange()
             .expectStatus()
             .isAccepted()
@@ -156,12 +156,12 @@ constructor(
 
         // When, Then
         authedClient.post()
-            .uri("/api/v1/reports/analysis")
+            .uri("/api/v1/reports/updates")
             .exchange()
             .expectStatus().isAccepted
 
         val eventStream: Flux<AnalysisProgressUpdate> = authedClient.get()
-            .uri("/api/v1/reports/analysis/progress")
+            .uri("/api/v1/reports/updates/progress")
             .accept(MediaType.TEXT_EVENT_STREAM)
             .exchange()
             .expectStatus().isOk()
