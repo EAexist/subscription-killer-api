@@ -38,4 +38,8 @@ class CustomOidcUser(
     override fun getUserInfo(): OidcUserInfo? {
         return oidcUser!!.userInfo
     }
+
+    fun getGoogleSubject(): String {
+        return oidcUser!!.claims?.get("sub")!! as String
+    }
 }

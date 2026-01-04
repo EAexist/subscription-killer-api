@@ -39,6 +39,10 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
         return appUserRepository.findByGoogleAccounts_Subject(googleSub)
     }
 
+    fun save(appUser: AppUser): AppUser {
+        return appUserRepository.save(appUser)
+    }
+
     fun register(user: OidcUser): AppUser {
         val appUser = AppUser(
             name = user.givenName

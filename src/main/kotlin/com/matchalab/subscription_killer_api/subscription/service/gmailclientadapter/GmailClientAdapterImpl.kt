@@ -41,7 +41,7 @@ open class GmailClientAdapterImpl(
             "gmail.query" to query
         ) {
 
-            logger.debug { "\uD83D\uDE80 query: $query" }
+            logger.debug { "\uD83D\uDE80 [listMessageIds] query: $query" }
 
             val messageIds = mutableListOf<String>()
             var pageToken: String? = null

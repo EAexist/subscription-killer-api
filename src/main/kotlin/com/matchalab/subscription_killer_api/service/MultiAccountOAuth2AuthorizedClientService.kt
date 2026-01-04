@@ -2,8 +2,9 @@ package com.matchalab.subscription_killer_api.service
 
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
+import com.matchalab.subscription_killer_api.security.CustomOidcUser
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
@@ -13,26 +14,42 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.OAuth2RefreshToken
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class MultiAccountOAuth2AuthorizedClientService(
     private val clientRegistrationRepository: ClientRegistrationRepository,
     private val googleAccountRepository: GoogleAccountRepository,
-    private val appUserRepository: AppUserRepository,
+    private val appUserService: AppUserService,
 ) : OAuth2AuthorizedClientService {
 
+    @Transactional
     override fun saveAuthorizedClient(client: OAuth2AuthorizedClient, principal: Authentication) {
-        val googleAccountSubject: String = (client.principalName)
+        val customUser = principal.principal as CustomOidcUser
+        val googleAccountSubject: String = customUser.getGoogleSubject()
 
-        val googleAccount: GoogleAccount? = googleAccountRepository.findByIdOrNull(googleAccountSubject)
-        if (googleAccount != null) {
-            googleAccount.refreshToken = client.refreshToken?.tokenValue
-            googleAccount.accessToken = client.accessToken.tokenValue
-            googleAccount.expiresAt = client.accessToken.expiresAt
-            googleAccountRepository.save(googleAccount)
+        val existingGoogleAccount: GoogleAccount? = googleAccountRepository.findByIdOrNull(googleAccountSubject)
+        
+        if (existingGoogleAccount != null) {
+            logger.debug { "\uD83D\uDD0A [saveAuthorizedClient] Updating existing GoogleAccount" }
+            client.refreshToken?.tokenValue?.let {
+                logger.debug { "\uD83D\uDD0A [saveAuthorizedClient] Updating RefreshToken" }
+                existingGoogleAccount.refreshToken = it
+            }
+            existingGoogleAccount.accessToken = client.accessToken.tokenValue
+            existingGoogleAccount.expiresAt = client.accessToken.expiresAt
+            googleAccountRepository.save(existingGoogleAccount)
         } else {
-
+            logger.debug { "\uD83D\uDD0A [saveAuthorizedClient] Adding new GoogleAccount" }
+            logger.debug {
+                "\uD83D\uDD0A [saveAuthorizedClient] " +
+                        "RefreshToken: ${client.refreshToken?.tokenValue ?: "NULL"}, " +
+                        "AccessToken: ${client.accessToken.tokenValue}, " +
+                        "ExpiresAt: ${client.accessToken.expiresAt}"
+            }
             val attributes = (principal as? OAuth2AuthenticationToken)?.principal?.attributes
                 ?: throw (Exception("Principal attributes not found"))
             val name: String = attributes["name"] as String
@@ -46,10 +63,10 @@ class MultiAccountOAuth2AuthorizedClientService(
                 accessToken = client.accessToken.tokenValue,
                 expiresAt = client.accessToken.expiresAt
             )
-
-            val newAppUser: AppUser = AppUser(null, name)
-            newAppUser.addGoogleAccount(newGoogleAccount)
-            appUserRepository.save(newAppUser)
+            val currentUser = (principal.principal as CustomOidcUser)
+            val appUser = appUserService.findByIdOrNotFound(currentUser.appUserId!!)
+            appUser.addGoogleAccount(newGoogleAccount)
+            appUserService.save(appUser)
         }
     }
 
@@ -69,7 +86,7 @@ class MultiAccountOAuth2AuthorizedClientService(
         } else {
             val appUserId =
                 UUID.fromString(appUserIdString)
-            val appUser: AppUser = appUserRepository.findByIdOrNull(
+            val appUser: AppUser = appUserService.findByIdOrNull(
                 appUserId
             ) ?: throw IllegalStateException("No Google Account linked for user $appUserId")
             googleAccount = appUser.googleAccounts.first()
