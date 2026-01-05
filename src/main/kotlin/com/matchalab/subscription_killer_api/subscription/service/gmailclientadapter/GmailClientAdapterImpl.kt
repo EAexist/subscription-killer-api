@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.io.IOException
+import java.util.Collections.synchronizedList
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,8 +30,8 @@ open class GmailClientAdapterImpl(
 ) : GmailClientAdapter {
 
     private val userId = "me"
-    private val semaphore = Semaphore(5)
-    private val getRequestChunkSize = 100
+    private val semaphore = Semaphore(2)
+    private val getRequestChunkSize = 50
 
     open override suspend fun listMessageIds(query: String): List<String> {
         val parent = observationRegistry.currentObservation
@@ -94,19 +95,23 @@ open class GmailClientAdapterImpl(
                         async {
                             semaphore.withPermit {
                                 retryWithBackoff {
-                                    val chunkResults = mutableListOf<Message>()
+                                    val chunkResults = synchronizedList(mutableListOf<Message>())
                                     executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
                                         override fun onSuccess(m: Message?, h: HttpHeaders) {
                                             m?.let { chunkResults.add(it) }
                                         }
 
                                         override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
+                                            logger.error { "❌\u0020Batch item failed: ${e.message} (Code: ${e.code})" }
                                             if (e.code == 429) throw RateLimitException(e.message)
                                         }
                                     }) { id ->
                                         gmailClient.users().messages().get(userId, id)
                                             .setFormat(plan.format)
                                             .setFields(plan.fields)
+                                    }
+                                    if (chunkResults.isEmpty() && chunk.isNotEmpty()) {
+                                        logger.debug { "❌\u0020getMessages | chunk not empty, chunkResults is empty" }
                                     }
                                     chunkResults
                                 }
@@ -130,11 +135,13 @@ open class GmailClientAdapterImpl(
                 return block()
             } catch (e: RateLimitException) {
                 if (attempt == maxRetries - 1) throw e
-                delay(currentDelay)
+                val jitter = (currentDelay * 0.2).toLong()
+                val delayWithJitter = currentDelay + (-jitter..jitter).random()
+                delay(delayWithJitter)
                 currentDelay *= 2
             }
         }
-        return block()
+        throw IllegalStateException("Retry failed")
     }
 
     class RateLimitException(message: String) : Exception(message)
@@ -150,7 +157,6 @@ open class GmailClientAdapterImpl(
 
         val batch = gmailClient.batch()
 
-        // Process in chunks if necessary (Gmail Batch limit is 100)
         ids.filterNotNull().take(100).forEach { id ->
             val request = requestBuilder(id)
             request.queue(batch, callback)
@@ -159,6 +165,7 @@ open class GmailClientAdapterImpl(
         try {
             batch.execute()
         } catch (e: Exception) {
+            logger.error { "❌\u0020[executeGmailBatch] ${e.message}" }
         }
     }
 //    open override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> =

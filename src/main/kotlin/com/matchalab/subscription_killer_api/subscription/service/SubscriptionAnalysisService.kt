@@ -141,8 +141,17 @@ class SubscriptionAnalysisService(
                 val listMessageQuery = String.format("%s (%s)", afterPart, fromPart)
                 val allMessageIds: List<String> = gmailClientAdapter.listMessageIds(listMessageQuery)
 
+                logger.debug {
+                    "🔊 | [analyzeSingleGoogleAccount] gmailClientAdapter.listMessageIds() returned ${allMessageIds.size} messageIds"
+                }
                 val allMessages: List<GmailMessage> =
                     gmailClientAdapter.getMessages(allMessageIds, MessageFetchPlan.INTERNAL_DATE_SNIPPET_FROM_SUBJECT)
+
+                logger.debug {
+                    "🔊 | [analyzeSingleGoogleAccount] gmailClientAdapter.getMessages() returned ${allMessages.size} messages:\n${
+                        allMessages.map { it.senderEmail }.joinToString(", ") { it }
+                    }"
+                }
 
                 progressService.setProgress(
                     appUserId,
@@ -153,16 +162,15 @@ class SubscriptionAnalysisService(
                 // @TODO: optimize
                 serviceProviderService.addEmailSourcesFromMessages(allMessages)
 
+                // Analyze Subscription Status
+                val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
+
                 logger.debug {
-                    "🔊 | [analyzeSingleGoogleAccount] allServiceProviders:\n${
-                        serviceProviderService.findAllWithEmailSources().joinToString("\n") {
-                            "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> "${emailSource.targetAddress}/${emailSource.isActive}" }}"
-                        }
+                    "🔊 | [analyzeSingleGoogleAccount] uniqueAddresses:\n${
+                        uniqueAddresses.joinToString("\n") { it }
                     }"
                 }
 
-                // Analyze Subscription Status
-                val uniqueAddresses = allMessages.map { it.senderEmail }.distinct()
                 val serviceProviders =
                     serviceProviderService.findByActiveEmailAddressesInWithEmailSources(uniqueAddresses)
 

@@ -47,7 +47,8 @@ app:
     max-age: 3600
   mail:
     analysis-months: 13
-  min-request-interval-hours: 72
+  #  min-request-interval-hours: 72
+  min-request-interval-hours: 0
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/1-filter-and-categorize-emails.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/2-generalize-string-pattern.st
