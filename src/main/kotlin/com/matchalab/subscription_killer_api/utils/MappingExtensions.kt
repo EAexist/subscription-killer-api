@@ -34,7 +34,6 @@ fun GoogleAccount.toReportDto(): AccountReportDto {
     return AccountReportDto(
         subscriptions = this.subscriptions.map { it -> it.toResponseDto() },
         googleAccount = this.toResponseDto(),
-        analyzedAt = this.analyzedAt
     )
 }
 

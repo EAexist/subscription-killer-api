@@ -2,6 +2,7 @@ package com.matchalab.subscription_killer_api.subscription.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
 import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionAnalysisService
@@ -49,6 +50,11 @@ class SubscriptionReportController(
         return report?.let {
             ResponseEntity.ok(it)
         } ?: ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/updates/eligibility")
+    fun getUpdateEligibility(@AuthenticatedUser appUserId: UUID): ReportUpdateEligibilityDto {
+        return reportService.getUpdateEligibility(appUserId)
     }
 
     @PostMapping("/updates")
