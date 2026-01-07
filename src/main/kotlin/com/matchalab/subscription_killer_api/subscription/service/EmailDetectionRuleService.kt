@@ -3,7 +3,6 @@ package com.matchalab.subscription_killer_api.subscription.service
 import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.call
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
-import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
@@ -11,6 +10,17 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
+
+data class EmailDetectionRuleGenerationDto(
+    val eventType: SubscriptionEventType,
+
+    val subjectKeywords: List<String> = emptyList(),
+    val subjectRegex: String? = null,
+
+    val snippetKeywords: List<String> = emptyList(),
+    val snippetRegex: String? = null
+)
+
 
 data class FilterAndCategorizeEmailsTaskResponse(
     val paymentStartMessages: List<GmailMessage>,
@@ -25,10 +35,10 @@ data class GmailMessageSummaryDto(
 )
 
 data class UpdateEmailDetectionRulesFromAIResultDto(
-    val paymentStartRule: EmailDetectionRule?,
-    val paymentCancelRule: EmailDetectionRule?,
-    val monthlyPaymentRule: EmailDetectionRule?,
-    val annualPaymentRule: EmailDetectionRule?,
+    val paymentStartRule: EmailDetectionRuleGenerationDto?,
+    val paymentCancelRule: EmailDetectionRuleGenerationDto?,
+    val monthlyPaymentRule: EmailDetectionRuleGenerationDto?,
+    val annualPaymentRule: EmailDetectionRuleGenerationDto?,
 ) {}
 
 @Service
@@ -39,7 +49,7 @@ class EmailDetectionRuleService(
     fun generateRules(
         emailSource: EmailSource,
         messages: List<GmailMessage>
-    ): Map<SubscriptionEventType, EmailDetectionRule> {
+    ): Map<SubscriptionEventType, EmailDetectionRuleGenerationDto> {
         val emails: List<GmailMessageSummaryDto> = messages.map {
             GmailMessageSummaryDto(it.subject, it.snippet)
         }

@@ -139,7 +139,7 @@ class ServiceProviderService(
                 val messages: List<GmailMessage> = addressToMessages[emailSource.targetAddress] ?: emptyList()
                 if (messages.isNotEmpty()) {
                     val newEmailDetectionRules = emailDetectionRuleService.generateRules(emailSource, messages)
-                    emailSource.updateEmailDetectionRules(
+                    emailSource.addEmailDetectionRules(
                         newEmailDetectionRules
                     )
                 }
