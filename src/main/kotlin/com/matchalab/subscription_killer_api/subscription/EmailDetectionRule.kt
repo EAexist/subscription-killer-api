@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.subscription
 
+import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import java.time.Instant
@@ -17,4 +18,18 @@ data class EmailDetectionRule(
 
     val snippetKeywords: List<String> = emptyList(),
     val snippetRegex: String? = null
-)
+) {
+    companion object {
+        fun createActive(generationDto: EmailDetectionRuleGenerationDto, updatedAt: Instant): EmailDetectionRule {
+            return EmailDetectionRule(
+                true,
+                updatedAt,
+                generationDto.eventType,
+                generationDto.subjectKeywords,
+                generationDto.subjectRegex,
+                generationDto.snippetKeywords,
+                generationDto.snippetRegex
+            )
+        }
+    }
+}

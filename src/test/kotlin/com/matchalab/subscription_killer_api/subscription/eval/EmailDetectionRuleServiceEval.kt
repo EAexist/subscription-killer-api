@@ -30,7 +30,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.io.ClassPathResource
-import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
@@ -56,7 +55,7 @@ private val logger = KotlinLogging.logger {}
 //)
 @Import(EmailDetectionRuleService::class)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
-@ActiveProfiles("dev", "test", "gcp")
+//@ActiveProfiles("dev", "test", "gcp")
 @Tag("gcp")
 @Tag("ai")
 class EmailDetectionRuleServiceEval @Autowired constructor(
@@ -66,7 +65,7 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
     lateinit var entityManagerFactory: EntityManagerFactory
 
     private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
-    private val testEmailSource = dataFactory.createEmailSource("fakeEmailAddress", mutableMapOf())
+    private val testEmailSource = dataFactory.createEmailSource("fakeEmailAddress")
 
     private lateinit var testMessageSummaries: List<GmailMessageSummaryDto>
 

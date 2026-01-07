@@ -48,15 +48,7 @@ class EmailSource(
                 it.isActive = false
             }
             eventRules.add(
-                EmailDetectionRule(
-                    true,
-                    updatedAt,
-                    newRule.eventType,
-                    newRule.subjectKeywords,
-                    newRule.subjectRegex,
-                    newRule.snippetKeywords,
-                    newRule.snippetRegex
-                )
+                EmailDetectionRule.createActive(newRule, updatedAt)
             )
         }
     }

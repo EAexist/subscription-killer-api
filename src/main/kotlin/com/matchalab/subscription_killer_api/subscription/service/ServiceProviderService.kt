@@ -146,7 +146,7 @@ class ServiceProviderService(
             }
         }
 
-        //@TODO If Rule is Complete, flag unused emailSources as disabled
+        //@TODO @COMPLETED If Rule is Complete, flag unused emailSources as disabled
         if (provider.isEmailDetectionRuleComplete()) {
             provider.emailSources.forEach {
                 if (it.eventRules.isEmpty()) {

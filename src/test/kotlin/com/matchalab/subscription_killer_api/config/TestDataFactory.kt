@@ -5,7 +5,6 @@ import com.matchalab.subscription_killer_api.repository.ServiceProviderRepositor
 import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import java.util.*
 
 open class TestDataFactory(
@@ -31,8 +30,8 @@ open class TestDataFactory(
 
     fun createEmailSource(
         targetAddress: String,
-        eventRules: MutableMap<SubscriptionEventType, EmailDetectionRule>?
+        eventRules: MutableList<EmailDetectionRule> = mutableListOf()
     ) =
-        EmailSource(null, targetAddress, (eventRules ?: mutableMapOf()))
+        EmailSource(null, targetAddress, eventRules)
 
 }

@@ -61,13 +61,15 @@ class SubscriptionAnalysisServiceTest(
             "Netflix",
             mutableListOf(
                 EmailSource(
-                    null, "info@account.netflix.com", mutableMapOf(
-                        SubscriptionEventType.PAID_SUBSCRIPTION_START to EmailDetectionRule(
+                    null, "info@account.netflix.com", mutableListOf(
+                        EmailDetectionRule(
+                            true, Instant.now(),
                             SubscriptionEventType.PAID_SUBSCRIPTION_START,
                             listOf("계정 정보 변경 확인"),
                             snippetKeywords = listOf("새로운 결제 수단")
                         ),
-                        SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to EmailDetectionRule(
+                        EmailDetectionRule(
+                            true, Instant.now(),
                             SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
                             subjectRegex = "멤버십을 다시 시작하세요",
                             snippetRegex = "멤버십이 보류 중",
@@ -203,7 +205,7 @@ class SubscriptionAnalysisServiceTest(
             } answers {
                 listOf(
                     fakeGmailMessages.filter { it.senderEmail == mockNetflixServiceProvider.emailSearchAddresses.first() }
-                    .minBy { it.internalDate },
+                        .minBy { it.internalDate },
                     fakeGmailMessages.filter { it.senderEmail == mockSketchfabServiceProvider.emailSearchAddresses.first() }
                         .minBy { it.internalDate })
             }
