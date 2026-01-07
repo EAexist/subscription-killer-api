@@ -13,9 +13,6 @@ import com.matchalab.subscription_killer_api.utils.observeSuspend
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.ObservationRegistry
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -30,8 +27,8 @@ open class GmailClientAdapterImpl(
 ) : GmailClientAdapter {
 
     private val userId = "me"
-    private val semaphore = Semaphore(2)
-    private val getRequestChunkSize = 50
+    private val semaphore = Semaphore(1)
+    private val getRequestChunkSize = 15
 
     open override suspend fun listMessageIds(query: String): List<String> {
         val parent = observationRegistry.currentObservation
@@ -89,44 +86,74 @@ open class GmailClientAdapterImpl(
             parent,
             "gmail.fields" to plan.fields
         ) {
-            coroutineScope {
-                messageIds.chunked(getRequestChunkSize)
-                    .map { chunk ->
-                        async {
-                            semaphore.withPermit {
-                                retryWithBackoff {
-                                    val chunkResults = synchronizedList(mutableListOf<Message>())
-                                    executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
-                                        override fun onSuccess(m: Message?, h: HttpHeaders) {
-                                            m?.let { chunkResults.add(it) }
-                                        }
 
-                                        override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
-                                            logger.error { "❌\u0020Batch item failed: ${e.message} (Code: ${e.code})" }
-                                            if (e.code == 429) throw RateLimitException(e.message)
-                                        }
-                                    }) { id ->
-                                        gmailClient.users().messages().get(userId, id)
-                                            .setFormat(plan.format)
-                                            .setFields(plan.fields)
-                                    }
-                                    if (chunkResults.isEmpty() && chunk.isNotEmpty()) {
-                                        logger.debug { "❌\u0020getMessages | chunk not empty, chunkResults is empty" }
-                                    }
-                                    chunkResults
-                                }
+            logger.debug { "🔊  [getMessages] Start fetching ${messageIds.size} messages" }
+
+            messageIds.chunked(getRequestChunkSize).flatMap { chunk ->
+                semaphore.withPermit {
+                    retryWithBackoff {
+                        val chunkResults = synchronizedList(mutableListOf<Message>())
+                        executeGmailBatch(chunk, object : JsonBatchCallback<Message>() {
+                            override fun onSuccess(m: Message?, h: HttpHeaders) {
+                                m?.let { chunkResults.add(it) }
                             }
+
+                            override fun onFailure(e: GoogleJsonError, h: HttpHeaders?) {
+                                logger.error { "❌\u0020Batch item failed: ${e.message} (Code: ${e.code})" }
+//                                if (e.code == 429) throw RateLimitException(e.message)
+                            }
+                        }) { id ->
+                            gmailClient.users().messages().get(userId, id)
+                                .setFormat(plan.format)
+                                .setFields(plan.fields)
                         }
-                    }.awaitAll()
-                    .flatten()
-                    .mapNotNull { it.toGmailMessage() }
+                        if (chunkResults.isEmpty() && chunk.isNotEmpty()) {
+                            logger.debug { "❌\u0020getMessages | chunk not empty, chunkResults is empty" }
+                        }
+                        chunkResults
+                    }
+                }
             }
+                .mapNotNull { it.toGmailMessage() }
         }
     }
 
+    override suspend fun getFirstMessageId(addresses: List<String>): String? {
+        val fromPart = addresses.joinToString(separator = " OR ") {
+            "from:\"$it\""
+        }
+        val query = fromPart
+        var pageToken: String? = null
+        var oldestId: String? = null
+
+        do {
+            val listResponse = try {
+                gmailClient.users().messages().list(userId)
+                    .setQ(query)
+                    .setPageToken(pageToken)
+                    .setMaxResults(500L)
+                    .setFields("nextPageToken,messages(id)") // Optimization: Only fetch IDs
+                    .execute()
+            } catch (e: Exception) {
+                null
+            } ?: break
+
+            val messages = listResponse.messages ?: emptyList()
+            if (messages.isNotEmpty()) {
+                // The last item in the list on the current page
+                oldestId = messages.last().id
+            }
+
+            pageToken = listResponse.nextPageToken
+        } while (pageToken != null)
+
+        return oldestId
+    }
+
+
     suspend fun <T> retryWithBackoff(
         maxRetries: Int = 5,
-        initialDelay: Long = 1000,
+        initialDelay: Long = 2000,
         block: suspend () -> T
     ): T {
         var currentDelay = initialDelay
@@ -157,7 +184,7 @@ open class GmailClientAdapterImpl(
 
         val batch = gmailClient.batch()
 
-        ids.filterNotNull().take(100).forEach { id ->
+        ids.filterNotNull().forEach { id ->
             val request = requestBuilder(id)
             request.queue(batch, callback)
         }

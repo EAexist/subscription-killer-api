@@ -35,8 +35,6 @@ private val logger = KotlinLogging.logger {}
 
 @ExtendWith(MockitoExtension::class)
 class SubscriptionAnalysisServiceTest(
-//    private val gmailClientFactory: GmailClientFactory,
-//    private val gmailClientAdapter: GmailClientAdapter,
 ) {
     private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
 
@@ -54,15 +52,7 @@ class SubscriptionAnalysisServiceTest(
 
     private val testMailProperties = MailProperties(analysisMonths = 13L)
 
-    private val subscriptionAnalysisService = SubscriptionAnalysisService(
-        googleAccountRepository,
-        appUserService,
-        serviceProviderService,
-        gmailClientFactory,
-        testMailProperties,
-        progressService,
-        ObservationRegistry.NOOP
-    )
+    private lateinit var subscriptionAnalysisService: SubscriptionAnalysisService
 
     private val testAppUserId: UUID = UUID.randomUUID()
 
@@ -106,6 +96,16 @@ class SubscriptionAnalysisServiceTest(
         val jsonPath = "static/messages_netflix_sketchfab.json"
         val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
         fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
+
+        subscriptionAnalysisService = SubscriptionAnalysisService(
+            googleAccountRepository,
+            appUserService,
+            serviceProviderService,
+            gmailClientFactory,
+            testMailProperties,
+            progressService,
+            ObservationRegistry.NOOP,
+        )
     }
 
     @Test
@@ -186,9 +186,31 @@ class SubscriptionAnalysisServiceTest(
 
             coEvery { mockGmailClientAdapter.listMessageIds(any<String>()) } returns (fakeGmailMessages.map { it.id })
 
-            coEvery { mockGmailClientAdapter.getMessages(any<List<String>>(), any<MessageFetchPlan>()) } answers {
+            coEvery {
+                mockGmailClientAdapter.getMessages(
+                    any<List<String>>(),
+                    MessageFetchPlan.INTERNAL_DATE_SNIPPET_FROM_SUBJECT
+                )
+            } answers {
                 fakeGmailMessages
             }
+
+            coEvery {
+                mockGmailClientAdapter.getMessages(
+                    any<List<String>>(),
+                    MessageFetchPlan.INTERNAL_DATE
+                )
+            } answers {
+                listOf(
+                    fakeGmailMessages.filter { it.senderEmail == mockNetflixServiceProvider.emailSearchAddresses.first() }
+                    .minBy { it.internalDate },
+                    fakeGmailMessages.filter { it.senderEmail == mockSketchfabServiceProvider.emailSearchAddresses.first() }
+                        .minBy { it.internalDate })
+            }
+
+            coEvery { mockGmailClientAdapter.getFirstMessageId(any<List<String>>()) } returns ("fakeFirstMessageId")
+
+            coEvery { mockGmailClientAdapter.getFirstMessageId(any<List<String>>()) } returns ("fakeFirstMessageId")
 
             // When
             subscriptionAnalysisService.analyze(testAppUserId)

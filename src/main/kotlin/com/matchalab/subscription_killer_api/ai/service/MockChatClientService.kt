@@ -16,6 +16,7 @@ class MockChatClientService(
 
     private val objectMapper = jacksonObjectMapper()
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> call(
         promptTemplateStream: Resource,
         params: Map<String, Any>,

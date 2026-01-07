@@ -6,6 +6,10 @@ data class MessageFetchPlan(
     val metadataHeaders: List<String> = emptyList()
 ) {
     companion object {
+        val INTERNAL_DATE = MessageFetchPlan(
+            format = "MINIMAL",
+            fields = "id,internalDate"
+        )
         val INTERNAL_DATE_SNIPPET_FROM_SUBJECT = MessageFetchPlan(
             format = "METADATA",
             fields = "id,internalDate,snippet,payload/headers",

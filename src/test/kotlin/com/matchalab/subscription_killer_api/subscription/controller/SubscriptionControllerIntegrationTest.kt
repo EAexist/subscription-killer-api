@@ -161,7 +161,7 @@ constructor(
             .expectStatus().isAccepted
 
         val eventStream: Flux<AnalysisProgressUpdate> = authedClient.get()
-            .uri("/api/v1/reports/updates/progress")
+            .uri("/api/v1/reports/updates")
             .accept(MediaType.TEXT_EVENT_STREAM)
             .exchange()
             .expectStatus().isOk()

@@ -96,7 +96,7 @@ app:
       - https://localhost:3000
       - http://localhost:3000
   mail:
-    analysis-months: 13
+    analysis-months: 8
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"

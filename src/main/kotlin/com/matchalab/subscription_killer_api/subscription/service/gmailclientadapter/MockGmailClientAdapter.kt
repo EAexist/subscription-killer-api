@@ -26,4 +26,8 @@ class MockGmailClientAdapter() : GmailClientAdapter {
     override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
         return messageIds.mapNotNull { sampleMessages[it] }
     }
+
+    override suspend fun getFirstMessageId(addresses: List<String>): String? {
+        return sampleMessages.values.first().id
+    }
 }
