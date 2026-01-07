@@ -43,4 +43,5 @@ class EmailSource(
             eventRules[eventType] = rule
         }
     }
+
 }

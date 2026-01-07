@@ -177,7 +177,7 @@ class ServiceProviderServiceTest() {
     fun `given incomplete rules and remaining chatclient quota then update via chatclient`() =
         runTest {
             every {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
@@ -271,7 +271,7 @@ class ServiceProviderServiceTest() {
 
             // Then
             verify(exactly = 0) {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
@@ -311,7 +311,7 @@ class ServiceProviderServiceTest() {
 
             // Then
             verify(exactly = 0) {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
@@ -356,7 +356,7 @@ class ServiceProviderServiceTest() {
 
                 // Then
                 verify(exactly = 0) {
-                    mockEmailDetectionRuleService.updateRules(
+                    mockEmailDetectionRuleService.generateRules(
                         any(),
                         any()
                     )

@@ -36,7 +36,7 @@ class EmailDetectionRuleService(
     private val chatClientService: ChatClientService,
     private val promptTemplateProperties: PromptTemplateProperties,
 ) {
-    fun updateRules(
+    fun generateRules(
         emailSource: EmailSource,
         messages: List<GmailMessage>
     ): Map<SubscriptionEventType, EmailDetectionRule> {
@@ -46,14 +46,12 @@ class EmailDetectionRuleService(
 
         val categorizedEmails: FilterAndCategorizeEmailsTaskResponse = filterAndCategorizeEmails(emails)
         val proposedRules: UpdateEmailDetectionRulesFromAIResultDto = generalizeStringPattern(categorizedEmails)
-        val mergedEmailDetectionRules: UpdateEmailDetectionRulesFromAIResultDto =
-            mergeEmailDetectionRules(emailSource, proposedRules)
 
         return listOfNotNull(
-            mergedEmailDetectionRules.paymentStartRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_START to it },
-            mergedEmailDetectionRules.paymentCancelRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to it },
-            mergedEmailDetectionRules.monthlyPaymentRule?.let { SubscriptionEventType.MONTHLY_PAYMENT to it },
-            mergedEmailDetectionRules.annualPaymentRule?.let { SubscriptionEventType.ANNUAL_PAYMENT to it }
+            proposedRules.paymentStartRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_START to it },
+            proposedRules.paymentCancelRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to it },
+            proposedRules.monthlyPaymentRule?.let { SubscriptionEventType.MONTHLY_PAYMENT to it },
+            proposedRules.annualPaymentRule?.let { SubscriptionEventType.ANNUAL_PAYMENT to it }
         ).toMap()
     }
 
@@ -69,22 +67,5 @@ class EmailDetectionRuleService(
         chatClientService.call<UpdateEmailDetectionRulesFromAIResultDto>(
             promptTemplateProperties.generalizeStringPattern,
             mapOf("categorizedEmails" to categorizedEmails)
-        )
-
-    fun mergeEmailDetectionRules(
-        emailSource: EmailSource,
-        proposedRules: UpdateEmailDetectionRulesFromAIResultDto
-    ): UpdateEmailDetectionRulesFromAIResultDto =
-        chatClientService.call<UpdateEmailDetectionRulesFromAIResultDto>(
-            promptTemplateProperties.mergeEmailDetectionRules, mapOf(
-                "currentPaymentStartRule" to (emailSource.paymentStartRule ?: "null"),
-                "newPaymentStartRule" to (proposedRules.paymentStartRule ?: "null"),
-                "currentPaymentCancelRule" to (emailSource.paymentCancelRule ?: "null"),
-                "newPaymentCancelRule" to (proposedRules.paymentCancelRule ?: "null"),
-                "currentMonthlyPaymentRule" to (emailSource.monthlyPaymentRule ?: "null"),
-                "newMonthlyPaymentRule" to (proposedRules.monthlyPaymentRule ?: "null"),
-                "currentAnnualPaymentRule" to (emailSource.annualPaymentRule ?: "null"),
-                "newAnnualPaymentRule" to (proposedRules.annualPaymentRule ?: "null"),
-            )
         )
 }

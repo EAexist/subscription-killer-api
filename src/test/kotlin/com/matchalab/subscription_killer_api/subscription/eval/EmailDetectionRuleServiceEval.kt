@@ -89,11 +89,6 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
 
         logger.debug { "proposedRules: $proposedRules" }
 
-        val mergedEmailDetectionRules: UpdateEmailDetectionRulesFromAIResultDto =
-            emailDetectionRuleService.mergeEmailDetectionRules(testEmailSource, proposedRules)
-
-        logger.debug { "mergedEmailDetectionRules: $mergedEmailDetectionRules" }
-
         assertAll(
             {
                 assertAll(
@@ -138,10 +133,6 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
                     }
                 )
             },
-
-            {
-                assertThat(proposedRules).isEqualTo(mergedEmailDetectionRules)
-            }
         )
     }
 }

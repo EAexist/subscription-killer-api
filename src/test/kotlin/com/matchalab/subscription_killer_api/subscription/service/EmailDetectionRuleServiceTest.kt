@@ -29,7 +29,6 @@ class EmailDetectionRuleServiceTest() {
         val emptyResource = ByteArrayResource(ByteArray(0))
         every { promptTemplateProperties.filterAndCategorizeEmails } returns emptyResource
         every { promptTemplateProperties.generalizeStringPattern } returns emptyResource
-        every { promptTemplateProperties.mergeEmailDetectionRules } returns emptyResource
     }
 
 //    @Test
@@ -63,7 +62,7 @@ class EmailDetectionRuleServiceTest() {
 //            ) {
 //                // When
 //                val updatedServiceProvider: Map<SubscriptionEventType, EmailDetectionRule> =
-//                    emailDetectionRuleService.updateRules(
+//                    emailDetectionRuleService.generateRules(
 //                        serviceProvider.emailSources[0],
 //                        fakeAddressToGmailMessages
 //                    )
