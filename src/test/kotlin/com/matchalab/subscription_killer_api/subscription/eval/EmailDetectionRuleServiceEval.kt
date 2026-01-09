@@ -3,18 +3,16 @@ package com.matchalab.subscription_killer_api.subscription.eval
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
+import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.config.TestDataFactory
-import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleService
 import com.matchalab.subscription_killer_api.subscription.service.FilterAndCategorizeEmailsTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
 import com.matchalab.subscription_killer_api.subscription.service.UpdateEmailDetectionRulesFromAIResultDto
-import com.matchalab.subscription_killer_api.utils.readMessages
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import com.matchalab.subscription_killer_api.utils.toSummaryDto
 import com.ninjasquad.springmockk.MockkBean
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.mockk.mockk
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.core.io.ClassPathResource
 import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
@@ -54,27 +51,26 @@ private val logger = KotlinLogging.logger {}
 //        SecurityFilterAutoConfiguration::class
 //    ]
 //)
-@Import(EmailDetectionRuleService::class)
+@Import(EmailDetectionRuleService::class, SampleMessageConfig::class)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
 @ActiveProfiles("dev", "test", "gcp")
 @Tag("gcp")
 @Tag("ai")
 class EmailDetectionRuleServiceEval @Autowired constructor(
-    private val emailDetectionRuleService: EmailDetectionRuleService
+    private val emailDetectionRuleService: EmailDetectionRuleService,
+    private val sampleMessages: List<Message>
 ) {
     @MockkBean
     lateinit var entityManagerFactory: EntityManagerFactory
 
-    private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
+    private val dataFactory = TestDataFactory()
     private val testEmailSource = dataFactory.createEmailSource("fakeEmailAddress", mutableMapOf())
 
     private lateinit var testMessageSummaries: List<GmailMessageSummaryDto>
 
     @BeforeEach
     fun setUp() {
-        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
-        val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
-        testMessageSummaries = rawMessages.mapNotNull { it.toGmailMessage()?.toSummaryDto() }
+        testMessageSummaries = sampleMessages.mapNotNull { it.toGmailMessage()?.toSummaryDto() }
     }
 
     @Test

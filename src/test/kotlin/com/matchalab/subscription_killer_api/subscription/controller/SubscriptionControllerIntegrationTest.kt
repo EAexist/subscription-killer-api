@@ -66,7 +66,7 @@ constructor(
 ) {
     lateinit var authedClient: WebTestClient
 
-    private val testDataFactory = TestDataFactory(serviceProviderRepository)
+    private val testDataFactory = TestDataFactory()
 
     private val localhost = "https://localhost:3000"
 

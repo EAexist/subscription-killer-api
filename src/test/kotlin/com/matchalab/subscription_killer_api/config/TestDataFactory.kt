@@ -1,20 +1,18 @@
 package com.matchalab.subscription_killer_api.config
 
+import com.google.api.client.json.gson.GsonFactory
+import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.domain.LocaleType
-import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import org.springframework.core.io.ClassPathResource
+import java.io.InputStream
 import java.util.*
 
 open class TestDataFactory(
-    private val serviceProviderRepository: ServiceProviderRepository
 ) {
-    data class ServiceProviderJson(
-        val aliasNames: Map<String, String>,
-        val emailAddresses: List<String>
-    )
 
     fun createServiceProvider(
         displayName: String,
@@ -35,4 +33,16 @@ open class TestDataFactory(
     ) =
         EmailSource(null, targetAddress, (eventRules ?: mutableMapOf()))
 
+    fun loadSampleMessages(): List<Message> {
+        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
+        return readMessages(ClassPathResource(jsonPath).inputStream)
+    }
+
+    fun readMessages(inputStream: InputStream): List<Message> {
+        val factory = GsonFactory.getDefaultInstance()
+        val parser = factory.createJsonParser(inputStream)
+        val messages = mutableListOf<Message>()
+        parser.parseArray(messages, Message::class.java)
+        return messages
+    }
 }

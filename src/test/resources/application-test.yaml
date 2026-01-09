@@ -9,3 +9,7 @@ sample-google-account:
   access-token: "placeholder"
   expires-at: "2026-01-09T03:51:28Z"
   scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email openid"
+app:
+  sample-messages:
+    dir: private/messages
+    fallback: static/messages/sample_messages_netflix_sketchfab.json

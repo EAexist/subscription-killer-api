@@ -5,14 +5,16 @@ import com.matchalab.subscription_killer_api.config.TestDataFactory
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
-import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
-import com.matchalab.subscription_killer_api.utils.*
+import com.matchalab.subscription_killer_api.utils.DateTimeUtils
+import com.matchalab.subscription_killer_api.utils.toDto
+import com.matchalab.subscription_killer_api.utils.toGmailMessage
+import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.ObservationRegistry
 import io.mockk.coEvery
@@ -25,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.core.io.ClassPathResource
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -36,7 +37,7 @@ private val logger = KotlinLogging.logger {}
 @ExtendWith(MockitoExtension::class)
 class SubscriptionAnalysisServiceTest(
 ) {
-    private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
+    private val dataFactory = TestDataFactory()
 
     private val googleAccountRepository = mockk<GoogleAccountRepository>()
 
@@ -93,8 +94,7 @@ class SubscriptionAnalysisServiceTest(
     @BeforeEach
     fun setUp() {
 
-        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
-        val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
+        val rawMessages: List<Message> = dataFactory.loadSampleMessages()
         fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
 
         subscriptionAnalysisService = SubscriptionAnalysisService(

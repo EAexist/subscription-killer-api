@@ -8,7 +8,6 @@ import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
-import com.matchalab.subscription_killer_api.utils.readMessages
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.every
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.core.io.ClassPathResource
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -33,7 +31,7 @@ class ServiceProviderServiceTest() {
     private val mockEmailSourceRepository = mockk<EmailSourceRepository>()
     private val mockEmailDetectionRuleService = mockk<EmailDetectionRuleService>()
 
-    private val dataFactory = TestDataFactory(mockk<ServiceProviderRepository>())
+    private val dataFactory = TestDataFactory()
 
     private val serviceProviderService = ServiceProviderService(
         mockServiceProviderRepository,
@@ -67,8 +65,7 @@ class ServiceProviderServiceTest() {
     )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {
-        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
-        readMessages(ClassPathResource(jsonPath).inputStream).mapNotNull { it.toGmailMessage() }
+        dataFactory.loadSampleMessages().mapNotNull { it.toGmailMessage() }
     }
 
     private val fakeAddressToGmailMessages: Map<String, List<GmailMessage>> =
