@@ -47,7 +47,8 @@ out/
 *.tmp
 .certs
 .env
-src/test/resources/application-test.yaml
+src/test/resources/application-test-local.yaml
+src/test/resources/private
 
-### Secrets ###
+### Scripts ###
 scripts/

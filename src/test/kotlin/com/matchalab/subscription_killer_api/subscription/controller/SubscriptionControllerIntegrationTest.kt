@@ -1,6 +1,6 @@
 package com.matchalab.subscription_killer_api.subscription.controller
 
-import com.matchalab.subscription_killer_api.config.GoogleTestUserProperties
+import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
 import com.matchalab.subscription_killer_api.config.TestDataFactory
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
@@ -19,9 +19,7 @@ import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
@@ -53,8 +51,9 @@ private val logger = KotlinLogging.logger {}
 //@Tag("gcp")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-@EnableConfigurationProperties(GoogleTestUserProperties::class)
+@EnableConfigurationProperties(SampleGoogleAccountProperties::class)
 @AutoConfigureObservability
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SubscriptionControllerIntegrationTest
 @Autowired
 constructor(
@@ -62,12 +61,9 @@ constructor(
     private val serviceProviderRepository: ServiceProviderRepository,
     private val sessionRepository: SessionRepository<out Session>,
     private val webTestClient: WebTestClient,
-    private val googleTestUserProperties: GoogleTestUserProperties,
+    private val sampleGoogleAccountProperties: SampleGoogleAccountProperties,
     private val transactionTemplate: TransactionTemplate,
 ) {
-    @Autowired
-//    lateinit var googleTestUserProperties: GoogleTestUserProperties
-
     lateinit var authedClient: WebTestClient
 
     private val testDataFactory = TestDataFactory(serviceProviderRepository)
@@ -77,6 +73,14 @@ constructor(
     private val testUserName: String = "testUserName"
 
     private lateinit var testAppUserId: UUID
+
+    @BeforeAll
+    fun checkEnvironment() {
+        Assumptions.assumeTrue(
+            sampleGoogleAccountProperties.refreshToken != "placeholder",
+            "✅ Skipping test: No real refresh token found."
+        )
+    }
 
     @BeforeEach
     fun setUp() {
@@ -90,13 +94,13 @@ constructor(
             )
         testAppUser.addGoogleAccount(
             GoogleAccount(
-                googleTestUserProperties.subject,
+                sampleGoogleAccountProperties.subject ?: "fakeSubject",
                 testUserName,
                 "testUserEmail",
-                googleTestUserProperties.refreshToken,
-                googleTestUserProperties.accessToken,
-                googleTestUserProperties.expiresAt,
-                googleTestUserProperties.scope
+                sampleGoogleAccountProperties.refreshToken,
+                sampleGoogleAccountProperties.accessToken,
+                sampleGoogleAccountProperties.expiresAt,
+                sampleGoogleAccountProperties.scope
             )
         )
 
