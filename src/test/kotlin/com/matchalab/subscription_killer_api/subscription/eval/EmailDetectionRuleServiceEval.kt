@@ -72,7 +72,7 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
 
     @BeforeEach
     fun setUp() {
-        val jsonPath = "static/messages_netflix_sketchfab.json"
+        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
         val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
         testMessageSummaries = rawMessages.mapNotNull { it.toGmailMessage()?.toSummaryDto() }
     }

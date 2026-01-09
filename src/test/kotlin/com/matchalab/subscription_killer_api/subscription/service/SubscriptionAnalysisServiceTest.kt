@@ -93,7 +93,7 @@ class SubscriptionAnalysisServiceTest(
     @BeforeEach
     fun setUp() {
 
-        val jsonPath = "static/messages_netflix_sketchfab.json"
+        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
         val rawMessages: List<Message> = readMessages(ClassPathResource(jsonPath).inputStream)
         fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
 
@@ -203,7 +203,7 @@ class SubscriptionAnalysisServiceTest(
             } answers {
                 listOf(
                     fakeGmailMessages.filter { it.senderEmail == mockNetflixServiceProvider.emailSearchAddresses.first() }
-                    .minBy { it.internalDate },
+                        .minBy { it.internalDate },
                     fakeGmailMessages.filter { it.senderEmail == mockSketchfabServiceProvider.emailSearchAddresses.first() }
                         .minBy { it.internalDate })
             }
