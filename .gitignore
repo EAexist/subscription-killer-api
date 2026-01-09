@@ -49,5 +49,5 @@ out/
 .env
 src/test/resources/application-test.yaml
 
-### Secrets ###
+### Scripts ###
 scripts/
