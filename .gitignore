@@ -48,6 +48,7 @@ out/
 .certs
 .env
 src/test/resources/application-test.yaml
+src/test/resources/private
 
 ### Scripts ###
 scripts/
