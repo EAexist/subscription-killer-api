@@ -38,7 +38,7 @@ class DataInitializer(
 //        }
     }
 
-    fun createServiceProvidersFromJson(jsonPath: String = "static/service-provider.json"): List<ServiceProvider> {
+    fun createServiceProvidersFromJson(jsonPath: String = "static/service-providers.json"): List<ServiceProvider> {
         val dtos: List<ServiceProviderJson> = readJsonList(ClassPathResource(jsonPath).inputStream)
 
         return dtos.map { dto ->

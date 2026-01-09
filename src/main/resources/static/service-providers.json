@@ -61,6 +61,8 @@
       "KO": "Adobe"
     },
     "emailAddresses": [
+      "message@adobe.com",
+      "store@adobe.com",
       "mail@adobetransactions.com"
     ],
     "websiteUrl": "www.adobe.com",
@@ -184,18 +186,6 @@
   },
   {
     "aliasNames": {
-      "EN": "Apple",
-      "KO": "Apple"
-    },
-    "emailAddresses": [
-      "appleid@id.apple.com",
-      "no_reply@email.apple.com"
-    ],
-    "websiteUrl": "www.apple.com",
-    "logoDevSuffix": "apple.com"
-  },
-  {
-    "aliasNames": {
       "EN": "Dropbox"
     },
     "emailAddresses": [
@@ -224,5 +214,25 @@
     ],
     "websiteUrl": "www.coupang.com",
     "logoDevSuffix": "coupang.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "WATCHA"
+    },
+    "emailAddresses": [
+      "do-not-reply@watcha.com"
+    ],
+    "websiteUrl": "www.watcha.com",
+    "logoDevSuffix": "watcha.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "noreply_melon"
+    },
+    "emailAddresses": [
+      "noreply_melon@kakaoent.com"
+    ],
+    "websiteUrl": "www.melon.com",
+    "logoDevSuffix": "melon.com"
   }
 ]
