@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("prod || gmail")
+@Profile("!prod && !gmail")
 @Component
 class MockGmailClientAdapter() : GmailClientAdapter {
 
-    val jsonPath = "static/messages_netflix_sketchfab.json"
+    val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
     val sampleMessages =
         readMessages(ClassPathResource(jsonPath).inputStream).mapNotNull { it.toGmailMessage() }.associateBy { it.id }
 

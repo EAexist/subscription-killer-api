@@ -16,11 +16,13 @@ import io.micrometer.observation.ObservationRegistry
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import org.springframework.context.annotation.Profile
 import java.io.IOException
 import java.util.Collections.synchronizedList
 
 private val logger = KotlinLogging.logger {}
 
+@Profile("prod || gmail")
 open class GmailClientAdapterImpl(
     private val gmailClient: Gmail,
     private val observationRegistry: ObservationRegistry
