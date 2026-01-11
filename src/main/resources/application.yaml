@@ -52,7 +52,6 @@ app:
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/1-filter-and-categorize-emails.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/2-generalize-string-pattern.st
-    merge-email-detection-rules: classpath:/prompts/eventRuleUpdate/3-merge-event-rules.st
 logging:
   charset:
     console: UTF-8

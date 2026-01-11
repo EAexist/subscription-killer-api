@@ -202,7 +202,6 @@ class SubscriptionAnalysisService(
                             computeSubscriptions(
                                 serviceProviders,
                                 allMessages,
-                                ::setProgress,
                                 ::setServiceProviderProgress
                             )
                         }
@@ -249,7 +248,6 @@ class SubscriptionAnalysisService(
     private suspend fun computeSubscriptions(
         serviceProviders: List<ServiceProvider>,
         allMessages: List<GmailMessage>,
-        setProgress: GeneralProgressCallback,
         setServiceProviderProgress: ServiceProviderProgressCallback
     ): List<SubscriptionDto> {
 

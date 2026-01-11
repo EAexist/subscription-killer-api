@@ -37,9 +37,9 @@ class ChatClientServiceImpl(
                     .entity(responseType))
         }.onSuccess { entity ->
             val entityString = entity.toString()
-            logger.info { "✨ | [Call Result]\n    prompt: $promptPreview,\n    result: $entityString" }
+            logger.info { "✨  [call] Result\n\tprompt: $promptPreview\n\tresult: $entityString" }
         }.onFailure { e ->
-            println("AI Call Failed: ${e.message}")
+            println("❌  [call] Failed: ${e.message}")
         }.getOrThrow()
     }
 

@@ -138,15 +138,15 @@ class ServiceProviderService(
             provider.emailSources.forEach { emailSource ->
                 val messages: List<GmailMessage> = addressToMessages[emailSource.targetAddress] ?: emptyList()
                 if (messages.isNotEmpty()) {
-                    val updatedEmailDetectionRules = emailDetectionRuleService.updateRules(emailSource, messages)
-                    emailSource.updateEmailDetectionRules(
-                        updatedEmailDetectionRules
+                    val newEmailDetectionRules = emailDetectionRuleService.generateRules(emailSource, messages)
+                    emailSource.addEmailDetectionRules(
+                        newEmailDetectionRules
                     )
                 }
             }
         }
 
-        //@TODO If Rule is Complete, flag unused emailSources as disabled
+        //@TODO @COMPLETED If Rule is Complete, flag unused emailSources as disabled
         if (provider.isEmailDetectionRuleComplete()) {
             provider.emailSources.forEach {
                 if (it.eventRules.isEmpty()) {

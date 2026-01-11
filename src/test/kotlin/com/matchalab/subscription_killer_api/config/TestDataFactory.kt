@@ -29,9 +29,9 @@ open class TestDataFactory(
 
     fun createEmailSource(
         targetAddress: String,
-        eventRules: MutableMap<SubscriptionEventType, EmailDetectionRule>?
+        eventRules: MutableList<EmailDetectionRule> = mutableListOf()
     ) =
-        EmailSource(null, targetAddress, (eventRules ?: mutableMapOf()))
+        EmailSource(null, targetAddress, eventRules)
 
     fun loadSampleMessages(): List<Message> {
         val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"

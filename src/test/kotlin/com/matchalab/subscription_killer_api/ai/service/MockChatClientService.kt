@@ -1,8 +1,8 @@
 package com.matchalab.subscription_killer_api.ai.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import com.matchalab.subscription_killer_api.subscription.service.FilterAndCategorizeEmailsTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.UpdateEmailDetectionRulesFromAIResultDto
 import org.springframework.context.annotation.Profile
@@ -39,14 +39,14 @@ class MockChatClientService(
 
         if ("{currentMonthlyPaymentRule}" in promptTemplate) {
             return UpdateEmailDetectionRulesFromAIResultDto(
-                EmailDetectionRule(
+                EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_START,
                     listOf("계정 정보 변경"),
                     "계정 정보 변경",
                     listOf("새로운 결제 수단 정보"),
                     "새로운 결제 수단 정보"
                 ),
-                EmailDetectionRule(
+                EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
                     listOf("결제 수단을 업데이트"),
                     "결제 수단을 업데이트",
