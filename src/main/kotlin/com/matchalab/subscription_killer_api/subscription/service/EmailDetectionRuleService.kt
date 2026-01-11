@@ -3,7 +3,6 @@ package com.matchalab.subscription_killer_api.subscription.service
 import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.call
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
-import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
@@ -11,6 +10,17 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
+
+data class EmailDetectionRuleGenerationDto(
+    val eventType: SubscriptionEventType,
+
+    val subjectKeywords: List<String> = emptyList(),
+    val subjectRegex: String? = null,
+
+    val snippetKeywords: List<String> = emptyList(),
+    val snippetRegex: String? = null
+)
+
 
 data class FilterAndCategorizeEmailsTaskResponse(
     val paymentStartMessages: List<GmailMessage>,
@@ -25,10 +35,10 @@ data class GmailMessageSummaryDto(
 )
 
 data class UpdateEmailDetectionRulesFromAIResultDto(
-    val paymentStartRule: EmailDetectionRule?,
-    val paymentCancelRule: EmailDetectionRule?,
-    val monthlyPaymentRule: EmailDetectionRule?,
-    val annualPaymentRule: EmailDetectionRule?,
+    val paymentStartRule: EmailDetectionRuleGenerationDto?,
+    val paymentCancelRule: EmailDetectionRuleGenerationDto?,
+    val monthlyPaymentRule: EmailDetectionRuleGenerationDto?,
+    val annualPaymentRule: EmailDetectionRuleGenerationDto?,
 ) {}
 
 @Service
@@ -36,24 +46,22 @@ class EmailDetectionRuleService(
     private val chatClientService: ChatClientService,
     private val promptTemplateProperties: PromptTemplateProperties,
 ) {
-    fun updateRules(
+    fun generateRules(
         emailSource: EmailSource,
         messages: List<GmailMessage>
-    ): Map<SubscriptionEventType, EmailDetectionRule> {
+    ): Map<SubscriptionEventType, EmailDetectionRuleGenerationDto> {
         val emails: List<GmailMessageSummaryDto> = messages.map {
             GmailMessageSummaryDto(it.subject, it.snippet)
         }
 
         val categorizedEmails: FilterAndCategorizeEmailsTaskResponse = filterAndCategorizeEmails(emails)
         val proposedRules: UpdateEmailDetectionRulesFromAIResultDto = generalizeStringPattern(categorizedEmails)
-        val mergedEmailDetectionRules: UpdateEmailDetectionRulesFromAIResultDto =
-            mergeEmailDetectionRules(emailSource, proposedRules)
 
         return listOfNotNull(
-            mergedEmailDetectionRules.paymentStartRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_START to it },
-            mergedEmailDetectionRules.paymentCancelRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to it },
-            mergedEmailDetectionRules.monthlyPaymentRule?.let { SubscriptionEventType.MONTHLY_PAYMENT to it },
-            mergedEmailDetectionRules.annualPaymentRule?.let { SubscriptionEventType.ANNUAL_PAYMENT to it }
+            proposedRules.paymentStartRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_START to it },
+            proposedRules.paymentCancelRule?.let { SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to it },
+            proposedRules.monthlyPaymentRule?.let { SubscriptionEventType.MONTHLY_PAYMENT to it },
+            proposedRules.annualPaymentRule?.let { SubscriptionEventType.ANNUAL_PAYMENT to it }
         ).toMap()
     }
 
@@ -69,22 +77,5 @@ class EmailDetectionRuleService(
         chatClientService.call<UpdateEmailDetectionRulesFromAIResultDto>(
             promptTemplateProperties.generalizeStringPattern,
             mapOf("categorizedEmails" to categorizedEmails)
-        )
-
-    fun mergeEmailDetectionRules(
-        emailSource: EmailSource,
-        proposedRules: UpdateEmailDetectionRulesFromAIResultDto
-    ): UpdateEmailDetectionRulesFromAIResultDto =
-        chatClientService.call<UpdateEmailDetectionRulesFromAIResultDto>(
-            promptTemplateProperties.mergeEmailDetectionRules, mapOf(
-                "currentPaymentStartRule" to (emailSource.paymentStartRule ?: "null"),
-                "newPaymentStartRule" to (proposedRules.paymentStartRule ?: "null"),
-                "currentPaymentCancelRule" to (emailSource.paymentCancelRule ?: "null"),
-                "newPaymentCancelRule" to (proposedRules.paymentCancelRule ?: "null"),
-                "currentMonthlyPaymentRule" to (emailSource.monthlyPaymentRule ?: "null"),
-                "newMonthlyPaymentRule" to (proposedRules.monthlyPaymentRule ?: "null"),
-                "currentAnnualPaymentRule" to (emailSource.annualPaymentRule ?: "null"),
-                "newAnnualPaymentRule" to (proposedRules.annualPaymentRule ?: "null"),
-            )
         )
 }

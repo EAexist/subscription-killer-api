@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
@@ -53,7 +52,7 @@ private val logger = KotlinLogging.logger {}
 //)
 @Import(EmailDetectionRuleService::class, SampleMessageConfig::class)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
-@ActiveProfiles("dev", "test", "gcp")
+//@ActiveProfiles("dev", "test", "gcp")
 @Tag("gcp")
 @Tag("ai")
 class EmailDetectionRuleServiceEval @Autowired constructor(
@@ -64,7 +63,7 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
     lateinit var entityManagerFactory: EntityManagerFactory
 
     private val dataFactory = TestDataFactory()
-    private val testEmailSource = dataFactory.createEmailSource("fakeEmailAddress", mutableMapOf())
+    private val testEmailSource = dataFactory.createEmailSource("fakeEmailAddress")
 
     private lateinit var testMessageSummaries: List<GmailMessageSummaryDto>
 
@@ -84,11 +83,6 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
             emailDetectionRuleService.generalizeStringPattern(categorizedEmails)
 
         logger.debug { "proposedRules: $proposedRules" }
-
-        val mergedEmailDetectionRules: UpdateEmailDetectionRulesFromAIResultDto =
-            emailDetectionRuleService.mergeEmailDetectionRules(testEmailSource, proposedRules)
-
-        logger.debug { "mergedEmailDetectionRules: $mergedEmailDetectionRules" }
 
         assertAll(
             {
@@ -134,10 +128,6 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
                     }
                 )
             },
-
-            {
-                assertThat(proposedRules).isEqualTo(mergedEmailDetectionRules)
-            }
         )
     }
 }

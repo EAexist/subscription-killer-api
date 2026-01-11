@@ -19,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -47,22 +49,24 @@ class ServiceProviderServiceTest() {
     private val netflixEmailAddress = "info@account.netflix.com"
     private val sketchfabEmailAddress = "notifications@sketchfab.com"
 
-    private val mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START: EmailDetectionRule =
-        EmailDetectionRule(
+    private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START: EmailDetectionRuleGenerationDto =
+        EmailDetectionRuleGenerationDto(
             SubscriptionEventType.PAID_SUBSCRIPTION_START,
             listOf("계정 정보 변경 확인"),
             snippetKeywords = listOf("새로운 결제 수단 정보가 등록")
         )
 
-    private val mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL: EmailDetectionRule = EmailDetectionRule(
-        SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
-        listOf("멤버십이 보류 중입니다")
-    )
+    private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL: EmailDetectionRuleGenerationDto =
+        EmailDetectionRuleGenerationDto(
+            SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
+            listOf("멤버십이 보류 중입니다")
+        )
 
-    private val mockSketchfabEmailDetectionRule_MONTHLY_PAYMENT: EmailDetectionRule = EmailDetectionRule(
-        SubscriptionEventType.MONTHLY_PAYMENT,
-        listOf("결제 완료")
-    )
+    private val mockSketchfabEmailDetectionRuleGenerationDto_MONTHLY_PAYMENT: EmailDetectionRuleGenerationDto =
+        EmailDetectionRuleGenerationDto(
+            SubscriptionEventType.MONTHLY_PAYMENT,
+            listOf("결제 완료")
+        )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {
         dataFactory.loadSampleMessages().mapNotNull { it.toGmailMessage() }
@@ -147,11 +151,11 @@ class ServiceProviderServiceTest() {
             val expectedServiceProviders = listOf(
                 dataFactory.createServiceProvider(
                     netflixDisplayName,
-                    mutableListOf(dataFactory.createEmailSource(netflixEmailAddress, null))
+                    mutableListOf(dataFactory.createEmailSource(netflixEmailAddress))
                 ),
                 dataFactory.createServiceProvider(
                     sketchfabDisplayName,
-                    mutableListOf(dataFactory.createEmailSource(sketchfabEmailAddress, null))
+                    mutableListOf(dataFactory.createEmailSource(sketchfabEmailAddress))
                 ),
             )
 
@@ -174,13 +178,13 @@ class ServiceProviderServiceTest() {
     fun `given incomplete rules and remaining chatclient quota then update via chatclient`() =
         runTest {
             every {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
-            } returns mapOf<SubscriptionEventType, EmailDetectionRule>(
-                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START,
-                SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL
+            } returns mapOf<SubscriptionEventType, EmailDetectionRuleGenerationDto>(
+                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START,
+                SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL
             )
 
 
@@ -189,21 +193,44 @@ class ServiceProviderServiceTest() {
                 mockSubscriptionRepository.countByServiceProviderId(any<UUID>())
             } returns maxNumberOfEmailDetectionRuleAnalysis - 1
 
+            val testUpdateAt = Instant.now()
+
             for (serviceProvider in listOf(
                 dataFactory.createServiceProvider(
-                    netflixDisplayName, mutableListOf(dataFactory.createEmailSource(netflixEmailAddress, null))
+                    netflixDisplayName,
+                    mutableListOf(dataFactory.createEmailSource(netflixEmailAddress))
                 ),
                 dataFactory.createServiceProvider(
                     netflixDisplayName, mutableListOf(
                         dataFactory.createEmailSource(
-                            netflixEmailAddress, mutableMapOf(
-                                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START
+                            netflixEmailAddress, mutableListOf(
+                                EmailDetectionRule.createActive(
+                                    mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START, testUpdateAt
+                                )
                             )
                         )
                     )
                 )
             )
             ) {
+                val expectedServiceProvider =
+                    dataFactory.createServiceProvider(
+                        netflixDisplayName, mutableListOf(
+                            dataFactory.createEmailSource(
+                                netflixEmailAddress, (serviceProvider.emailSources[0].eventRules + mutableListOf(
+                                    EmailDetectionRule.createActive(
+                                        mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START,
+                                        testUpdateAt
+                                    ),
+                                    EmailDetectionRule.createActive(
+                                        mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL,
+                                        testUpdateAt
+                                    )
+                                )).toMutableList()
+                            )
+                        )
+                    )
+
                 // When
                 val updatedServiceProvider: ServiceProvider =
                     serviceProviderService.updateEmailDetectionRules(
@@ -212,27 +239,21 @@ class ServiceProviderServiceTest() {
                     )
 
                 // Then
-                val expectedServiceProvider =
-                    dataFactory.createServiceProvider(
-                        netflixDisplayName, mutableListOf(
-                            dataFactory.createEmailSource(
-                                netflixEmailAddress, mutableMapOf(
-                                    SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START,
-                                    SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL
-                                )
-                            )
-                        )
-                    )
-
                 verify(atLeast = 1) {
                     mockServiceProviderRepository.save(any<ServiceProvider>())
                 }
                 assertThat(updatedServiceProvider).isNotNull()
                     .usingRecursiveComparison()
-                    .ignoringFields("id", "serviceProvider")
+                    .ignoringFields("id", "serviceProvider", "emailSources.eventRules.updatedAt")
                     .isEqualTo(expectedServiceProvider)
                 assertThat(updatedServiceProvider.id).isNotNull()
-                assertThat(updatedServiceProvider.emailSources)
+                assertThat(updatedServiceProvider.emailSources).allSatisfy { source ->
+                    assertThat(source.eventRules).allSatisfy { rule ->
+                        assertThat(rule.updatedAt)
+                            .isAfterOrEqualTo(testUpdateAt)
+                            .isBeforeOrEqualTo(testUpdateAt.plus(Duration.ofMinutes(1)))
+                    }
+                }
             }
 
         }
@@ -246,13 +267,19 @@ class ServiceProviderServiceTest() {
                 dataFactory.createServiceProvider(
                     netflixDisplayName, mutableListOf(
                         dataFactory.createEmailSource(
-                            netflixEmailAddress, mutableMapOf(
-                                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START,
+                            netflixEmailAddress, mutableListOf(
+                                EmailDetectionRule.createActive(
+                                    mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START,
+                                    Instant.now()
+                                ),
                             )
                         ),
                         dataFactory.createEmailSource(
-                            netflixEmailAddress, mutableMapOf(
-                                SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL,
+                            netflixEmailAddress, mutableListOf(
+                                EmailDetectionRule.createActive(
+                                    mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL,
+                                    Instant.now()
+                                ),
                             )
                         )
 
@@ -268,7 +295,7 @@ class ServiceProviderServiceTest() {
 
             // Then
             verify(exactly = 0) {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
@@ -291,8 +318,11 @@ class ServiceProviderServiceTest() {
                 dataFactory.createServiceProvider(
                     sketchfabDisplayName, mutableListOf(
                         dataFactory.createEmailSource(
-                            sketchfabEmailAddress, mutableMapOf(
-                                SubscriptionEventType.MONTHLY_PAYMENT to mockSketchfabEmailDetectionRule_MONTHLY_PAYMENT,
+                            sketchfabEmailAddress, mutableListOf(
+                                EmailDetectionRule.createActive(
+                                    mockSketchfabEmailDetectionRuleGenerationDto_MONTHLY_PAYMENT,
+                                    Instant.now()
+                                ),
                             )
                         )
                     )
@@ -308,7 +338,7 @@ class ServiceProviderServiceTest() {
 
             // Then
             verify(exactly = 0) {
-                mockEmailDetectionRuleService.updateRules(
+                mockEmailDetectionRuleService.generateRules(
                     any(),
                     any()
                 )
@@ -334,13 +364,16 @@ class ServiceProviderServiceTest() {
             for (serviceProvider in listOf(
                 dataFactory.createServiceProvider(
                     netflixDisplayName,
-                    mutableListOf(dataFactory.createEmailSource(netflixEmailAddress, null))
+                    mutableListOf(dataFactory.createEmailSource(netflixEmailAddress))
                 ),
                 dataFactory.createServiceProvider(
                     netflixDisplayName, mutableListOf(
                         dataFactory.createEmailSource(
-                            netflixEmailAddress, mutableMapOf(
-                                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START
+                            netflixEmailAddress, mutableListOf(
+                                EmailDetectionRule.createActive(
+                                    mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START,
+                                    Instant.now()
+                                )
                             )
                         )
                     )
@@ -353,7 +386,7 @@ class ServiceProviderServiceTest() {
 
                 // Then
                 verify(exactly = 0) {
-                    mockEmailDetectionRuleService.updateRules(
+                    mockEmailDetectionRuleService.generateRules(
                         any(),
                         any()
                     )

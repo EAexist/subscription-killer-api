@@ -1,9 +1,11 @@
 package com.matchalab.subscription_killer_api.subscription
 
+import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.NaturalId
 import org.hibernate.type.SqlTypes
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -22,7 +24,7 @@ class EmailSource(
     val targetAddress: String,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    val eventRules: MutableMap<SubscriptionEventType, EmailDetectionRule> = mutableMapOf(),
+    val eventRules: MutableList<EmailDetectionRule> = mutableListOf(),
 
     var isActive: Boolean = true,
 
@@ -31,16 +33,24 @@ class EmailSource(
     var serviceProvider: ServiceProvider? = null,
 ) {
 
-    val paymentStartRule: EmailDetectionRule? get() = eventRules[SubscriptionEventType.PAID_SUBSCRIPTION_START]
-    val paymentCancelRule: EmailDetectionRule? get() = eventRules[SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL]
-    val monthlyPaymentRule: EmailDetectionRule? get() = eventRules[SubscriptionEventType.MONTHLY_PAYMENT]
-    val annualPaymentRule: EmailDetectionRule? get() = eventRules[SubscriptionEventType.ANNUAL_PAYMENT]
+    val paymentStartRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_START) && it.isActive }
+    val paymentCancelRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL) && it.isActive }
+    val monthlyPaymentRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.MONTHLY_PAYMENT) && it.isActive }
+    val annualPaymentRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.ANNUAL_PAYMENT) && it.isActive }
 
-    fun updateEmailDetectionRules(
-        newRules: Map<SubscriptionEventType, EmailDetectionRule>,
+    fun addEmailDetectionRules(
+        newRules: Map<SubscriptionEventType, EmailDetectionRuleGenerationDto>,
     ) {
-        newRules.forEach { (eventType, rule) ->
-            eventRules[eventType] = rule
+        val updatedAt = Instant.now()
+        newRules.entries.forEach { (eventType, newRule) ->
+            val existingRule = eventRules.find { (it.eventType == eventType) && it.isActive }
+            existingRule?.let {
+                it.isActive = false
+            }
+            eventRules.add(
+                EmailDetectionRule.createActive(newRule, updatedAt)
+            )
         }
     }
+
 }

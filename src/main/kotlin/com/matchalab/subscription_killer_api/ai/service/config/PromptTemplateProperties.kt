@@ -7,5 +7,4 @@ import org.springframework.core.io.Resource
 data class PromptTemplateProperties(
     val filterAndCategorizeEmails: Resource,
     val generalizeStringPattern: Resource,
-    val mergeEmailDetectionRules: Resource,
 )
