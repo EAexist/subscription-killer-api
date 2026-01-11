@@ -41,18 +41,8 @@ private val logger = KotlinLogging.logger {}
     ],
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-//@EnableAutoConfiguration(
-//    exclude = [
-//        DataSourceAutoConfiguration::class,
-//        HibernateJpaAutoConfiguration::class,
-//        SecurityAutoConfiguration::class,
-//        UserDetailsServiceAutoConfiguration::class,
-//        SecurityFilterAutoConfiguration::class
-//    ]
-//)
 @Import(EmailDetectionRuleService::class, SampleMessageConfig::class)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
-//@ActiveProfiles("dev", "test", "gcp")
 @Tag("gcp")
 @Tag("ai")
 class EmailDetectionRuleServiceEval @Autowired constructor(

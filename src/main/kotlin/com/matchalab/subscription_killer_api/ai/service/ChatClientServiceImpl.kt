@@ -11,11 +11,12 @@ private val logger = KotlinLogging.logger {}
 @Service
 @Profile("ai || prod")
 class ChatClientServiceImpl(
-    private val chatClientBuilder: ChatClient.Builder
+    private val chatClient: ChatClient,
+//    private val chatClientBuilder: ChatClient.Builder
 ) : ChatClientService {
 
     private val maxPromptPreviewLength = 100
-    private val chatClient: ChatClient = chatClientBuilder.build()
+//    private val chatClient: ChatClient = chatClientBuilder.build()
 
     open override fun <T : Any> call(
         promptTemplateStream: Resource,

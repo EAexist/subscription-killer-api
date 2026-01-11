@@ -227,7 +227,8 @@
   },
   {
     "aliasNames": {
-      "EN": "noreply_melon"
+      "EN": "noreply_melon",
+      "KO": "멜론"
     },
     "emailAddresses": [
       "noreply_melon@kakaoent.com"

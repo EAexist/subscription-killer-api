@@ -60,11 +60,22 @@ spring:
   config:
     activate:
       on-profile: gcp
+app:
+  google:
+    client-id: ${APP_GOOGLE_CLIENT_ID}
+    client-secret: ${APP_GOOGLE_CLIENT_SECRET}
+    token-server-url: https://oauth2.googleapis.com/token
+    token-refresh-threshold-seconds: 300
+---
+spring:
+  config:
+    activate:
+      on-profile: ai
   ai:
     google:
       genai:
         project-id: ${GOOGLE_CLOUD_PROJECT}
-        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY}
+        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
         chat:
           options:
             model: gemini-2.5-flash
@@ -73,13 +84,6 @@ spring:
       observations:
         log-prompt: false
         log-completion: false
-app:
-  google:
-    client-id: ${APP_GOOGLE_CLIENT_ID}
-    client-secret: ${APP_GOOGLE_CLIENT_SECRET}
-    token-server-url: https://oauth2.googleapis.com/token
-    token-refresh-threshold-seconds: 300
-
 ---
 spring:
   config:
@@ -120,6 +124,9 @@ management:
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
+  info:
+    git:
+      enabled: true
 ---
 spring:
   config:

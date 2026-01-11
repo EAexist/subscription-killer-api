@@ -11,6 +11,7 @@ import com.matchalab.subscription_killer_api.utils.observeSuspend
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.kotlin.asContextElement
 import io.micrometer.observation.ObservationRegistry
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class SubscriptionReportController(
     private val reportService: SubscriptionReportService,
     private val observationRegistry: ObservationRegistry,
     private val appProperties: AppProperties,
-    properties: AppProperties,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     @GetMapping
@@ -94,7 +95,7 @@ class SubscriptionReportController(
 
         val parent = observationRegistry.currentObservation
 
-        CoroutineScope(Dispatchers.IO + observationRegistry.asContextElement()).launch {
+        CoroutineScope(dispatcher + observationRegistry.asContextElement()).launch {
             observationRegistry.observeSuspend(
                 "analysis.task",
                 parent,

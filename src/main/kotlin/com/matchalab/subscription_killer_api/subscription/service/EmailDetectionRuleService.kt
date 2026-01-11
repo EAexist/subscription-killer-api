@@ -50,6 +50,10 @@ class EmailDetectionRuleService(
         emailSource: EmailSource,
         messages: List<GmailMessage>
     ): Map<SubscriptionEventType, EmailDetectionRuleGenerationDto> {
+
+
+        logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.first().senderEmail}" }
+
         val emails: List<GmailMessageSummaryDto> = messages.map {
             GmailMessageSummaryDto(it.subject, it.snippet)
         }
