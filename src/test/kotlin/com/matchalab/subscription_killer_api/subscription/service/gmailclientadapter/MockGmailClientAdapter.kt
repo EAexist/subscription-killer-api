@@ -19,7 +19,8 @@ class MockGmailClientAdapter(
     private val sampleMessages: List<Message>
 ) : GmailClientAdapter {
 
-    val idToSampleMessages = sampleMessages.mapNotNull { it.toGmailMessage() }.associateBy { it.id }
+    val idToSampleMessages =
+        sampleMessages.mapNotNull { it.toGmailMessage() }.sortedBy { it.internalDate }.associateBy { it.id }
 
     override suspend fun listMessageIds(query: String): List<String> {
         return idToSampleMessages.values.map { it.id }
@@ -30,6 +31,6 @@ class MockGmailClientAdapter(
     }
 
     override suspend fun getFirstMessageId(addresses: List<String>): String? {
-        return idToSampleMessages.values.first().id
+        return idToSampleMessages.values.first { it.senderEmail in addresses }.id
     }
 }
