@@ -91,7 +91,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation("io.projectreactor:reactor-test:3.8.1")
 
-    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+    testImplementation("org.awaitility:awaitility:4.2.2")
 
     // Micrometer Observation
     implementation("org.springframework.boot:spring-boot-starter-aop")
