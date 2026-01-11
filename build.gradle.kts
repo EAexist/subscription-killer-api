@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.5.8"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    id("com.gorylenko.gradle-git-properties") version "2.5.4"
 }
 
 group = "com.matchalab"
@@ -90,12 +91,15 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation("io.projectreactor:reactor-test:3.8.1")
 
+    testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+
     // Micrometer Observation
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
+
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
@@ -120,10 +124,19 @@ tasks.withType<Test> {
 }
 
 tasks.register<Zip>("buildZip") {
+
+    dependsOn("generateGitProperties")
+
     from(tasks.compileJava)
     from(tasks.processResources)
 
-    into("lib") { from(configurations.compileClasspath) }
+    into("lib") {
+        from(configurations.runtimeClasspath) // Use runtimeClasspath for a runnable zip
+    }
+}
+
+tasks.processResources {
+    dependsOn("generateGitProperties")
 }
 
 tasks.withType<JavaExec> {
@@ -132,6 +145,10 @@ tasks.withType<JavaExec> {
 
 tasks.build {
     dependsOn(tasks.getByName("buildZip"))
+}
+
+gitProperties {
+    failOnNoGitDirectory = false
 }
 
 // TODO : Use layers for dependencies.
