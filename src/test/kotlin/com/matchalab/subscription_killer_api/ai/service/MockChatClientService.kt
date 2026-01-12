@@ -2,8 +2,8 @@ package com.matchalab.subscription_killer_api.ai.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
-import com.matchalab.subscription_killer_api.subscription.service.FilterAndCategorizeEmailsTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.UpdateEmailDetectionRulesFromAIResultDto
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
@@ -25,7 +25,7 @@ class MockChatClientService(
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
 
         if ("{emails}" in promptTemplate) {
-            return FilterAndCategorizeEmailsTaskResponse(
+            return EmailCategorizationTaskResponse(
                 subscriptionStartMessages = listOf(),
                 subscriptionCancelMessages = listOf(),
                 monthlyPaymentMessages = listOf(),

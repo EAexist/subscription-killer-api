@@ -1,7 +1,7 @@
 package com.matchalab.subscription_killer_api.evals.prompts
 
 import com.google.api.services.gmail.model.Message
-import com.matchalab.subscription_killer_api.ai.dto.FilterAndCategorizeEmailsResponse
+import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.config.AiConfig
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
@@ -43,9 +43,8 @@ private val logger = KotlinLogging.logger {}
 //    SmallerSampleMessageConfig::class
 )
 @EnableConfigurationProperties(PromptTemplateProperties::class)
-class FilterAndCategorizeEmailEval @Autowired constructor(
+class EmailCategorizationEval @Autowired constructor(
     private val emailCategorizationPromptService: EmailCategorizationPromptService,
-    private val promptTemplateProperties: PromptTemplateProperties,
     private val sampleMessages: List<Message>,
 ) {
 
@@ -63,10 +62,10 @@ class FilterAndCategorizeEmailEval @Autowired constructor(
 //                )
 //            }
 
-        val exactResponse: FilterAndCategorizeEmailsResponse =
+        val exactResponse: EmailCategorizationResponse =
             emailCategorizationPromptService.run(allMessages)
 
-        val expectedResponse = FilterAndCategorizeEmailsResponse(
+        val expectedResponse = EmailCategorizationResponse(
             listOf(
                 "19b5eb4d89185432",
                 "19b633ef8816f70b",
@@ -135,7 +134,7 @@ class FilterAndCategorizeEmailEval @Autowired constructor(
 //            allMessages.groupBy { it.senderEmail }.map { (se, messages) ->
 //                async(Dispatchers.IO) {
 //
-//                    val exactResponse = chatClientService.call<FilterAndCategorizeEmailsResponse>(
+//                    val exactResponse = chatClientService.call<EmailCategorizationResponse>(
 //                        promptTemplateProperties.filterAndCategorizeEmails,
 //                        mapOf("emails" to messages)
 //                    )

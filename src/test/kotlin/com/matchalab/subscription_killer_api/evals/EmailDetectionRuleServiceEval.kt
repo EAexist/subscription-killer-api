@@ -5,8 +5,8 @@ import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.config.TestDataFactory
+import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleService
-import com.matchalab.subscription_killer_api.subscription.service.FilterAndCategorizeEmailsTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
 import com.matchalab.subscription_killer_api.subscription.service.UpdateEmailDetectionRulesFromAIResultDto
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
@@ -66,7 +66,7 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
 
     @Test
     fun `given messages should prompt work well`() {
-        val categorizedEmails: FilterAndCategorizeEmailsTaskResponse =
+        val categorizedEmails: EmailCategorizationTaskResponse =
             emailDetectionRuleService.filterAndCategorizeEmails(emails = testMessageSummaries)
 
         logger.debug { "categorizedEmails: $categorizedEmails" }

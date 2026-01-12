@@ -21,7 +21,7 @@ data class EmailDetectionRuleGenerationDto(
 )
 
 
-data class FilterAndCategorizeEmailsTaskResponse(
+data class EmailCategorizationTaskResponse(
     val subscriptionStartMessages: List<GmailMessage> = listOf(),
     val subscriptionCancelMessages: List<GmailMessage> = listOf(),
     val monthlyPaymentMessages: List<GmailMessage> = listOf(),
@@ -66,7 +66,7 @@ class EmailDetectionRuleService(
             it.toSummaryDto()
         }
 
-        val categorizedEmails: FilterAndCategorizeEmailsTaskResponse = filterAndCategorizeEmails(emails)
+        val categorizedEmails: EmailCategorizationTaskResponse = filterAndCategorizeEmails(emails)
         val proposedRules: UpdateEmailDetectionRulesFromAIResultDto = generalizeStringPattern(categorizedEmails)
 
         return listOfNotNull(
@@ -77,15 +77,15 @@ class EmailDetectionRuleService(
         ).toMap()
     }
 
-    fun filterAndCategorizeEmails(emails: List<GmailMessageSummaryDto>): FilterAndCategorizeEmailsTaskResponse =
-        chatClientService.call<FilterAndCategorizeEmailsTaskResponse>(
+    fun filterAndCategorizeEmails(emails: List<GmailMessageSummaryDto>): EmailCategorizationTaskResponse =
+        chatClientService.call<EmailCategorizationTaskResponse>(
             promptTemplateProperties.filterAndCategorizeEmails,
             mapOf(
                 "emails" to emails
             )
         )
 
-    fun generalizeStringPattern(categorizedEmails: FilterAndCategorizeEmailsTaskResponse): UpdateEmailDetectionRulesFromAIResultDto =
+    fun generalizeStringPattern(categorizedEmails: EmailCategorizationTaskResponse): UpdateEmailDetectionRulesFromAIResultDto =
         chatClientService.call<UpdateEmailDetectionRulesFromAIResultDto>(
             promptTemplateProperties.generalizeStringPattern,
             mapOf("categorizedEmails" to categorizedEmails)
