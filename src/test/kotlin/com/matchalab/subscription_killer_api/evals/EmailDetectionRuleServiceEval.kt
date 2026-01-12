@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription.eval
+package com.matchalab.subscription_killer_api.evals
 
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl

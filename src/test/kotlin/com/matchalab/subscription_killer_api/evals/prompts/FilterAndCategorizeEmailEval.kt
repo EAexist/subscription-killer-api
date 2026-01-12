@@ -4,15 +4,16 @@ import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.call
+import com.matchalab.subscription_killer_api.ai.service.config.AiConfig
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import com.matchalab.subscription_killer_api.config.SampleMessageConfig
+import com.matchalab.subscription_killer_api.config.SmallerSampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.service.FilterAndCategorizeEmailsTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import com.matchalab.subscription_killer_api.utils.toSummaryDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Tag
 import org.springframework.ai.model.chat.client.autoconfigure.ChatClientAutoConfiguration
 import org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiChatAutoConfiguration
 import org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration
@@ -25,8 +26,8 @@ import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
 
-@Tag("gcp")
-@Tag("ai")
+//@Tag("gcp")
+//@Tag("ai")
 @SpringBootTest(
     classes = [
         ToolCallingAutoConfiguration::class,
@@ -34,10 +35,14 @@ private val logger = KotlinLogging.logger {}
         GoogleGenAiChatAutoConfiguration::class,
         ChatClientAutoConfiguration::class,
         SpringAiRetryAutoConfiguration::class,
+        AiConfig::class
     ],
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-@Import(SampleMessageConfig::class)
+@Import(
+    SampleMessageConfig::class,
+    SmallerSampleMessageConfig::class
+)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
 class FilterAndCategorizeEmailEval @Autowired constructor(
     private val chatClientService: ChatClientService,
