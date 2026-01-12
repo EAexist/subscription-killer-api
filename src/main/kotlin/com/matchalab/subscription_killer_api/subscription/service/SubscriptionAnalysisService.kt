@@ -537,22 +537,14 @@ class SubscriptionAnalysisService(
     }
 
     private fun matchMessageToEvent(message: GmailMessage, rule: EmailDetectionRule): Boolean {
-        val subjectMatch: Boolean = matchRegexOrKeyword(message.subject, rule.subjectRegex, rule.subjectKeywords)
-        val snippetMatch: Boolean = matchRegexOrKeyword(message.snippet, rule.snippetRegex, rule.snippetKeywords)
+        val subjectMatch: Boolean = matchRegex(message.subject, rule.subjectRegex)
+        val snippetMatch: Boolean = matchRegex(message.snippet, rule.snippetRegex)
         return subjectMatch && snippetMatch
     }
 
-    private fun matchRegexOrKeyword(target: String, regex: String?, keywords: List<String>): Boolean {
-        if (!regex.isNullOrEmpty()) {
-            regex.let {
-                if (it.toRegex(RegexOption.IGNORE_CASE).containsMatchIn(target)) {
-                    return true
-                }
-            }
-        }
-        return keywords.any { target.contains(it, ignoreCase = true) }
+    private fun matchRegex(target: String, regex: String): Boolean {
+        return regex.toRegex(RegexOption.IGNORE_CASE).containsMatchIn(target)
     }
-
 
     private fun isBeforeLastMonth(target: Instant, before: Instant = Instant.now()): Boolean {
         val daysSinceLastPayment = ChronoUnit.DAYS.between(target, before)

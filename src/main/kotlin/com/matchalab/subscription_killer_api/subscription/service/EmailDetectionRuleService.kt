@@ -3,6 +3,7 @@ package com.matchalab.subscription_killer_api.subscription.service
 import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.call
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
+import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
@@ -14,11 +15,8 @@ private val logger = KotlinLogging.logger {}
 data class EmailDetectionRuleGenerationDto(
     val eventType: SubscriptionEventType,
 
-    val subjectKeywords: List<String> = emptyList(),
-    val subjectRegex: String? = null,
-
-    val snippetKeywords: List<String> = emptyList(),
-    val snippetRegex: String? = null
+    val subjectRegex: String,
+    val snippetRegex: String
 )
 
 
@@ -82,4 +80,20 @@ class EmailDetectionRuleService(
             promptTemplateProperties.generalizeStringPattern,
             mapOf("categorizedEmails" to categorizedEmails)
         )
+
+    fun matchMessageToEvent(message: GmailMessage, rule: EmailDetectionRule): Boolean {
+        val subjectMatch: Boolean = matchRegex(message.subject, rule.subjectRegex)
+        val snippetMatch: Boolean = matchRegex(message.snippet, rule.snippetRegex)
+        return subjectMatch && snippetMatch
+    }
+
+    fun matchMessageToEvent(message: GmailMessage, rule: EmailDetectionRuleGenerationDto): Boolean {
+        val subjectMatch: Boolean = matchRegex(message.subject, rule.subjectRegex)
+        val snippetMatch: Boolean = matchRegex(message.snippet, rule.snippetRegex)
+        return subjectMatch && snippetMatch
+    }
+
+    private fun matchRegex(target: String, regex: String): Boolean {
+        return regex.toRegex(RegexOption.IGNORE_CASE).containsMatchIn(target)
+    }
 }

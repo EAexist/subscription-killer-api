@@ -52,20 +52,22 @@ class ServiceProviderServiceTest() {
     private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.PAID_SUBSCRIPTION_START,
-            listOf("계정 정보 변경 확인"),
-            snippetKeywords = listOf("새로운 결제 수단 정보가 등록")
+            "계정 정보 변경 확인",
+            "새로운 결제 수단 정보가 등록"
         )
 
     private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
-            listOf("멤버십이 보류 중입니다")
+            "멤버십이 보류 중입니다",
+            ".*"
         )
 
     private val mockSketchfabEmailDetectionRuleGenerationDto_MONTHLY_PAYMENT: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.MONTHLY_PAYMENT,
-            listOf("결제 완료")
+            "결제 완료",
+            ".*"
         )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {

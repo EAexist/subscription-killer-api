@@ -13,11 +13,8 @@ data class EmailDetectionRule(
     @Enumerated(EnumType.STRING)
     val eventType: SubscriptionEventType,
 
-    val subjectKeywords: List<String> = emptyList(),
-    val subjectRegex: String? = null,
-
-    val snippetKeywords: List<String> = emptyList(),
-    val snippetRegex: String? = null
+    val subjectRegex: String,
+    val snippetRegex: String
 ) {
     companion object {
         fun createActive(generationDto: EmailDetectionRuleGenerationDto, updatedAt: Instant): EmailDetectionRule {
@@ -25,9 +22,7 @@ data class EmailDetectionRule(
                 true,
                 updatedAt,
                 generationDto.eventType,
-                generationDto.subjectKeywords,
                 generationDto.subjectRegex,
-                generationDto.snippetKeywords,
                 generationDto.snippetRegex
             )
         }

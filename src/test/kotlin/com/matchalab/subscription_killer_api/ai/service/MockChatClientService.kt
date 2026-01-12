@@ -41,16 +41,12 @@ class MockChatClientService(
             return UpdateEmailDetectionRulesFromAIResultDto(
                 EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_START,
-                    listOf("계정 정보 변경"),
                     "계정 정보 변경",
-                    listOf("새로운 결제 수단 정보"),
                     "새로운 결제 수단 정보"
                 ),
                 EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
-                    listOf("결제 수단을 업데이트"),
                     "결제 수단을 업데이트",
-                    listOf("멤버십이 현재 정지"),
                     "멤버십이 현재 정지"
                 ),
                 null,

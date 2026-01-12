@@ -66,8 +66,8 @@ class SubscriptionAnalysisServiceTest(
                         EmailDetectionRule(
                             true, Instant.now(),
                             SubscriptionEventType.PAID_SUBSCRIPTION_START,
-                            listOf("계정 정보 변경 확인"),
-                            snippetKeywords = listOf("새로운 결제 수단")
+                            "계정 정보 변경 확인",
+                            "새로운 결제 수단"
                         ),
                         EmailDetectionRule(
                             true, Instant.now(),
