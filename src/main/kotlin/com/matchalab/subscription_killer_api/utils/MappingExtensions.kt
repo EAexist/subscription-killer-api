@@ -82,5 +82,5 @@ fun Message.toGmailMessage(): GmailMessage? {
 }
 
 fun GmailMessage.toSummaryDto(): GmailMessageSummaryDto =
-    GmailMessageSummaryDto(this.subject, this.snippet)
+    GmailMessageSummaryDto(this.id, this.subject, this.snippet)
 

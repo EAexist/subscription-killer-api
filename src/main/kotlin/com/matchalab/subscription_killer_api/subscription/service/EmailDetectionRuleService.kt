@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.utils.toSummaryDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -21,13 +22,14 @@ data class EmailDetectionRuleGenerationDto(
 
 
 data class FilterAndCategorizeEmailsTaskResponse(
-    val paymentStartMessages: List<GmailMessage>,
-    val paymentCancelMessages: List<GmailMessage>,
-    val monthlyPaymentMessages: List<GmailMessage>,
-    val annualPaymentMessages: List<GmailMessage>,
+    val subscriptionStartMessages: List<GmailMessage> = listOf(),
+    val subscriptionCancelMessages: List<GmailMessage> = listOf(),
+    val monthlyPaymentMessages: List<GmailMessage> = listOf(),
+    val annualPaymentMessages: List<GmailMessage> = listOf(),
 )
 
 data class GmailMessageSummaryDto(
+    val id: String,
     val subject: String,
     val snippet: String
 )
@@ -38,6 +40,14 @@ data class UpdateEmailDetectionRulesFromAIResultDto(
     val monthlyPaymentRule: EmailDetectionRuleGenerationDto?,
     val annualPaymentRule: EmailDetectionRuleGenerationDto?,
 ) {}
+
+data class UpdateEmailDetectionRulesFromAIResultDtoNew(
+    val paymentStartRule: List<EmailDetectionRuleGenerationDto>,
+    val paymentCancelRule: List<EmailDetectionRuleGenerationDto>,
+    val monthlyPaymentRule: List<EmailDetectionRuleGenerationDto>,
+    val annualPaymentRule: List<EmailDetectionRuleGenerationDto>,
+) {}
+
 
 @Service
 class EmailDetectionRuleService(
@@ -53,7 +63,7 @@ class EmailDetectionRuleService(
         logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.first().senderEmail}" }
 
         val emails: List<GmailMessageSummaryDto> = messages.map {
-            GmailMessageSummaryDto(it.subject, it.snippet)
+            it.toSummaryDto()
         }
 
         val categorizedEmails: FilterAndCategorizeEmailsTaskResponse = filterAndCategorizeEmails(emails)

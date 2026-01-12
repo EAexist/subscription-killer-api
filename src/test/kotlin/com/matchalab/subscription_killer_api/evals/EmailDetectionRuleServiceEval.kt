@@ -27,10 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Profile
 import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
 
+@Tag("gcp")
+@Tag("ai")
+@Profile("ai | prod")
 @SpringBootTest(
     classes = [
         ToolCallingAutoConfiguration::class,
@@ -43,8 +47,6 @@ private val logger = KotlinLogging.logger {}
 )
 @Import(EmailDetectionRuleService::class, SampleMessageConfig::class)
 @EnableConfigurationProperties(PromptTemplateProperties::class)
-@Tag("gcp")
-@Tag("ai")
 class EmailDetectionRuleServiceEval @Autowired constructor(
     private val emailDetectionRuleService: EmailDetectionRuleService,
     private val sampleMessages: List<Message>
@@ -78,8 +80,8 @@ class EmailDetectionRuleServiceEval @Autowired constructor(
             {
                 assertAll(
                     "filterAndCategorizeEmails() Results",
-                    { assertThat(categorizedEmails.paymentStartMessages).hasSize(1) },
-                    { assertThat(categorizedEmails.paymentCancelMessages).hasSize(2) },
+                    { assertThat(categorizedEmails.subscriptionStartMessages).hasSize(1) },
+                    { assertThat(categorizedEmails.subscriptionCancelMessages).hasSize(2) },
                     { assertThat(categorizedEmails.monthlyPaymentMessages).isEmpty() },
                     { assertThat(categorizedEmails.annualPaymentMessages).isEmpty() },
                     {

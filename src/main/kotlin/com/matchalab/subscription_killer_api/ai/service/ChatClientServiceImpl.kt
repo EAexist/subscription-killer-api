@@ -2,6 +2,8 @@ package com.matchalab.subscription_killer_api.ai.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.ai.chat.client.ChatClient
+import org.springframework.ai.google.genai.GoogleGenAiChatOptions
+import org.springframework.ai.google.genai.common.GoogleGenAiThinkingLevel
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
@@ -23,6 +25,7 @@ class ChatClientServiceImpl(
         params: Map<String, Any>,
         responseType: Class<T>
     ): T {
+        logger.info { "✨  [call]" }
 
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
         val promptPreview = promptTemplate.replace(Regex("\\s+"), " ").take(maxPromptPreviewLength)
@@ -30,6 +33,10 @@ class ChatClientServiceImpl(
         return runCatching {
             requireNotNull(
                 chatClient.prompt()
+                    .options(
+                        GoogleGenAiChatOptions.builder().thinkingLevel(GoogleGenAiThinkingLevel.LOW)
+                            .includeThoughts(false).build()
+                    )
                     .user { u ->
                         u.text(promptTemplate)
                         params.forEach { (k, v) -> u.param(k, v) }

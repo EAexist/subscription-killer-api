@@ -17,6 +17,7 @@ class SmallerSampleMessageConfig {
     @Bean
     @Primary
     fun limitedSampleMessages(originalMessages: List<Message>): List<Message> {
+        logger.debug { "[limitedSampleMessages]" }
         return originalMessages.filter { it.toGmailMessage()?.senderEmail in sampleEmails }
     }
 }

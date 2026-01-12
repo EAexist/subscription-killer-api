@@ -32,6 +32,9 @@ spring:
     jdbc:
       initialize-schema: always
     timeout: 3d
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiChatAutoConfiguration
 server:
   forward-headers-strategy: framework
 app:
@@ -72,14 +75,18 @@ spring:
     activate:
       on-profile: ai
   ai:
+    retry:
+      max-attempts: 1
     google:
       genai:
         project-id: ${GOOGLE_CLOUD_PROJECT}
         api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
         chat:
           options:
-            model: gemini-2.5-flash
+            model: gemini-3-flash-preview
             temperature: 0.1
+            thinking-level: LOW
+    #            thinking-budget: 0
     chat:
       observations:
         log-prompt: false

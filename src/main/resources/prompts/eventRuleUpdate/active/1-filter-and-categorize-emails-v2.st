@@ -1,4 +1,4 @@
-Act as a Data Engineer. Analyze the provided Gmail messages for a single service.
+Role: Data Engineer.
 
 Task: Filter out marketing/newsletters and categorize "signal" emails.
 
@@ -8,10 +8,10 @@ MONTHLY_PAYMENT: Monthly recurring receipts, payments, or subscription extension
 
 ANNUAL_PAYMENT: Annual recurring receipts, payments, or subscription extensions.
 
-PAID_SUBSCRIPTION_START: New paid subscriptions, billing/account info changes, plan upgrades/downgrades, or restarts from pause/termination.
+SUBSCRIPTION_START: New membership subscriptions, billing/account info changes, plan upgrades/downgrades, or restarts from pause/termination.
 
-PAID_SUBSCRIPTION_CANCEL: Cancellations, expirations, pauses, or payment failures.
+SUBSCRIPTION_CANCEL: Cancellations, expirations, reminder of scheduled expiration, pauses, or payment failures of subscription.
 
-NONE: All other emails (marketing, recommendations, or noise).
+Input Format: "ID|Subject|Snippet".
 
 Emails: {emails}

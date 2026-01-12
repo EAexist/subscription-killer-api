@@ -26,8 +26,8 @@ class MockChatClientService(
 
         if ("{emails}" in promptTemplate) {
             return FilterAndCategorizeEmailsTaskResponse(
-                paymentStartMessages = listOf(),
-                paymentCancelMessages = listOf(),
+                subscriptionStartMessages = listOf(),
+                subscriptionCancelMessages = listOf(),
                 monthlyPaymentMessages = listOf(),
                 annualPaymentMessages = listOf(),
             ) as T
