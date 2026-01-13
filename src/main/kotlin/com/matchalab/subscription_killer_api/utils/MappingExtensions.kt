@@ -57,9 +57,10 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
     )
 }
 
-fun Message.toGmailMessage(): GmailMessage? {
+fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage? {
 
-//    logger.debug { "Message.toGmailMessage() Message: ${this.toString()}" }
+    val doHidePrices = true
+
     val internalDate = this.internalDate.let { DateTimeUtils.epochMilliToInstant(it) }
     val headers = this.payload?.headers ?: return null
     val fromHeaderValue =
@@ -69,7 +70,10 @@ fun Message.toGmailMessage(): GmailMessage? {
 
     val regex = """^(.+)\s+<(.+)>$""".toRegex()
     val matchResult = regex.find(fromHeaderValue)
-    val (name, email) = matchResult?.destructured?.toList() ?: listOf("", "")
+    val (name, email) = (matchResult?.destructured?.toList() ?: listOf(
+        "",
+        ""
+    )).map { if (doHidePrices) it.hidePrices() else it }
 
     return GmailMessage(
         id = this.id,
@@ -77,10 +81,26 @@ fun Message.toGmailMessage(): GmailMessage? {
         senderEmail = email,
         subject = subjectHeaderValue,
         internalDate = internalDate,
-        snippet = this.snippet ?: "",
+        snippet = this.snippet.take(maxSnippetSize) ?: "",
     )
 }
 
 fun GmailMessage.toSummaryDto(): GmailMessageSummaryDto =
     GmailMessageSummaryDto(this.id, this.subject, this.snippet)
+
+fun String.hidePrices(): String {
+    val priceRegex = """\b(\$|€|£|USD|₩|원)?\s?\d{1,3}(?:,\d{3})*(?:\.\d+)?\b""".toRegex(RegexOption.IGNORE_CASE)
+
+    return this
+        .replace(priceRegex, "[PRICE]")
+}
+
+fun String.hideDates(): String {
+    val dateAndOptionalTimeRegex =
+        """(?i)\b(\d{4}-\d{2}-\d{2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(?:st|nd|rd|th)?,? \d{4})(\s+\d{1,2}:\d{2}(:\d{2})?)?\b""".toRegex(
+            RegexOption.IGNORE_CASE
+        )
+
+    return this.replace(dateAndOptionalTimeRegex, "[DATE]")
+}
 

@@ -33,7 +33,7 @@ typealias GeneralProgressCallback = (AnalysisProgressStatus) -> Unit
 typealias ServiceProviderProgressCallback = (UUID, ServiceProviderAnalysisProgressStatus) -> Unit
 
 @ConfigurationProperties(prefix = "app.mail")
-data class MailProperties(val analysisMonths: Long)
+data class MailProperties(val analysisMonths: Long, val maxSnippetSize: Int)
 
 @Service
 class SubscriptionAnalysisService(

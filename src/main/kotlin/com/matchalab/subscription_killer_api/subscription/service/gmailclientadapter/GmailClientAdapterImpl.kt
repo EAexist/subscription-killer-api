@@ -9,6 +9,7 @@ import com.google.api.services.gmail.model.ListMessagesResponse
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.service.MailProperties
 import com.matchalab.subscription_killer_api.utils.observeSuspend
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -25,6 +26,7 @@ private val logger = KotlinLogging.logger {}
 @Profile("google-auth && gmail")
 open class GmailClientAdapterImpl(
     private val gmailClient: Gmail,
+    private val mailProperties: MailProperties,
     private val observationRegistry: ObservationRegistry
 ) : GmailClientAdapter {
 
@@ -116,7 +118,7 @@ open class GmailClientAdapterImpl(
                     }
                 }
             }
-                .mapNotNull { it.toGmailMessage() }
+                .mapNotNull { it.toGmailMessage(mailProperties.maxSnippetSize) }
         }
     }
 

@@ -42,6 +42,7 @@ app:
     max-age: 3600
   mail:
     analysis-months: 13
+    max-snippet-size: 150
   #  min-request-interval-hours: 72
   min-request-interval-hours: 0
   prompts:

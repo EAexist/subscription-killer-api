@@ -12,7 +12,7 @@ private val logger = KotlinLogging.logger {}
 @TestConfiguration
 class SmallerSampleMessageConfig {
 
-    private val sampleEmails = listOf("info@account.netflix.com", "do-not-reply@watcha.com")
+    private val sampleEmails = listOf("do-not-reply@watcha.com")
 
     @Bean
     @Primary

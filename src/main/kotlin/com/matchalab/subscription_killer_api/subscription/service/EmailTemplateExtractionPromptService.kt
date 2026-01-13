@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.ai.service.call
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import com.matchalab.subscription_killer_api.ai.toPromptParamString
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.utils.hideDates
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -20,7 +21,7 @@ class EmailTemplateExtractionPromptService(
 
     fun run(messages: List<GmailMessage>): EmailTemplateExtractionResponse {
 
-        val uniqueMessages = messages.distinctBy { it.subject to it.snippet }
+        val uniqueMessages = messages.distinctBy { it.subject.hideDates() to it.snippet.hideDates() }
         val promptParams =
             EmailTemplateExtractionPromptParams(uniqueMessages.joinToString("\n") { it.toPromptParamString() })
 
