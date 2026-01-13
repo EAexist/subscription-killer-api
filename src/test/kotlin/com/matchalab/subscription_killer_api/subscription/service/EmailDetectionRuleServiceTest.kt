@@ -34,8 +34,8 @@ class EmailDetectionRuleServiceTest() {
 //                    any<Class<UpdateEmailDetectionRulesFromAIResultDto>>()
 //                )
 //            } returns UpdateEmailDetectionRulesFromAIResultDto(
-//                mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START,
-//                mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL, null, null
+//                mockNetflixEmailDetectionRule_SUBSCRIPTION_START,
+//                mockNetflixEmailDetectionRule_SUBSCRIPTION_CANCEL, null, null
 //            )
 //
 //            for (serviceProvider in listOf(
@@ -46,7 +46,7 @@ class EmailDetectionRuleServiceTest() {
 //                    netflixDisplayName, mutableListOf(
 //                        createEmailSource(
 //                            netflixEmailAddress, mutableMapOf(
-//                                SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START
+//                                SubscriptionEventType.SUBSCRIPTION_START to mockNetflixEmailDetectionRule_SUBSCRIPTION_START
 //                            )
 //                        )
 //                    )
@@ -66,8 +66,8 @@ class EmailDetectionRuleServiceTest() {
 //                        netflixDisplayName, mutableListOf(
 //                            createEmailSource(
 //                                netflixEmailAddress, mutableMapOf(
-//                                    SubscriptionEventType.PAID_SUBSCRIPTION_START to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_START,
-//                                    SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRule_PAID_SUBSCRIPTION_CANCEL
+//                                    SubscriptionEventType.SUBSCRIPTION_START to mockNetflixEmailDetectionRule_SUBSCRIPTION_START,
+//                                    SubscriptionEventType.SUBSCRIPTION_CANCEL to mockNetflixEmailDetectionRule_SUBSCRIPTION_CANCEL
 //                                )
 //                            )
 //                        )

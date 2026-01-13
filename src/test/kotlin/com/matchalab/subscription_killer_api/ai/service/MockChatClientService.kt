@@ -41,14 +41,14 @@ class MockChatClientService(
         if ("{currentMonthlyPaymentRule}" in promptTemplate) {
             return UpdateEmailDetectionRulesFromAIResultDto(
                 EmailDetectionRuleGenerationDto(
-                    SubscriptionEventType.PAID_SUBSCRIPTION_START,
+                    SubscriptionEventType.SUBSCRIPTION_START,
                     EmailTemplate(
                         "계정 정보 변경",
                         "새로운 결제 수단 정보"
                     )
                 ),
                 EmailDetectionRuleGenerationDto(
-                    SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
+                    SubscriptionEventType.SUBSCRIPTION_CANCEL,
                     EmailTemplate(
                         "결제 수단을 업데이트",
                         "멤버십이 현재 정지"

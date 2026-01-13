@@ -100,12 +100,12 @@ class EmailCategorizationEval @Autowired constructor(
             "Assertions",
             {
                 assertThat(exactResponse.subscriptionStartMessageIds)
-                    .`as`("PAID_SUBSCRIPTION_START")
+                    .`as`("SUBSCRIPTION_START")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.subscriptionStartMessageIds)
             },
             {
                 assertThat(exactResponse.subscriptionCancelMessageIds)
-                    .`as`("PAID_SUBSCRIPTION_CANCEL")
+                    .`as`("SUBSCRIPTION_CANCEL")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.subscriptionCancelMessageIds)
             },
             {

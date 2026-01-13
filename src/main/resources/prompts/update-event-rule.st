@@ -17,8 +17,8 @@ OR
 ### Event Definitions
 - MONTHLY_PAYMENT: This is monthly recurring mail indicating monthly receipts/payment/paid subscription extension. 
 - ANNUAL_PAYMENT: This is yearly recurring mail indicating yearly receipts/payment/paid subscription extension.
-- PAID_SUBSCRIPTION_START: This mail indicates One-time "Welcome" or "Confirmation" that a paid plan/subscription is first activated/renewed. 
-- PAID_SUBSCRIPTION_CANCEL: This mail indicates termination/end of paid subscription.
+- SUBSCRIPTION_START: This mail indicates One-time "Welcome" or "Confirmation" that a paid plan/subscription is first activated/renewed.
+- SUBSCRIPTION_CANCEL: This mail indicates termination/end of paid subscription.
 
 ### Strict Constraints
 1. GENERALIZATION: Rules MUST NOT contain user-specific data (names, dollar amounts like "$14.99", dates like "October 5th", or credit card last 4 digits).

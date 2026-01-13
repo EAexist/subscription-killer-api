@@ -20,13 +20,13 @@ fun EmailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(
         emailCategorizationResponse.subscriptionStartMessageIds.forEach {
             put(
                 it,
-                SubscriptionEventType.PAID_SUBSCRIPTION_START
+                SubscriptionEventType.SUBSCRIPTION_START
             )
         }
         emailCategorizationResponse.subscriptionCancelMessageIds.forEach {
             put(
                 it,
-                SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL
+                SubscriptionEventType.SUBSCRIPTION_CANCEL
             )
         }
         emailCategorizationResponse.monthlyPaymentMessageIds.forEach {

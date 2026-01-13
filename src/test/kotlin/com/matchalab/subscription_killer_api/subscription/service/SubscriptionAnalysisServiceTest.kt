@@ -65,7 +65,7 @@ class SubscriptionAnalysisServiceTest(
                     null, "info@account.netflix.com", mutableListOf(
                         EmailDetectionRule(
                             true, Instant.now(),
-                            SubscriptionEventType.PAID_SUBSCRIPTION_START,
+                            SubscriptionEventType.SUBSCRIPTION_START,
                             EmailTemplate(
                                 "계정 정보 변경 확인",
                                 "새로운 결제 수단"
@@ -73,7 +73,7 @@ class SubscriptionAnalysisServiceTest(
                         ),
                         EmailDetectionRule(
                             true, Instant.now(),
-                            SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
+                            SubscriptionEventType.SUBSCRIPTION_CANCEL,
                             EmailTemplate(
                                 "멤버십을 다시 시작하세요",
                                 "멤버십이 보류 중",

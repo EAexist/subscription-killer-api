@@ -116,16 +116,16 @@ class GeneralizeStringPatternEval @Autowired constructor(
             "Assertions",
             {
                 val template =
-                    emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_START }.template
+                    emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_START }.template
                 assertThat(template.matchMessagesOrEmpty(allMessages).map { it.id })
-                    .`as`("PAID_SUBSCRIPTION_START")
+                    .`as`("SUBSCRIPTION_START")
                     .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionStartMessageIds)
             },
             {
                 val template =
-                    emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL }.template
+                    emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL }.template
                 assertThat(template.matchMessagesOrEmpty(allMessages).map { it.id })
-                    .`as`("PAID_SUBSCRIPTION_CANCEL")
+                    .`as`("SUBSCRIPTION_CANCEL")
                     .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionCancelMessageIds)
             },
             {

@@ -33,8 +33,8 @@ class EmailSource(
     var serviceProvider: ServiceProvider? = null,
 ) {
 
-    val paymentStartRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_START) && it.isActive }
-    val paymentCancelRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL) && it.isActive }
+    val paymentStartRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.SUBSCRIPTION_START) && it.isActive }
+    val paymentCancelRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL) && it.isActive }
     val monthlyPaymentRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.MONTHLY_PAYMENT) && it.isActive }
     val annualPaymentRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.ANNUAL_PAYMENT) && it.isActive }
 
