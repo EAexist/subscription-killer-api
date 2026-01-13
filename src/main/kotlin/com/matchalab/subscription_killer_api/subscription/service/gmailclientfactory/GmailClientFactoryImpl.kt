@@ -13,6 +13,7 @@ import com.google.auth.oauth2.UserCredentials
 import com.matchalab.subscription_killer_api.config.GoogleClientProperties
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapterImpl
 import com.matchalab.subscription_killer_api.utils.observe
@@ -27,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap
 class GmailClientFactoryImpl(
     private val googleAccountRepository: GoogleAccountRepository,
     private val googleClientProperties: GoogleClientProperties,
-    private val observationRegistry: ObservationRegistry
+    private val mailProperties: MailProperties,
+    private val observationRegistry: ObservationRegistry,
 ) : GmailClientFactory {
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
     private val jsonFactory = GsonFactory.getDefaultInstance()
@@ -38,7 +40,7 @@ class GmailClientFactoryImpl(
 
         return adapterCache.getOrPut(subject) {
             val authenticatedGmailClient = createClient(subject)
-            GmailClientAdapterImpl(authenticatedGmailClient, observationRegistry)
+            GmailClientAdapterImpl(authenticatedGmailClient, mailProperties, observationRegistry)
         }
     }
 

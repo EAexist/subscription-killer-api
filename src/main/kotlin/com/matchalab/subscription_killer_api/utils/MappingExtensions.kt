@@ -57,16 +57,16 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
     )
 }
 
-fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage? {
+fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
 
     val doHidePrices = true
 
     val internalDate = this.internalDate.let { DateTimeUtils.epochMilliToInstant(it) }
-    val headers = this.payload?.headers ?: return null
+    val headers = this.payload?.headers
     val fromHeaderValue =
-        headers.find { it.name.equals("From", ignoreCase = true) }?.value ?: return null
+        headers?.find { it.name.equals("From", ignoreCase = true) }?.value ?: ""
     val subjectHeaderValue =
-        headers.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
+        headers?.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
 
     val regex = """^(.+)\s+<(.+)>$""".toRegex()
     val matchResult = regex.find(fromHeaderValue)

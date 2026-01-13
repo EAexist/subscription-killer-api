@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.evals.prompts
 
-import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 import com.matchalab.subscription_killer_api.ai.dto.EmailTemplateExtractionResponse
 import com.matchalab.subscription_killer_api.ai.dto.toEmailDetectionRuleGenerationDto
@@ -14,7 +13,6 @@ import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.matchMessagesOrEmpty
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import com.matchalab.subscription_killer_api.subscription.service.EmailTemplateExtractionPromptService
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
@@ -47,14 +45,11 @@ private val logger = KotlinLogging.logger {}
 @EnableConfigurationProperties(PromptTemplateProperties::class)
 class GeneralizeStringPatternEval @Autowired constructor(
     private val emailTemplateExtractionPromptService: EmailTemplateExtractionPromptService,
-    private val sampleMessages: List<Message>,
+    private val sampleMessages: List<GmailMessage>,
 ) {
 
     @Test
     fun `given gmail messages should create general regex patterns for subscription event categories`() {
-
-        val allMessages: List<GmailMessage> =
-            sampleMessages.mapNotNull { it.toGmailMessage() }
 
         val emailCategorizationResponse = EmailCategorizationResponse(
             listOf(
@@ -98,7 +93,7 @@ class GeneralizeStringPatternEval @Autowired constructor(
             )
         )
 
-        val subscriptionEventMessages = emailCategorizationResponse.toMessages(allMessages)
+        val subscriptionEventMessages = emailCategorizationResponse.toMessages(sampleMessages)
 
         val exactResponse: EmailTemplateExtractionResponse =
             emailTemplateExtractionPromptService.run(subscriptionEventMessages)
@@ -115,21 +110,21 @@ class GeneralizeStringPatternEval @Autowired constructor(
             {
                 val template =
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_START }.template
-                assertThat(template.matchMessagesOrEmpty(allMessages).map { it.id })
+                assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("SUBSCRIPTION_START")
                     .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionStartMessageIds)
             },
             {
                 val template =
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL }.template
-                assertThat(template.matchMessagesOrEmpty(allMessages).map { it.id })
+                assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("SUBSCRIPTION_CANCEL")
                     .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionCancelMessageIds)
             },
             {
                 val template =
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.MONTHLY_PAYMENT }.template
-                assertThat(template.matchMessagesOrEmpty(allMessages).map { it.id })
+                assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("MONTHLY_PAYMENT")
                     .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.monthlyPaymentMessageIds)
             },

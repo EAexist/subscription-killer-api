@@ -5,7 +5,6 @@ import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
 import com.matchalab.subscription_killer_api.subscription.*
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.every
 import io.mockk.mockk
@@ -74,7 +73,7 @@ class ServiceProviderServiceTest() {
         )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {
-        dataFactory.loadSampleMessages().mapNotNull { it.toGmailMessage() }
+        dataFactory.loadSampleMessages()
     }
 
     private val fakeAddressToGmailMessages: Map<String, List<GmailMessage>> =

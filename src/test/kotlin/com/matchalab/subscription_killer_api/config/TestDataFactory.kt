@@ -5,8 +5,9 @@ import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.domain.LocaleType
 import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
+import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import org.springframework.core.io.ClassPathResource
 import java.io.InputStream
 import java.util.*
@@ -33,9 +34,9 @@ open class TestDataFactory(
     ) =
         EmailSource(null, targetAddress, eventRules)
 
-    fun loadSampleMessages(): List<Message> {
+    fun loadSampleMessages(): List<GmailMessage> {
         val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
-        return readMessages(ClassPathResource(jsonPath).inputStream)
+        return readMessages(ClassPathResource(jsonPath).inputStream).map { it.toGmailMessage() }
     }
 
     fun readMessages(inputStream: InputStream): List<Message> {

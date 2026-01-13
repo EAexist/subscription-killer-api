@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
-import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.config.TestDataFactory
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
@@ -14,7 +13,6 @@ import com.matchalab.subscription_killer_api.subscription.service.gmailclientada
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import com.matchalab.subscription_killer_api.utils.toDto
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.ObservationRegistry
@@ -100,9 +98,6 @@ class SubscriptionAnalysisServiceTest(
 
     @BeforeEach
     fun setUp() {
-
-        val rawMessages: List<Message> = dataFactory.loadSampleMessages()
-        fakeGmailMessages = rawMessages.mapNotNull { it.toGmailMessage() }
 
         subscriptionAnalysisService = SubscriptionAnalysisService(
             googleAccountRepository,

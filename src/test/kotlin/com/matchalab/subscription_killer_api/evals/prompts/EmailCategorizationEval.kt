@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.evals.prompts
 
-import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.config.AiConfig
@@ -8,7 +7,6 @@ import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplatePro
 import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationPromptService
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
@@ -41,17 +39,14 @@ private val logger = KotlinLogging.logger {}
 @EnableConfigurationProperties(PromptTemplateProperties::class)
 class EmailCategorizationEval @Autowired constructor(
     private val emailCategorizationPromptService: EmailCategorizationPromptService,
-    private val sampleMessages: List<Message>,
+    private val sampleMessages: List<GmailMessage>,
 ) {
 
     @Test
     fun `given gmail messages should identify message ids corresponding to subscription events`() {
 
-        val allMessages: List<GmailMessage> =
-            sampleMessages.mapNotNull { it.toGmailMessage() }
-
         val exactResponse: EmailCategorizationResponse =
-            emailCategorizationPromptService.run(allMessages)
+            emailCategorizationPromptService.run(sampleMessages)
 
         val expectedResponse = EmailCategorizationResponse(
             listOf(
