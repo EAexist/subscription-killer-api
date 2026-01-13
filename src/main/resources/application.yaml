@@ -2,9 +2,9 @@ spring:
   profiles:
     group:
       prod:
-        - "gcp"
-        - "ai"
         - "google-auth"
+        - "gmail"
+        - "ai"
 ---
 
 spring:
@@ -130,6 +130,8 @@ spring:
     activate:
       on-profile: ai
   ai:
+    model:
+      chat: google-genai
     retry:
       max-attempts: 1
     google:
