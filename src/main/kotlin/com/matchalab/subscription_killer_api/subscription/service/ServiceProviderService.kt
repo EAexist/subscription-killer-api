@@ -24,7 +24,7 @@ class ServiceProviderService(
     interface ServiceProviderProjection {
         val id: UUID
         val displayName: String
-        val canAnalyzePayment: Boolean
+        val canAnalyzeSubscription: Boolean
     }
 
     val maxNumberOfEmailDetectionRuleAnalysis: Long = 40
@@ -66,7 +66,7 @@ class ServiceProviderService(
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
-                canAnalyzePayment = it.isEmailDetectionRuleAvailable()
+                canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
             )
         }
     }
@@ -78,7 +78,7 @@ class ServiceProviderService(
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
-                canAnalyzePayment = it.isEmailDetectionRuleAvailable()
+                canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
             )
         }
     }

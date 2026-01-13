@@ -44,11 +44,11 @@ class ServiceProvider(
     val emailSearchAddresses: List<String> get() = activeEmailSources.map { it.targetAddress }
     val emailSearchAliasNames: Map<String, String>? get() = if (isEmailDetectionRuleComplete()) aliasNames else null
 
-    fun isPaymentStartRulePresent(): Boolean {
+    fun isSubscriptionStartRulePresent(): Boolean {
         return emailSources.any { it.paymentStartRule != null }
     }
 
-    fun isPaymentCancelRulePresent(): Boolean {
+    fun isSubscriptionCancelRulePresent(): Boolean {
         return emailSources.any { it.paymentCancelRule != null }
     }
 
@@ -57,11 +57,11 @@ class ServiceProvider(
     }
 
     fun isEmailDetectionRuleAvailable(): Boolean {
-        return isPaymentStartRulePresent() || isMonthlyPaymentRulePresent()
+        return isSubscriptionStartRulePresent() || isMonthlyPaymentRulePresent()
     }
 
     fun isEmailDetectionRuleComplete(): Boolean {
-        return (isPaymentStartRulePresent() && isPaymentCancelRulePresent()) || isMonthlyPaymentRulePresent()
+        return (isSubscriptionStartRulePresent() && isSubscriptionCancelRulePresent()) || isMonthlyPaymentRulePresent()
     }
 
     fun addAllEmailSources(newEmailSources: List<EmailSource>) {

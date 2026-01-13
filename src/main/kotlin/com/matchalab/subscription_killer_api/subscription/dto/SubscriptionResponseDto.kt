@@ -7,5 +7,5 @@ data class SubscriptionResponseDto(
     val registeredSince: Instant?,
     val hasSubscribedNewsletterOrAd: Boolean,
     val subscribedSince: Instant?,
-    val isNotSureIfPaymentIsOngoing: Boolean,
+    val isNotSureIfSubcriptionIsOngoing: Boolean,
 ) {}

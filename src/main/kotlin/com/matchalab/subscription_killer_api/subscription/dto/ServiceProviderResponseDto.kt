@@ -7,5 +7,5 @@ data class ServiceProviderResponseDto(
     val displayName: String,
     val logoDevSuffix: String,
     val websiteUrl: String,
-    val canAnalyzePayment: Boolean
+    val canAnalyzeSubscription: Boolean
 ) {}
