@@ -20,13 +20,11 @@ import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
 
 @Tag("ai")
-@ActiveProfiles("ai", "test")
 @SpringBootTest(
     classes = [
         ToolCallingAutoConfiguration::class,
@@ -52,11 +50,8 @@ class EmailCategorizationEval @Autowired constructor(
         val allMessages: List<GmailMessage> =
             sampleMessages.mapNotNull { it.toGmailMessage() }
 
-//        val exactResponse: EmailCategorizationResponse =
-//            emailCategorizationPromptService.run(allMessages)
-
         val exactResponse: EmailCategorizationResponse =
-            EmailCategorizationResponse(listOf(), listOf(), listOf(), listOf())
+            emailCategorizationPromptService.run(allMessages)
 
         val expectedResponse = EmailCategorizationResponse(
             listOf(

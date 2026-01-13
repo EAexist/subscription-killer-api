@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 
 @Service
-@Profile("!ai && !prod")
+@Profile("!ai")
 class MockChatClientService(
 ) : ChatClientService {
 

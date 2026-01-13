@@ -5,6 +5,7 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
@@ -19,6 +20,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+@Profile("google-auth")
 @Service
 class MultiAccountOAuth2AuthorizedClientService(
     private val clientRegistrationRepository: ClientRegistrationRepository,
@@ -32,7 +34,7 @@ class MultiAccountOAuth2AuthorizedClientService(
         val googleAccountSubject: String = customUser.getGoogleSubject()
 
         val existingGoogleAccount: GoogleAccount? = googleAccountRepository.findByIdOrNull(googleAccountSubject)
-        
+
         if (existingGoogleAccount != null) {
             logger.debug { "\uD83D\uDD0A [saveAuthorizedClient] Updating existing GoogleAccount" }
             client.refreshToken?.tokenValue?.let {

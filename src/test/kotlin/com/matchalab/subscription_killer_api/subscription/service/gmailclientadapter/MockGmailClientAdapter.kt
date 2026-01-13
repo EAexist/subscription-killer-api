@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("!prod && !gmail")
+@Profile("!google-auth || !gmail")
 @Component
 @Import(SampleMessageConfig::class)
 class MockGmailClientAdapter(

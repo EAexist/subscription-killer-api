@@ -3,6 +3,7 @@ package com.matchalab.subscription_killer_api.config
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets
 
 private val logger = KotlinLogging.logger {}
 
+@Tag("google-auth")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 class WebSecurityConfigIntegrationTest {

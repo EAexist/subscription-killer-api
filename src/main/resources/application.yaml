@@ -1,4 +1,13 @@
 spring:
+  profiles:
+    group:
+      prod:
+        - "gcp"
+        - "ai"
+        - "google-auth"
+---
+
+spring:
   config:
     import: "optional:file:.env[.properties]"
   application:
@@ -11,34 +20,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${APP_GOOGLE_CLIENT_ID}
-            client-secret: ${APP_GOOGLE_CLIENT_SECRET}
-            client-authentication-method: client_secret_basic
-            scope:
-              - openid
-              - email
-              - profile
-              - https://www.googleapis.com/auth/gmail.readonly
-            authorization-grant-type: authorization_code
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
   session:
     jdbc:
       initialize-schema: always
     timeout: 3d
   ai:
-    google:
-      genai:
-        enabled: false
-  autoconfigure:
-    exclude:
-      - org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiChatAutoConfiguration
+    model:
+      chat: none
 server:
   forward-headers-strategy: framework
 app:
@@ -63,10 +51,28 @@ logging:
   charset:
     console: UTF-8
 ---
+
 spring:
   config:
     activate:
-      on-profile: gcp
+      on-profile: google-auth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${APP_GOOGLE_CLIENT_ID}
+            client-secret: ${APP_GOOGLE_CLIENT_SECRET}
+            client-authentication-method: client_secret_basic
+            scope:
+              - openid
+              - email
+              - profile
+              - https://www.googleapis.com/auth/gmail.readonly
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
 app:
   google:
     client-id: ${APP_GOOGLE_CLIENT_ID}
@@ -74,28 +80,7 @@ app:
     token-server-url: https://oauth2.googleapis.com/token
     token-refresh-threshold-seconds: 300
 ---
-spring:
-  config:
-    activate:
-      on-profile: ai
-  ai:
-    retry:
-      max-attempts: 1
-    google:
-      genai:
-        project-id: ${GOOGLE_CLOUD_PROJECT}
-        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
-        chat:
-          options:
-            model: gemini-3-flash-preview
-            temperature: 0.1
-            thinking-level: LOW
-    #            thinking-budget: 0
-    chat:
-      observations:
-        log-prompt: false
-        log-completion: false
----
+
 spring:
   config:
     activate:
@@ -139,6 +124,30 @@ management:
     git:
       enabled: true
 ---
+
+spring:
+  config:
+    activate:
+      on-profile: ai
+  ai:
+    retry:
+      max-attempts: 1
+    google:
+      genai:
+        project-id: ${GOOGLE_CLOUD_PROJECT}
+        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
+        chat:
+          options:
+            model: gemini-3-flash-preview
+            temperature: 0.1
+            thinking-level: LOW
+    #            thinking-budget: 0
+    chat:
+      observations:
+        log-prompt: false
+        log-completion: false
+---
+
 spring:
   config:
     activate:

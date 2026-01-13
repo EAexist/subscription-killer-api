@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 private val logger = KotlinLogging.logger {}
 
 @Service
-@Profile("ai || prod")
+@Profile("ai")
 class ChatClientServiceImpl(
     private val chatClient: ChatClient,
 //    private val chatClientBuilder: ChatClient.Builder

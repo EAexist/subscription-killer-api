@@ -7,9 +7,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
-@Profile("!prod && !gmail")
+@Profile("!google-auth || !gmail")
 @Service
-
 @Import(SampleMessageConfig::class)
 class MockGmailClientFactory(
     val mockGmailClientAdapter: MockGmailClientAdapter

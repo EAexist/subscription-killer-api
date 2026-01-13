@@ -111,15 +111,21 @@ allOpen {
 }
 
 tasks.withType<Test> {
+
+    val tagsProperty = project.findProperty("includeTags") as String?
+    val tags = tagsProperty?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+
     useJUnitPlatform {
-        if (!project.hasProperty("includeGcp")) {
-            excludeTags("gcp")
-        }
-        if (!project.hasProperty("includeAi")) {
-            excludeTags("ai")
+        if (tags.isNotEmpty()) {
+            val tagExpression = "none() | (${tags.joinToString(" | ")})"
+            includeTags(tagExpression)
+        } else {
+            includeTags("none()")
         }
     }
-    systemProperty("spring.profiles.active", System.getProperty("spring.profiles.active", "dev,test,gcp"))
+    val defaultProfiles = listOf("test", "dev")
+    val activeProfiles = (defaultProfiles + tags).distinct().joinToString(",")
+    systemProperty("spring.profiles.active", activeProfiles)
 }
 
 tasks.register<Zip>("buildZip") {

@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.service.MultiAccountOAuth2Authorize
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -16,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.cors.CorsConfigurationSource
 
+@Profile("google-auth")
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(CorsProperties::class)

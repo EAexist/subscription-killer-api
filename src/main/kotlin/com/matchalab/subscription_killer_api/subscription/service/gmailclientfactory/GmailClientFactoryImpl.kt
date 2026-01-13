@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-@Profile("prod || gmail")
+@Profile("google-auth && gmail")
 @Service
 class GmailClientFactoryImpl(
     private val googleAccountRepository: GoogleAccountRepository,

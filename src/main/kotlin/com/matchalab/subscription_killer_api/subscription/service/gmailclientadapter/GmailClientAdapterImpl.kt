@@ -22,7 +22,7 @@ import java.util.Collections.synchronizedList
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("prod || gmail")
+@Profile("google-auth && gmail")
 open class GmailClientAdapterImpl(
     private val gmailClient: Gmail,
     private val observationRegistry: ObservationRegistry
