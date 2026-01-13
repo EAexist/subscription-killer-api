@@ -6,9 +6,12 @@ import com.matchalab.subscription_killer_api.ai.dto.EmailTemplateExtractionRespo
 import com.matchalab.subscription_killer_api.ai.dto.EmailTemplateExtractionResult
 import com.matchalab.subscription_killer_api.subscription.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationResponseFactory
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 @Profile("!ai")
@@ -76,14 +79,4 @@ class MockChatClientService(
         }
         return responseType.getDeclaredConstructor().newInstance()
     }
-
-//    override fun <T : Any> call(
-//        promptTemplateStream: Resource,
-//        params: Map<String, Any>,
-//        typeRef: ParameterizedTypeReference<T>
-//    ): T {
-//        val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
-//
-//        return objectMapper.readValue("{}", typeRef)
-//    }
 }

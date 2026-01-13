@@ -17,25 +17,25 @@ fun EmailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(
     emailCategorizationResponse: EmailCategorizationResponse
 ): List<EmailDetectionRuleGenerationDto> {
     val idToType = mutableMapOf<String, SubscriptionEventType>().apply {
-        emailCategorizationResponse.subsStartMsgIds?.forEach {
+        emailCategorizationResponse.subsStartMsgIds.forEach {
             put(
                 it,
                 SubscriptionEventType.SUBSCRIPTION_START
             )
         }
-        emailCategorizationResponse.subsCancelMsgIds?.forEach {
+        emailCategorizationResponse.subsCancelMsgIds.forEach {
             put(
                 it,
                 SubscriptionEventType.SUBSCRIPTION_CANCEL
             )
         }
-        emailCategorizationResponse.monthlyMsgIds?.forEach {
+        emailCategorizationResponse.monthlyMsgIds.forEach {
             put(
                 it,
                 SubscriptionEventType.MONTHLY_PAYMENT
             )
         }
-        emailCategorizationResponse.annualMsgIds?.forEach {
+        emailCategorizationResponse.annualMsgIds.forEach {
             put(
                 it,
                 SubscriptionEventType.ANNUAL_PAYMENT
