@@ -4,9 +4,9 @@ import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 import com.matchalab.subscription_killer_api.ai.service.ChatClientServiceImpl
 import com.matchalab.subscription_killer_api.ai.service.config.AiConfig
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
-import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.config.MailProperties
+import com.matchalab.subscription_killer_api.subscription.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationPromptService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat

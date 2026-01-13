@@ -1,15 +1,13 @@
 package com.matchalab.subscription_killer_api.config
 
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.domain.LocaleType
 import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
+import com.matchalab.subscription_killer_api.utils.readMessages
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import org.springframework.core.io.ClassPathResource
-import java.io.InputStream
 import java.util.*
 
 open class TestDataFactory(
@@ -39,11 +37,5 @@ open class TestDataFactory(
         return readMessages(ClassPathResource(jsonPath).inputStream).map { it.toGmailMessage() }
     }
 
-    fun readMessages(inputStream: InputStream): List<Message> {
-        val factory = GsonFactory.getDefaultInstance()
-        val parser = factory.createJsonParser(inputStream)
-        val messages = mutableListOf<Message>()
-        parser.parseArray(messages, Message::class.java)
-        return messages
-    }
+
 }

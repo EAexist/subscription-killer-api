@@ -1,8 +1,8 @@
 package com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter
 
-import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.config.SampleMessageConfig
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
