@@ -36,6 +36,4 @@ open class TestDataFactory(
         val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
         return readMessages(ClassPathResource(jsonPath).inputStream).map { it.toGmailMessage() }
     }
-
-
 }

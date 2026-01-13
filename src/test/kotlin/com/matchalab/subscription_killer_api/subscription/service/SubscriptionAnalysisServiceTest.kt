@@ -92,7 +92,7 @@ class SubscriptionAnalysisServiceTest(
     val fakeGoogleAccountA: GoogleAccount = GoogleAccount("FAKE_SUBJECT_A", "FAKE_NAME_A", "FAKE_EMAIL_A")
     val fakeGoogleAccountB: GoogleAccount = GoogleAccount("FAKE_SUBJECT_B", "FAKE_NAME_B", "FAKE_EMAIL_B")
 
-    lateinit var fakeGmailMessages: List<GmailMessage>
+    private val fakeGmailMessages: List<GmailMessage> = dataFactory.loadSampleMessages()
 
     private val mockServiceProviders = listOf(mockNetflixServiceProvider, mockSketchfabServiceProvider)
 
