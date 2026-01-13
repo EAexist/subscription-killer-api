@@ -27,9 +27,16 @@ class EmailCategorizationPromptService(
         logger.debug { "[run] ✨  Condensed messages: ${messages.size} -> ${uniqueMessages.size}" }
         logger.debug { "[run] ✨  Calling chatClient for ${uniqueMessages.size} messages" }
 
-        return chatClientService.call<EmailCategorizationResponse>(
+        return chatClientService.call<Map<String, List<String>>>(
             promptTemplateProperties.filterAndCategorizeEmails,
             mapOf("emails" to promptParams.emails)
-        )
+        ).let {
+            EmailCategorizationResponse(
+                monthlyMsgIds = it["M"].orEmpty(),
+                annualMsgIds = it["A"].orEmpty(),
+                subsStartMsgIds = it["S"].orEmpty(),
+                subsCancelMsgIds = it["C"].orEmpty()
+            )
+        }
     }
 }

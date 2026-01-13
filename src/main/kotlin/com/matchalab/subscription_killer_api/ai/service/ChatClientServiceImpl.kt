@@ -1,7 +1,7 @@
 package com.matchalab.subscription_killer_api.ai.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.ai.chat.client.AdvisorParams
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.google.genai.GoogleGenAiChatOptions
 import org.springframework.ai.google.genai.common.GoogleGenAiThinkingLevel
@@ -13,8 +13,9 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 @Profile("ai")
-class ChatClientServiceImpl(
+final class ChatClientServiceImpl(
     private val chatClient: ChatClient,
+    private val objectMapper: ObjectMapper
 //    private val chatClientBuilder: ChatClient.Builder
 ) : ChatClientService {
 
@@ -32,19 +33,19 @@ class ChatClientServiceImpl(
         val promptPreview = promptTemplate.replace(Regex("\\s+"), " ").take(maxPromptPreviewLength)
 
         return runCatching {
-            requireNotNull(
-                chatClient.prompt()
-                    .options(
-                        GoogleGenAiChatOptions.builder().thinkingLevel(GoogleGenAiThinkingLevel.LOW)
-                            .includeThoughts(false).build()
-                    )
-                    .advisors { AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT }
-                    .user { u ->
-                        u.text(promptTemplate)
-                        params.forEach { (k, v) -> u.param(k, v) }
-                    }
-                    .call()
-                    .entity(responseType))
+            val json = chatClient.prompt()
+                .options(
+                    GoogleGenAiChatOptions.builder().thinkingLevel(GoogleGenAiThinkingLevel.LOW)
+                        .includeThoughts(false).responseMimeType("application/json").build()
+                )
+//                    .advisors { AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT }
+                .user { u ->
+                    u.text(promptTemplate)
+                    params.forEach { (k, v) -> u.param(k, v) }
+                }
+                .call().content()
+
+            objectMapper.readValue(json, responseType)
         }.onSuccess { entity ->
             val entityString = entity.toString()
             logger.info { "✨  [call] Result\n\tprompt: $promptTemplate\n\tresult: $entityString" }

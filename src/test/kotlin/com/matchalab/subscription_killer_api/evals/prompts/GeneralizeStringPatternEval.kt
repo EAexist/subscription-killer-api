@@ -10,6 +10,7 @@ import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplatePro
 import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.matchMessagesOrEmpty
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import com.matchalab.subscription_killer_api.subscription.service.EmailTemplateExtractionPromptService
@@ -22,6 +23,7 @@ import org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiC
 import org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration
 import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
@@ -36,13 +38,14 @@ private val logger = KotlinLogging.logger {}
         ChatClientAutoConfiguration::class,
         SpringAiRetryAutoConfiguration::class,
         EmailTemplateExtractionPromptService::class,
+        JacksonAutoConfiguration::class,
         ChatClientServiceImpl::class,
         AiConfig::class,
         SampleMessageConfig::class
     ],
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-@EnableConfigurationProperties(PromptTemplateProperties::class)
+@EnableConfigurationProperties(PromptTemplateProperties::class, MailProperties::class)
 class GeneralizeStringPatternEval @Autowired constructor(
     private val emailTemplateExtractionPromptService: EmailTemplateExtractionPromptService,
     private val sampleMessages: List<GmailMessage>,
@@ -112,21 +115,21 @@ class GeneralizeStringPatternEval @Autowired constructor(
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_START }.template
                 assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("SUBSCRIPTION_START")
-                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionStartMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subsStartMsgIds)
             },
             {
                 val template =
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL }.template
                 assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("SUBSCRIPTION_CANCEL")
-                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subscriptionCancelMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.subsCancelMsgIds)
             },
             {
                 val template =
                     emailDetectionRuleGenerationDtos.first { it.eventType == SubscriptionEventType.MONTHLY_PAYMENT }.template
                 assertThat(template.matchMessagesOrEmpty(sampleMessages).map { it.id })
                     .`as`("MONTHLY_PAYMENT")
-                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.monthlyPaymentMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(emailCategorizationResponse.monthlyMsgIds)
             },
             {
                 assertThat(emailDetectionRuleGenerationDtos.none { it.eventType == SubscriptionEventType.ANNUAL_PAYMENT })

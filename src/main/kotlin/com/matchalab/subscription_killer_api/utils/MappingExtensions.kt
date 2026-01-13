@@ -100,7 +100,9 @@ fun String.hideDates(): String {
         """(?i)\b(\d{4}-\d{2}-\d{2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(?:st|nd|rd|th)?,? \d{4})(\s+\d{1,2}:\d{2}(:\d{2})?)?\b""".toRegex(
             RegexOption.IGNORE_CASE
         )
+    val koreanDateRegex = """\d{4}년\s?\d{1,2}월\s?\d{1,2}일""".toRegex()
 
     return this.replace(dateAndOptionalTimeRegex, "[DATE]")
+        .replace(koreanDateRegex, "[DATE]")
 }
 

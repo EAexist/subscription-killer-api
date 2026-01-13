@@ -6,6 +6,7 @@ import com.matchalab.subscription_killer_api.ai.service.config.AiConfig
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import com.matchalab.subscription_killer_api.config.SampleMessageConfig
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationPromptService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
@@ -16,6 +17,7 @@ import org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiC
 import org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration
 import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
@@ -30,13 +32,14 @@ private val logger = KotlinLogging.logger {}
         ChatClientAutoConfiguration::class,
         SpringAiRetryAutoConfiguration::class,
         EmailCategorizationPromptService::class,
+        JacksonAutoConfiguration::class,
         ChatClientServiceImpl::class,
         AiConfig::class,
         SampleMessageConfig::class
     ],
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-@EnableConfigurationProperties(PromptTemplateProperties::class)
+@EnableConfigurationProperties(PromptTemplateProperties::class, MailProperties::class)
 class EmailCategorizationEval @Autowired constructor(
     private val emailCategorizationPromptService: EmailCategorizationPromptService,
     private val sampleMessages: List<GmailMessage>,
@@ -92,24 +95,24 @@ class EmailCategorizationEval @Autowired constructor(
         assertAll(
             "Assertions",
             {
-                assertThat(exactResponse.subscriptionStartMessageIds)
+                assertThat(exactResponse.subsStartMsgIds)
                     .`as`("SUBSCRIPTION_START")
-                    .containsExactlyInAnyOrderElementsOf(expectedResponse.subscriptionStartMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(expectedResponse.subsStartMsgIds)
             },
             {
-                assertThat(exactResponse.subscriptionCancelMessageIds)
+                assertThat(exactResponse.subsCancelMsgIds)
                     .`as`("SUBSCRIPTION_CANCEL")
-                    .containsExactlyInAnyOrderElementsOf(expectedResponse.subscriptionCancelMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(expectedResponse.subsCancelMsgIds)
             },
             {
-                assertThat(exactResponse.monthlyPaymentMessageIds)
+                assertThat(exactResponse.monthlyMsgIds)
                     .`as`("MONTHLY_PAYMENT")
-                    .containsExactlyInAnyOrderElementsOf(expectedResponse.monthlyPaymentMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(expectedResponse.monthlyMsgIds)
             },
             {
-                assertThat(exactResponse.annualPaymentMessageIds)
+                assertThat(exactResponse.annualMsgIds)
                     .`as`("ANNUAL_PAYMENT")
-                    .containsExactlyInAnyOrderElementsOf(expectedResponse.annualPaymentMessageIds)
+                    .containsExactlyInAnyOrderElementsOf(expectedResponse.annualMsgIds)
             }
         )
     }
