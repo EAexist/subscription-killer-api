@@ -103,15 +103,12 @@ logging:
     com.matchalab.subscription_killer_api: DEBUG
     org:
       springframework:
-        #        ai: DEBUG
         security: DEBUG
         security.oauth2: DEBUG
         security.oauth2.client: DEBUG
         session: DEBUG
       hibernate:
         SQL: DEBUG
-#        type.descriptor.sql.BasicBinder: TRACE
-#    web.filter: DEBUG
 management:
   tracing:
     enabled: true
