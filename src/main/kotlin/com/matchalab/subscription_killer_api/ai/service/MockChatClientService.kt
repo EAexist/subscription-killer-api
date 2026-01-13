@@ -41,10 +41,10 @@ class MockChatClientService(
             val emailCategorizationResponse: EmailCategorizationResponse =
                 EmailCategorizationResponseFactory.createSample()
             return mapOf(
-                "M" to emailCategorizationResponse.subsStartMsgIds,
-                "A" to emailCategorizationResponse.subsCancelMsgIds,
-                "S" to emailCategorizationResponse.monthlyMsgIds,
-                "C" to emailCategorizationResponse.annualMsgIds,
+                "M" to emailCategorizationResponse.monthlyMsgIds,
+                "A" to emailCategorizationResponse.annualMsgIds,
+                "S" to emailCategorizationResponse.subsStartMsgIds,
+                "C" to emailCategorizationResponse.subsCancelMsgIds,
             ) as T
         }
 
