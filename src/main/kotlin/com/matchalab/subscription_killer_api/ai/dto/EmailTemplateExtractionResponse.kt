@@ -5,7 +5,7 @@ import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 
 data class EmailTemplateExtractionResponse(
-    val result: List<EmailTemplateExtractionResult>
+    val result: List<EmailTemplateExtractionResult> = emptyList()
 )
 
 data class EmailTemplateExtractionResult(

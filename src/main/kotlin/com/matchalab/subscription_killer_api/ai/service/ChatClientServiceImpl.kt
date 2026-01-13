@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.ai.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.ai.chat.client.AdvisorParams
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.google.genai.GoogleGenAiChatOptions
 import org.springframework.ai.google.genai.common.GoogleGenAiThinkingLevel
@@ -37,6 +38,7 @@ class ChatClientServiceImpl(
                         GoogleGenAiChatOptions.builder().thinkingLevel(GoogleGenAiThinkingLevel.LOW)
                             .includeThoughts(false).build()
                     )
+                    .advisors { AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT }
                     .user { u ->
                         u.text(promptTemplate)
                         params.forEach { (k, v) -> u.param(k, v) }

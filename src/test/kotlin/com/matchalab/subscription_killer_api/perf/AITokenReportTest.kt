@@ -3,6 +3,7 @@ package com.matchalab.subscription_killer_api.perf
 import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
 import com.matchalab.subscription_killer_api.config.SmallerSampleMessageConfig
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
+import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -40,18 +41,19 @@ class AITokenReportTest
 @Autowired
 constructor(
     private val authenticatedClientFactory: AuthenticatedClientFactory,
+    private val emailSourceRepository: EmailSourceRepository,
     private val transactionTemplate: TransactionTemplate,
     private val appUserRepository: AppUserRepository,
 ) {
     private lateinit var sampleAppUserId: UUID
     private lateinit var authedClient: WebTestClient
 
-
     @LocalServerPort
     private var port: Int = 0
 
     @BeforeEach
     fun setUp() {
+        emailSourceRepository.clearAllEventRules()
         val authenticatedClientSetup = authenticatedClientFactory.create(port)
         sampleAppUserId = authenticatedClientSetup.appUserId
         authedClient = authenticatedClientSetup.client
@@ -60,6 +62,7 @@ constructor(
     @AfterEach
     fun clear() {
         authenticatedClientFactory.clear()
+        emailSourceRepository.clearAllEventRules()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
