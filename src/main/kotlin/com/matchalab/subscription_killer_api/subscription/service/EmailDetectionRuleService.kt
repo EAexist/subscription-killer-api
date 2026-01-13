@@ -41,18 +41,25 @@ class EmailDetectionRuleService(
         messages: List<GmailMessage>
     ): Map<SubscriptionEventType, EmailDetectionRuleGenerationDto> {
 
-        logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.first().senderEmail}" }
+        logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.firstOrNull()?.senderEmail ?: "<NO EMAILS>"}" }
+
+        if (messages.isEmpty()) {
+            return mapOf()
+        }
 
         val emailCategorizationResponse: EmailCategorizationResponse = emailCategorizationPromptService.run(messages)
 
         val subscriptionEventMessages = emailCategorizationResponse.toMessages(messages)
+
+        if (subscriptionEventMessages.isEmpty()) {
+            return mapOf()
+        }
 
         val emailTemplateExtractionResponse: EmailTemplateExtractionResponse =
             emailTemplateExtractionPromptService.run(subscriptionEventMessages)
 
         val emailDetectionRuleGenerationDtos: List<EmailDetectionRuleGenerationDto> =
             emailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(emailCategorizationResponse)
-
 
         return emailDetectionRuleGenerationDtos.associateBy { it.eventType }
     }
