@@ -7,6 +7,7 @@ import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
@@ -51,7 +52,7 @@ class SubscriptionAnalysisServiceTest(
 
     private val progressService = mockk<ProgressService>(relaxUnitFun = true)
 
-    private val testMailProperties = MailProperties(analysisMonths = 13L)
+    private val testMailProperties = MailProperties(analysisMonths = 13L, maxSnippetSize = 150)
 
     private lateinit var subscriptionAnalysisService: SubscriptionAnalysisService
 

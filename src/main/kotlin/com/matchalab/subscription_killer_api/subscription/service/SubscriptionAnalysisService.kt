@@ -5,6 +5,7 @@ import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.ServiceProviderAnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
@@ -20,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -31,9 +31,6 @@ private val logger = KotlinLogging.logger {}
 
 typealias GeneralProgressCallback = (AnalysisProgressStatus) -> Unit
 typealias ServiceProviderProgressCallback = (UUID, ServiceProviderAnalysisProgressStatus) -> Unit
-
-@ConfigurationProperties(prefix = "app.mail")
-data class MailProperties(val analysisMonths: Long, val maxSnippetSize: Int)
 
 @Service
 class SubscriptionAnalysisService(
