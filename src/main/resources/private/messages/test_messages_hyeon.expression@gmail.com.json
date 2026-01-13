@@ -1,0 +1,903 @@
+[
+  {
+    "id": "1859ffd47c3cc924",
+    "internalDate": "1673426453000",
+    "snippet": "Dropbox에 파일 올리기 Dropbox에 파일을 올리고 나면 컴퓨터, 휴대폰, 태블릿 등 Dropbox 앱을 설치한 모든 장치에서 파일에 액세스할 수 있습니다. 또한 어떤 파일 형식이든 안전하게 백업되고 쉽게 공유할 수 있습니다. Dropbox에 파일 저장",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Dropbox <no-reply@dropbox.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "Dropbox에 파일을 올리세요!"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1859ffeb30de895d",
+    "internalDate": "1673426546000",
+    "snippet": "안녕하세요, Hyeon님. 이기쁨(gibbeum.j.lee@gmail.com)님이 Dropbox &#39;2205_LX메타버스&#39; 폴더를 편집할 수 있도록 회원님을 초대했습니다. Dropbox에 추가 감사합니다! Dropbox팀 드림 Dropbox에 신고하기 © 2023 Dropbox",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "\"이기쁨 (via Dropbox)\" <no-reply@dropbox.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "이기쁨님이 ‘2205_LX메타버스’ 폴더를 공유했습니다."
+        }
+      ]
+    }
+  },
+  {
+    "id": "1859ffed348fdbb1",
+    "internalDate": "1673426555000",
+    "snippet": "안녕하세요, Hyeon님. 이기쁨(gibbeum.j.lee@gmail.com)님이 Dropbox &#39;20220810_Cultural_DNA Workshop&#39; 폴더를 편집할 수 있도록 회원님을 초대했습니다. Dropbox에 추가 감사합니다! Dropbox팀 드림 Dropbox에 신고하기 © 2023 Dropbox",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "\"이기쁨 (via Dropbox)\" <no-reply@dropbox.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "이기쁨님이 ‘20220810_Cultural_DNA Workshop’ 폴더를 공유했습니다."
+        }
+      ]
+    }
+  },
+  {
+    "id": "1889f8297c87edd4",
+    "internalDate": "1686303314000",
+    "snippet": "안녕하세요, Pyo Hyeon님 새 웹 브라우저에서 회원님의 Dropbox 계정에 방금 로그인했습니다. 계정을 안전하게 보호하기 위해 회원님이 로그인한 것이 맞는지 알려주시기 바랍니다. 회원님이 맞나요? 시간: Jun 9, 2023 at 6:35 pm (KST) 장치: Windows 상의 Chrome 예 아니요 확실하지 않음 계정 보호 방법에 대해 자세히",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Dropbox <no-reply@dropbox.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "안녕하세요, Pyo Hyeon님. 회원님의 Dropbox 계정에서 새로운 로그인이 감지되었습니다."
+        }
+      ]
+    }
+  },
+  {
+    "id": "1905d62e1b5a4cc4",
+    "internalDate": "1719553678000",
+    "snippet": "Adobe 무료 체험판에 대한 자세한 내용은 다음과 같습니다. ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ HYEON 님, 1TB 용량 포함 Lightroom 플랜 무료 체험판을 시작합니다! 무료 체험 기간이 2024년",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Adobe <store@adobe.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "무료 체험판을 시작합니다!"
+        }
+      ]
+    }
+  },
+  {
+    "id": "190820cc8e9fd673",
+    "internalDate": "1720168793000",
+    "snippet": "고객님의 취소 요청이 처리되었습니다. 고객님의 서비스가 2024년 07월 05일 (PT)에 종료될 예정입니다. 취소 확인 고객님의 취소 요청이 처리되었습니다. 고객님의 서비스가 2024년 07월 05일 (PT)에 종료될 예정입니다. 이후 고객님의 계정은 기본 수준의 무료 멤버십으로 전환됩니다. 무료 멤버십을 통해 Creative Cloud 서비스를 제한적으로",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Adobe Creative Cloud <message@adobe.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "2024년 07월 05일 (PT)에 서비스 종료 예정"
+        }
+      ]
+    }
+  },
+  {
+    "id": "190926d0cc2f3531",
+    "internalDate": "1720443537000",
+    "snippet": "이 요청을 제출하지 않았더라도 이 인증 코드가 없으면 계정에 액세스할 수 없습니다. ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ 고객님의 인증 코드는 다음과 같습니다. 643993 이 요청을 제출하지 않았더라도 이 인증",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Adobe <message@adobe.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "인증 코드"
+        }
+      ]
+    }
+  },
+  {
+    "id": "190927ce07f9eacf",
+    "internalDate": "1720444575000",
+    "snippet": "이 요청을 제출하지 않았더라도 이 인증 코드가 없으면 계정에 액세스할 수 없습니다. ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ 고객님의 인증 코드는 다음과 같습니다. 929285 이 요청을 제출하지 않았더라도 이 인증",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Adobe <message@adobe.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "인증 코드"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1940d5a407867390",
+    "internalDate": "1735390805000",
+    "snippet": "표현さん、ゲストメンバーアカウントを有効にして、映画やドラマをお楽しみください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "신동우さんの視聴プランに招待されました"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1940e8e5a2e2c7d6",
+    "internalDate": "1735410997000",
+    "snippet": "ご利用開始にあたり役立つ情報をご案内します。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "Netflixへようこそ"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1941c992b7c8790d",
+    "internalDate": "1735646587000",
+    "snippet": "末尾16の電話番号をアカウントに追加しました。パスワードの再設定やアカウントのセキュリティ強化に利用できるよう、番号の確認を行ってください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "アカウントへの新しい電話番号の追加と確認完了のご案内"
+        }
+      ]
+    }
+  },
+  {
+    "id": "194247419bccd3c3",
+    "internalDate": "1735778375000",
+    "snippet": "このコードを入力してログインできます ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "Netflixより: ログインコードのご送付"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1942475286870696",
+    "internalDate": "1735778444000",
+    "snippet": "お客様のNetflixアカウント (hyeon.expression@gmail.com) の利用者をお確かめください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "新しいデバイスでお客様のアカウントが使用されています"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1948ca756537adce",
+    "internalDate": "1737526564000",
+    "snippet": "2025年1月24日までNetflixをお楽しみいただけます ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "メンバーシップのキャンセルのご案内"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19566116b51b7215",
+    "internalDate": "1741174172000",
+    "snippet": "Youtube Logo Zerom 🎵님이 내 댓글에 하트를 보냈습니다. 마음이 충전되는 로파이 1시간 (Lo-fi for Charging Mind 1 hour) | Zerom 🎵 @hyeonpyo1913 공부하면서 듣고 있는데 기분 몽글몽글해져서 좋아요 🥰 하트를 받은 댓글 보기 댓글 및 답글에 대한 이메일을 더 이상 수신하지 않으려면 수신거부할 수 있습니다",
+    "payload": {
+      "headers": [
+        {
+          "name": "Subject",
+          "value": "Zerom 🎵님이 내 댓글에 하트를 보냈습니다."
+        },
+        {
+          "name": "From",
+          "value": "YouTube <noreply@youtube.com>"
+        }
+      ]
+    }
+  },
+  {
+    "id": "195bfc792ee5bcbe",
+    "internalDate": "1742679282000",
+    "snippet": "이 요청을 제출하지 않았더라도 이 인증 코드가 없으면 계정에 액세스할 수 없습니다. ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ 고객님의 인증 코드는 다음과 같습니다. 981975 이 요청을 제출하지 않았더라도 이 인증",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Adobe <message@adobe.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "인증 코드"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19687221dc04770a",
+    "internalDate": "1746023881000",
+    "snippet": "Complete registration Please enter this confirmation code in the window where you started creating your account: 470983 Why do I have to confirm my email? Confirming your email address certifies that",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Sketchfab <notifications@sketchfab.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "Your Sketchfab confirmation code"
+        }
+      ]
+    }
+  },
+  {
+    "id": "196872257d240b50",
+    "internalDate": "1746023895000",
+    "snippet": "Sketchfab Hey express1on, Welcome to Sketchfab! You&#39;re joining an active community of millions of members who are passionate about 3D, VR, and AR. We set out to build a platform that is fun and",
+    "payload": {
+      "headers": [
+        {
+          "name": "Subject",
+          "value": "Welcome to Sketchfab!"
+        },
+        {
+          "name": "From",
+          "value": "Sketchfab <notifications@sketchfab.com>"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19776e0a209cfd86",
+    "internalDate": "1750046121000",
+    "snippet": "이용자 여러분께 안내드립니다. 2025년 6월 10일 오후 3시 36분부터 2025년 6월 11일 오전 7시까지(대한민국 표준시), ChatGPT 및 API 서비스에서 일시적으로 오류가 증가하는 현상이 확인되었습니다. 이 현상은 시스템 업데이트로 인하여 발생했습니다. 상당수 서버들과의 연결이 일시적으로 끊기면서 가용 처리 용량이 감소함에 따라, 응답 속도",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "OpenAI <noreply@tm.openai.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "6월 10일 서비스 장애에 대한 안내"
+        }
+      ]
+    }
+  },
+  {
+    "id": "197bc3a30d07e1a5",
+    "internalDate": "1751209619000",
+    "snippet": "これで、映画やドラマをお楽しみいただける準備が整いました。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "おかえりなさい!"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1980d48b0bb69ad3",
+    "internalDate": "1752569524000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1980f76fd7599825",
+    "internalDate": "1752606112000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19813abc202ea678",
+    "internalDate": "1752676679000",
+    "snippet": "넷플릭스 멤버십을 다시 시작하세요. 쉽고 간단하게! ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 멤버십이 보류 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19813abc3047adb3",
+    "internalDate": "1752676679000",
+    "snippet": "회원님의 멤버십이 현재 정지되어 있습니다. 도움이 필요하시면 언제든지 고객 센터로 문의해 주시기 바랍니다. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "결제 수단을 업데이트해 주세요."
+        }
+      ]
+    }
+  },
+  {
+    "id": "198152ffd480c6c0",
+    "internalDate": "1752702122000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19815324d3768811",
+    "internalDate": "1752702274000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198153271fe48cf1",
+    "internalDate": "1752702283000",
+    "snippet": "업데이트 완료! 회원님의 계정에 새로운 결제 수단 정보가 등록되었습니다. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "계정 정보 변경 확인"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198345658c1d6469",
+    "internalDate": "1753224729000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19857fe8c8627744",
+    "internalDate": "1753822956000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198795aac2430c58",
+    "internalDate": "1754382641000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198bd1765e6fd2ca",
+    "internalDate": "1755519083000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198dea45c1ceee5c",
+    "internalDate": "1756081969000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198ece88354c6656",
+    "internalDate": "1756321317000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "198f7c9b9cdfc728",
+    "internalDate": "1756503848000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19911a0681f77cbf",
+    "internalDate": "1756937348000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "1994d2d81cb7ee78",
+    "internalDate": "1757936451000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19954e6af259dad2",
+    "internalDate": "1758066028000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19969d763d8bd2ea",
+    "internalDate": "1758417347000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19a2922cf8b68ce4",
+    "internalDate": "1761626738000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19a4195ac997e191",
+    "internalDate": "1762036919000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19a7be439927efa2",
+    "internalDate": "1763015145000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19a7da81ced149f2",
+    "internalDate": "1763044760000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19ab5b9b42b52be9",
+    "internalDate": "1763985437000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19ad5fbefb311df3",
+    "internalDate": "1764526648000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19af09644d90c402",
+    "internalDate": "1764972970000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19afa4e4cd8bf89f",
+    "internalDate": "1765136026000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19afee3d6405a29d",
+    "internalDate": "1765212934000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19aff780525c0d42",
+    "internalDate": "1765222646000",
+    "snippet": "최근 넷플릭스는 Warner Bros.를 인수할 예정임을 발표했습니다. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "넷플릭스에서 Warner Bros.를 맞이하며"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19b0563f9fc1ad9f",
+    "internalDate": "1765321995000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19b2960cf0ec03e8",
+    "internalDate": "1765925768000",
+    "snippet": "누가 회원님의 넷플릭스 계정(hyeon.expression@gmail.com)을 사용 중인지 확인해 주세요. ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "회원님의 계정이 새로운 디바이스에서 사용 중입니다"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19b6be4238e7e822",
+    "internalDate": "1767041671000",
+    "snippet": "お客様のNetflixアカウント (hyeon.expression@gmail.com) の利用者をお確かめください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "新しいデバイスでお客様のアカウントが使用されています"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19b8d1c755422dbc",
+    "internalDate": "1767599010000",
+    "snippet": "お客様のNetflixアカウント (hyeon.expression@gmail.com) の利用者をお確かめください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "新しいデバイスでお客様のアカウントが使用されています"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19b9323aebbcff0a",
+    "internalDate": "1767700147000",
+    "snippet": "お客様のNetflixアカウント (hyeon.expression@gmail.com) の利用者をお確かめください。 ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+    "payload": {
+      "headers": [
+        {
+          "name": "From",
+          "value": "Netflix <info@account.netflix.com>"
+        },
+        {
+          "name": "Subject",
+          "value": "新しいデバイスでお客様のアカウントが使用されています"
+        }
+      ]
+    }
+  }
+]

@@ -97,6 +97,9 @@ app:
       - http://localhost:3000
   mail:
     analysis-months: 8
+  sample-messages:
+    dir: private/messages
+    fallback: static/messages/sample_messages_netflix_sketchfab.json
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
