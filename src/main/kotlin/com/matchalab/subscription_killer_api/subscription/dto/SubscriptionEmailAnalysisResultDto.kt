@@ -8,5 +8,5 @@ data class SubscriptionEmailAnalysisResultDto(
     val registeredSince: Instant,
     val hasSubscribedNewsletterOrAd: Boolean,
     val subscribedSince: Instant?,
-    val isNotSureIfSubcriptionIsOngoing: Boolean,
+    val isNotSureIfSubscriptionIsOngoing: Boolean,
 ) {}

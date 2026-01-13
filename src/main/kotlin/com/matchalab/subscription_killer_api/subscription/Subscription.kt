@@ -22,7 +22,7 @@ class Subscription(
     val registeredSince: Instant?,
     val hasSubscribedNewsletterOrAd: Boolean,
     val subscribedSince: Instant?,
-    val isNotSureIfSubcriptionIsOngoing: Boolean,
+    val isNotSureIfSubscriptionIsOngoing: Boolean,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_provider_id", nullable = false)

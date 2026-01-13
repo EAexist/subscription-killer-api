@@ -121,14 +121,14 @@ class SubscriptionAnalysisServiceTest(
                         subscribedSince =
                             DateTimeUtils.epochMilliToInstant(1752702283000),
                         registeredSince = null,
-                        isNotSureIfSubcriptionIsOngoing = false,
+                        isNotSureIfSubscriptionIsOngoing = false,
                     ),
                     SubscriptionResponseDto(
                         serviceProvider = mockSketchfabServiceProvider.toDto(),
                         hasSubscribedNewsletterOrAd = false,
                         subscribedSince = null,
                         registeredSince = null,
-                        isNotSureIfSubcriptionIsOngoing = false,
+                        isNotSureIfSubscriptionIsOngoing = false,
                     )
                 )
 

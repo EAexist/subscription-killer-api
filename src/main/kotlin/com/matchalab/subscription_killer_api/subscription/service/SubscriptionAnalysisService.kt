@@ -48,14 +48,14 @@ class SubscriptionAnalysisService(
 
     data class SubscribedSinceDto(
         val subscribedSince: Instant?,
-        val isNotSureIfSubcriptionIsOngoing: Boolean = false,
+        val isNotSureIfSubscriptionIsOngoing: Boolean = false,
     )
 
     data class SubscriptionDto(
         val serviceProviderId: UUID,
         var registeredSince: Instant?,
         val subscribedSince: Instant?,
-        val isNotSureIfSubcriptionIsOngoing: Boolean,
+        val isNotSureIfSubscriptionIsOngoing: Boolean,
         val hasSubscribedNewsletterOrAd: Boolean
     )
 
@@ -94,7 +94,7 @@ class SubscriptionAnalysisService(
                 registeredSince = it.registeredSince,
                 hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd,
                 subscribedSince = it.subscribedSince,
-                isNotSureIfSubcriptionIsOngoing = it.isNotSureIfSubcriptionIsOngoing,
+                isNotSureIfSubscriptionIsOngoing = it.isNotSureIfSubscriptionIsOngoing,
                 serviceProvider = serviceProvider,
                 googleAccount = googleAccount
             )
@@ -347,7 +347,7 @@ class SubscriptionAnalysisService(
                 registeredSince = null,
                 hasSubscribedNewsletterOrAd = hasSubscribedNewsletterOrAd,
                 subscribedSince = subscribedSinceResult.subscribedSince,
-                isNotSureIfSubcriptionIsOngoing = subscribedSinceResult.isNotSureIfSubcriptionIsOngoing,
+                isNotSureIfSubscriptionIsOngoing = subscribedSinceResult.isNotSureIfSubscriptionIsOngoing,
             )
         }
     }

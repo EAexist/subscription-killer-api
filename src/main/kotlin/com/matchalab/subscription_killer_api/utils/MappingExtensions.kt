@@ -43,7 +43,7 @@ fun Subscription.toResponseDto(): SubscriptionResponseDto {
         registeredSince = this.registeredSince,
         hasSubscribedNewsletterOrAd = this.hasSubscribedNewsletterOrAd,
         subscribedSince = this.subscribedSince,
-        isNotSureIfSubcriptionIsOngoing = this.isNotSureIfSubcriptionIsOngoing,
+        isNotSureIfSubscriptionIsOngoing = this.isNotSureIfSubscriptionIsOngoing,
     )
 }
 
