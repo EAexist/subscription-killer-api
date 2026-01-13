@@ -90,7 +90,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation("io.projectreactor:reactor-test:3.8.1")
-    
+
     testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
 
     // Micrometer Observation
@@ -112,7 +112,6 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform {
-        // 'includeExternal' 파라미터가 없으면 해당 태그 제외
         if (!project.hasProperty("includeGcp")) {
             excludeTags("gcp")
         }

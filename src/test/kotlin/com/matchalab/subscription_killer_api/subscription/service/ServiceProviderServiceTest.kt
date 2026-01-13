@@ -4,10 +4,7 @@ import com.matchalab.subscription_killer_api.config.TestDataFactory
 import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
-import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
-import com.matchalab.subscription_killer_api.subscription.GmailMessage
-import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
+import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.every
@@ -52,22 +49,28 @@ class ServiceProviderServiceTest() {
     private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_START: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.PAID_SUBSCRIPTION_START,
-            "계정 정보 변경 확인",
-            "새로운 결제 수단 정보가 등록"
+            EmailTemplate(
+                "계정 정보 변경 확인",
+                "새로운 결제 수단 정보가 등록"
+            )
         )
 
     private val mockNetflixEmailDetectionRuleGenerationDto_PAID_SUBSCRIPTION_CANCEL: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
-            "멤버십이 보류 중입니다",
-            ".*"
+            EmailTemplate(
+                "멤버십이 보류 중입니다",
+                ".*"
+            )
         )
 
     private val mockSketchfabEmailDetectionRuleGenerationDto_MONTHLY_PAYMENT: EmailDetectionRuleGenerationDto =
         EmailDetectionRuleGenerationDto(
             SubscriptionEventType.MONTHLY_PAYMENT,
-            "결제 완료",
-            ".*"
+            EmailTemplate(
+                "결제 완료",
+                ".*"
+            )
         )
 
     private val fakeGmailMessages: List<GmailMessage> by lazy {

@@ -1,8 +1,9 @@
 package com.matchalab.subscription_killer_api.ai.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
+import com.matchalab.subscription_killer_api.subscription.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
-import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationTaskResponse
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
 import com.matchalab.subscription_killer_api.subscription.service.UpdateEmailDetectionRulesFromAIResultDto
 import org.springframework.context.annotation.Profile
@@ -25,11 +26,11 @@ class MockChatClientService(
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
 
         if ("{emails}" in promptTemplate) {
-            return EmailCategorizationTaskResponse(
-                subscriptionStartMessages = listOf(),
-                subscriptionCancelMessages = listOf(),
-                monthlyPaymentMessages = listOf(),
-                annualPaymentMessages = listOf(),
+            return EmailCategorizationResponse(
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
             ) as T
         }
 
@@ -41,13 +42,17 @@ class MockChatClientService(
             return UpdateEmailDetectionRulesFromAIResultDto(
                 EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_START,
-                    "계정 정보 변경",
-                    "새로운 결제 수단 정보"
+                    EmailTemplate(
+                        "계정 정보 변경",
+                        "새로운 결제 수단 정보"
+                    )
                 ),
                 EmailDetectionRuleGenerationDto(
                     SubscriptionEventType.PAID_SUBSCRIPTION_CANCEL,
-                    "결제 수단을 업데이트",
-                    "멤버십이 현재 정지"
+                    EmailTemplate(
+                        "결제 수단을 업데이트",
+                        "멤버십이 현재 정지"
+                    )
                 ),
                 null,
                 null

@@ -20,12 +20,13 @@ import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
 
 @Tag("ai")
+@ActiveProfiles("ai", "test")
 @SpringBootTest(
     classes = [
         ToolCallingAutoConfiguration::class,
@@ -34,13 +35,10 @@ private val logger = KotlinLogging.logger {}
         SpringAiRetryAutoConfiguration::class,
         EmailCategorizationPromptService::class,
         ChatClientServiceImpl::class,
-        AiConfig::class
+        AiConfig::class,
+        SampleMessageConfig::class
     ],
     webEnvironment = SpringBootTest.WebEnvironment.NONE
-)
-@Import(
-    SampleMessageConfig::class,
-//    SmallerSampleMessageConfig::class
 )
 @EnableConfigurationProperties(PromptTemplateProperties::class)
 class EmailCategorizationEval @Autowired constructor(
@@ -53,14 +51,6 @@ class EmailCategorizationEval @Autowired constructor(
 
         val allMessages: List<GmailMessage> =
             sampleMessages.mapNotNull { it.toGmailMessage() }
-//                .filter {
-//                it.senderEmail in listOf(
-//                    "do-not-reply@watcha.com",
-//                    "info@account.netflix.com",
-//                    "message@adobe.com",
-//                    "noreply_melon@kakaoent.com"
-//                )
-//            }
 
         val exactResponse: EmailCategorizationResponse =
             emailCategorizationPromptService.run(allMessages)
@@ -129,45 +119,5 @@ class EmailCategorizationEval @Autowired constructor(
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.annualPaymentMessageIds)
             }
         )
-
-//        runBlocking {
-//            allMessages.groupBy { it.senderEmail }.map { (se, messages) ->
-//                async(Dispatchers.IO) {
-//
-//                    val exactResponse = chatClientService.call<EmailCategorizationResponse>(
-//                        promptTemplateProperties.filterAndCategorizeEmails,
-//                        mapOf("emails" to messages)
-//                    )
-//
-//                    val expectedResponse = expectedResponses.mapValues { (_, ids) ->
-//                        ids.filter { id -> idToMessages[id]?.senderEmail == se }.toSet()
-//                    }
-//
-//                    assertAll(
-//                        "Assertions for $se",
-//                        {
-//                            assertThat(exactResponse.subscriptionStartMessageIds.map { it.id }.toSet())
-//                                .`as`("subscriptionStartMessages")
-//                                .isEqualTo(expectedResponse["subscriptionStartMessages"] ?: emptySet<String>())
-//                        },
-//                        {
-//                            assertThat(exactResponse.subscriptionCancelMessages.map { it.id }.toSet())
-//                                .`as`("subscriptionCancelMessages")
-//                                .isEqualTo(expectedResponse["subscriptionCancelMessages"] ?: emptySet<String>())
-//                        },
-//                        {
-//                            assertThat(exactResponse.monthlyPaymentMessages.map { it.id }.toSet())
-//                                .`as`("monthlyPaymentMessages")
-//                                .isEqualTo(expectedResponse["monthlyPaymentMessages"] ?: emptySet<String>())
-//                        },
-//                        {
-//                            assertThat(exactResponse.annualPaymentMessages.map { it.id }.toSet())
-//                                .`as`("annualPaymentMessages")
-//                                .isEqualTo(expectedResponse["annualPaymentMessages"] ?: emptySet<String>())
-//                        }
-//                    )
-//                }
-//            }.awaitAll()
-//        }
     }
 }

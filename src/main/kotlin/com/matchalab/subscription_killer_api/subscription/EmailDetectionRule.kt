@@ -13,8 +13,7 @@ data class EmailDetectionRule(
     @Enumerated(EnumType.STRING)
     val eventType: SubscriptionEventType,
 
-    val subjectRegex: String,
-    val snippetRegex: String
+    val template: EmailTemplate,
 ) {
     companion object {
         fun createActive(generationDto: EmailDetectionRuleGenerationDto, updatedAt: Instant): EmailDetectionRule {
@@ -22,9 +21,12 @@ data class EmailDetectionRule(
                 true,
                 updatedAt,
                 generationDto.eventType,
-                generationDto.subjectRegex,
-                generationDto.snippetRegex
+                generationDto.template,
             )
         }
     }
 }
+
+
+
+

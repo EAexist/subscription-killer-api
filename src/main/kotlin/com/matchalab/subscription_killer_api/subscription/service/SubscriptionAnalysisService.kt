@@ -537,9 +537,7 @@ class SubscriptionAnalysisService(
     }
 
     private fun matchMessageToEvent(message: GmailMessage, rule: EmailDetectionRule): Boolean {
-        val subjectMatch: Boolean = matchRegex(message.subject, rule.subjectRegex)
-        val snippetMatch: Boolean = matchRegex(message.snippet, rule.snippetRegex)
-        return subjectMatch && snippetMatch
+        return rule.template.matchMessage(message)
     }
 
     private fun matchRegex(target: String, regex: String): Boolean {

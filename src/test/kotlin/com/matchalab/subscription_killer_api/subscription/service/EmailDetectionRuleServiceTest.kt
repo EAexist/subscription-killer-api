@@ -1,34 +1,27 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
-import com.matchalab.subscription_killer_api.ai.service.ChatClientService
-import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.core.io.ByteArrayResource
 
 private val logger = KotlinLogging.logger {}
 
 @ExtendWith(MockitoExtension::class)
 class EmailDetectionRuleServiceTest() {
 
-    private val mockChatClientService = mockk<ChatClientService>()
-    private val promptTemplateProperties = mockk<PromptTemplateProperties>()
+    private val emailCategorizationPromptService = mockk<EmailCategorizationPromptService>()
+    private val emailTemplateExtractionPromptService = mockk<EmailTemplateExtractionPromptService>()
 
     private val emailDetectionRuleService = EmailDetectionRuleService(
-        mockChatClientService,
-        promptTemplateProperties
+        emailCategorizationPromptService,
+        emailTemplateExtractionPromptService
     )
 
     @BeforeEach
     fun setUp() {
         // Given
-        val emptyResource = ByteArrayResource(ByteArray(0))
-        every { promptTemplateProperties.filterAndCategorizeEmails } returns emptyResource
-        every { promptTemplateProperties.generalizeStringPattern } returns emptyResource
     }
 
 //    @Test
