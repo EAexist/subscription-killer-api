@@ -21,7 +21,7 @@ class Subscription(
 
     val registeredSince: Instant?,
     val hasSubscribedNewsletterOrAd: Boolean,
-    val paidSince: Instant?,
+    val subscribedSince: Instant?,
     val isNotSureIfPaymentIsOngoing: Boolean,
 
     @ManyToOne(fetch = FetchType.LAZY)

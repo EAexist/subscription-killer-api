@@ -42,7 +42,7 @@ fun Subscription.toResponseDto(): SubscriptionResponseDto {
         serviceProvider = this.serviceProvider.toDto(),
         registeredSince = this.registeredSince,
         hasSubscribedNewsletterOrAd = this.hasSubscribedNewsletterOrAd,
-        paidSince = this.paidSince,
+        subscribedSince = this.subscribedSince,
         isNotSureIfPaymentIsOngoing = this.isNotSureIfPaymentIsOngoing,
     )
 }

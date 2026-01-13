@@ -7,6 +7,6 @@ data class SubscriptionEmailAnalysisResultDto(
     val serviceProviderId: UUID,
     val registeredSince: Instant,
     val hasSubscribedNewsletterOrAd: Boolean,
-    val paidSince: Instant?,
+    val subscribedSince: Instant?,
     val isNotSureIfPaymentIsOngoing: Boolean,
 ) {}

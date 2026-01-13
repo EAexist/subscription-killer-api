@@ -50,14 +50,14 @@ class SubscriptionAnalysisService(
     val MAX_GAP_DAYS: Int = 45
 
     data class PaidSinceDto(
-        val paidSince: Instant?,
+        val subscribedSince: Instant?,
         val isNotSureIfPaymentIsOngoing: Boolean = false,
     )
 
     data class SubscriptionDto(
         val serviceProviderId: UUID,
         var registeredSince: Instant?,
-        val paidSince: Instant?,
+        val subscribedSince: Instant?,
         val isNotSureIfPaymentIsOngoing: Boolean,
         val hasSubscribedNewsletterOrAd: Boolean
     )
@@ -96,7 +96,7 @@ class SubscriptionAnalysisService(
             val subscription = Subscription(
                 registeredSince = it.registeredSince,
                 hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd,
-                paidSince = it.paidSince,
+                subscribedSince = it.subscribedSince,
                 isNotSureIfPaymentIsOngoing = it.isNotSureIfPaymentIsOngoing,
                 serviceProvider = serviceProvider,
                 googleAccount = googleAccount
@@ -217,7 +217,7 @@ class SubscriptionAnalysisService(
                     }
                     logger.debug {
                         "🔊  [analyzeSingleGoogleAccount] computedSubscriptions:\n${
-                            computedSubscriptions.joinToString("\n") { "${serviceProviders.find { sp -> sp.id == it.serviceProviderId }?.displayName} ${it.registeredSince} ${it.paidSince}" }
+                            computedSubscriptions.joinToString("\n") { "${serviceProviders.find { sp -> sp.id == it.serviceProviderId }?.displayName} ${it.registeredSince} ${it.subscribedSince}" }
                         }"
                     }
 
@@ -232,7 +232,7 @@ class SubscriptionAnalysisService(
 
                 logger.debug {
                     "🔊\t[analyzeSingleGoogleAccount] subscriptions:\n${
-                        subscriptions.joinToString("\n") { "${serviceProviders.find { sp -> sp.id == it.serviceProviderId }} ${it.registeredSince} ${it.paidSince}" }
+                        subscriptions.joinToString("\n") { "${serviceProviders.find { sp -> sp.id == it.serviceProviderId }} ${it.registeredSince} ${it.subscribedSince}" }
                     }"
                 }
 
@@ -341,15 +341,15 @@ class SubscriptionAnalysisService(
                 serviceProviderService.updateEmailDetectionRules(serviceProvider, addressToMessages)
 //            }
 
-            val paidSinceResult: PaidSinceDto = computePaidSince(updatedServiceProvider, addressToMessages)
+            val subscribedSinceResult: PaidSinceDto = computePaidSince(updatedServiceProvider, addressToMessages)
             val hasSubscribedNewsletterOrAd: Boolean = false
 
             SubscriptionDto(
                 serviceProviderId = updatedServiceProvider.requiredId,
                 registeredSince = null,
                 hasSubscribedNewsletterOrAd = hasSubscribedNewsletterOrAd,
-                paidSince = paidSinceResult.paidSince,
-                isNotSureIfPaymentIsOngoing = paidSinceResult.isNotSureIfPaymentIsOngoing,
+                subscribedSince = subscribedSinceResult.subscribedSince,
+                isNotSureIfPaymentIsOngoing = subscribedSinceResult.isNotSureIfPaymentIsOngoing,
             )
         }
     }

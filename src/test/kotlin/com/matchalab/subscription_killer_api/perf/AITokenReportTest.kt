@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -27,12 +28,13 @@ private val logger = KotlinLogging.logger {}
 
 @Tag("ai")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableAutoConfiguration
 @AutoConfigureWebTestClient
 @EnableConfigurationProperties(SampleGoogleAccountProperties::class)
 @AutoConfigureObservability
 @Import(
     AuthenticatedClientFactory::class,
-    SmallerSampleMessageConfig::class
+    SmallerSampleMessageConfig::class,
 )
 class AITokenReportTest
 @Autowired

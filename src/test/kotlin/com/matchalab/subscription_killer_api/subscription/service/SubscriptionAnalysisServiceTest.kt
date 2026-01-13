@@ -122,7 +122,7 @@ class SubscriptionAnalysisServiceTest(
                     SubscriptionResponseDto(
                         serviceProvider = mockNetflixServiceProvider.toDto(),
                         hasSubscribedNewsletterOrAd = false,
-                        paidSince =
+                        subscribedSince =
                             DateTimeUtils.epochMilliToInstant(1752702283000),
                         registeredSince = null,
                         isNotSureIfPaymentIsOngoing = false,
@@ -130,7 +130,7 @@ class SubscriptionAnalysisServiceTest(
                     SubscriptionResponseDto(
                         serviceProvider = mockSketchfabServiceProvider.toDto(),
                         hasSubscribedNewsletterOrAd = false,
-                        paidSince = null,
+                        subscribedSince = null,
                         registeredSince = null,
                         isNotSureIfPaymentIsOngoing = false,
                     )

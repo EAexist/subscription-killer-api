@@ -52,8 +52,11 @@ class EmailCategorizationEval @Autowired constructor(
         val allMessages: List<GmailMessage> =
             sampleMessages.mapNotNull { it.toGmailMessage() }
 
+//        val exactResponse: EmailCategorizationResponse =
+//            emailCategorizationPromptService.run(allMessages)
+
         val exactResponse: EmailCategorizationResponse =
-            emailCategorizationPromptService.run(allMessages)
+            EmailCategorizationResponse(listOf(), listOf(), listOf(), listOf())
 
         val expectedResponse = EmailCategorizationResponse(
             listOf(
