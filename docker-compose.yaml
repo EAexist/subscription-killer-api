@@ -12,6 +12,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   elasticsearch:
+    profiles: [ "observe" ]
     image: ghcr.io/openzipkin/zipkin-elasticsearch8:latest
     container_name: elasticsearch
     # Bind Mount: Survives 'docker compose down -v'
@@ -28,6 +29,7 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 
   zipkin:
+    profiles: [ "observe" ]
     image: openzipkin/zipkin:latest
     container_name: zipkin
     depends_on:
@@ -39,6 +41,7 @@ services:
       - ES_HOSTS=http://elasticsearch:9200
 
   grafana:
+    profiles: [ "observe" ]
     image: grafana/grafana:latest
     container_name: grafana
     ports:
