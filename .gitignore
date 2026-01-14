@@ -51,4 +51,4 @@ src/test/resources/application-test-local.yaml
 src/test/resources/private
 
 ### Scripts ###
-scripts/
+.local/
