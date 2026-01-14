@@ -10,7 +10,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
-import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 
@@ -69,8 +68,8 @@ class MockChatClientService(
                 EmailTemplateExtractionResult(
                     listOf(parts[0]),
                     EmailTemplate(
-                        Pattern.quote(parts[1]),
-                        Pattern.quote(parts[2])
+                        parts[1],
+                        parts[2]
                     )
                 )
             }

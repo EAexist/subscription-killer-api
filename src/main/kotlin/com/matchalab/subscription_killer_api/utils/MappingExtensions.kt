@@ -72,7 +72,7 @@ fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
     val matchResult = regex.find(fromHeaderValue)
     val (name, email) = (matchResult?.destructured?.toList() ?: listOf(
         "",
-        ""
+        fromHeaderValue.trim()
     )).map { if (doHidePrices) it.hidePrices() else it }
 
     return GmailMessage(
