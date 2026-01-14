@@ -7,19 +7,17 @@ import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.*
 import com.matchalab.subscription_killer_api.subscription.config.MailProperties
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.GmailClientFactory
 import com.matchalab.subscription_killer_api.utils.DateTimeUtils
-import com.matchalab.subscription_killer_api.utils.toDto
-import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.ObservationRegistry
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -115,18 +113,18 @@ class SubscriptionAnalysisServiceTest(
     @Test
     fun `given GmailClientFactory should correctly create subscription report response dto`() =
         runTest {
-            val expectedSubscriptions: List<SubscriptionResponseDto> =
+            val expectedSubscriptions: List<Subscription> =
                 listOf(
-                    SubscriptionResponseDto(
-                        serviceProvider = mockNetflixServiceProvider.toDto(),
+                    Subscription(
+                        serviceProvider = mockNetflixServiceProvider,
                         hasSubscribedNewsletterOrAd = false,
                         subscribedSince =
                             DateTimeUtils.epochMilliToInstant(1752702283000),
                         registeredSince = null,
                         isNotSureIfSubscriptionIsOngoing = false,
                     ),
-                    SubscriptionResponseDto(
-                        serviceProvider = mockSketchfabServiceProvider.toDto(),
+                    Subscription(
+                        serviceProvider = mockSketchfabServiceProvider,
                         hasSubscribedNewsletterOrAd = false,
                         subscribedSince = null,
                         registeredSince = null,
@@ -176,7 +174,6 @@ class SubscriptionAnalysisServiceTest(
             } returns
                     mockServiceProviders
 
-
             every {
                 serviceProviderService.updateEmailDetectionRules(
                     any<ServiceProvider>(),
@@ -185,6 +182,25 @@ class SubscriptionAnalysisServiceTest(
             } answers {
                 firstArg()
             }
+
+            every {
+                subscriptionService.findByGoogleAccountAndServiceProviderIdOrCreate(
+                    any<GoogleAccount>(),
+                    any<UUID>()
+                )
+            } answers {
+                Subscription(
+                    serviceProvider = serviceProviderService.findByIdWithSubscriptions(secondArg())
+                        ?: throw EntityNotFoundException()
+                )
+            }
+
+            every {
+                subscriptionService.save(any<Subscription>())
+            } answers {
+                firstArg()
+            }
+
 
             every { gmailClientFactory.createAdapter(any<String>()) } returns (mockGmailClientAdapter)
 
@@ -220,18 +236,25 @@ class SubscriptionAnalysisServiceTest(
             subscriptionAnalysisService.analyze(testAppUserId)
 
             val capturedAccounts = mutableListOf<GoogleAccount>()
+            val capturedSubscriptions = mutableListOf<Subscription>()
 
             verify(exactly = 2) {
                 googleAccountRepository.save(capture(capturedAccounts))
             }
 
+            verify(exactly = 4) {
+                subscriptionService.save(capture(capturedSubscriptions))
+            }
+
             // Then
             logger.debug { "[subscriptionAnalysisService.analyze] capturedAccounts: $capturedAccounts" }
+            logger.debug { "[subscriptionAnalysisService.analyze] capturedSubscriptions: $capturedSubscriptions" }
+
+            assertThat(capturedSubscriptions)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(*(expectedSubscriptions + expectedSubscriptions).toTypedArray())
 
             assertThat(capturedAccounts).allSatisfy { capturedAccount ->
-                assertThat(capturedAccount.subscriptions.map { it.toResponseDto() }).isNotEmpty()
-                    .usingRecursiveComparison()
-                    .isEqualTo(expectedSubscriptions)
                 assertThat(capturedAccount.analyzedAt)
                     .isBetween(Instant.now().minus(Duration.ofMinutes(10)), Instant.now())
             }

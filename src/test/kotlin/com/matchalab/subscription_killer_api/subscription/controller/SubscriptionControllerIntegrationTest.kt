@@ -1,13 +1,9 @@
 package com.matchalab.subscription_killer_api.subscription.controller
 
+import com.matchalab.subscription_killer_api.config.AuthenticatedClientFactory
 import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
-import com.matchalab.subscription_killer_api.config.TestDataFactory
-import com.matchalab.subscription_killer_api.domain.AppUser
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
-import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
@@ -25,16 +21,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import org.springframework.session.Session
-import org.springframework.session.SessionRepository
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.transaction.support.TransactionTemplate
@@ -52,89 +42,28 @@ private val logger = KotlinLogging.logger {}
 @AutoConfigureWebTestClient
 @EnableConfigurationProperties(SampleGoogleAccountProperties::class)
 @AutoConfigureObservability
+@Import(AuthenticatedClientFactory::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SubscriptionControllerIntegrationTest
 @Autowired
 constructor(
     private val appUserRepository: AppUserRepository,
     private val serviceProviderRepository: ServiceProviderRepository,
-    private val sessionRepository: SessionRepository<out Session>,
-    private val webTestClient: WebTestClient,
-    private val sampleGoogleAccountProperties: SampleGoogleAccountProperties,
     private val transactionTemplate: TransactionTemplate,
+    private val authenticatedClientFactory: AuthenticatedClientFactory,
 ) {
-    lateinit var authedClient: WebTestClient
+    private lateinit var sampleAppUserId: UUID
+    private lateinit var authedClient: WebTestClient
 
-    private val testDataFactory = TestDataFactory()
-
-    private val localhost = "https://localhost:3000"
-
-    private val testUserName: String = "testUserName"
-
-    private lateinit var testAppUserId: UUID
-
-    @BeforeAll
-    fun checkEnvironment() {
-        Assumptions.assumeTrue(
-            sampleGoogleAccountProperties.refreshToken != "placeholder",
-            "✅ Skipping test: No real refresh token found."
-        )
-    }
+    @LocalServerPort
+    private var port: Int = 0
 
     @BeforeEach
     fun setUp() {
-
-        val testAppUser =
-            AppUser(
-                null,
-                testUserName,
-                UserRoleType.USER,
-                mutableListOf<GoogleAccount>()
-            )
-        testAppUser.addGoogleAccount(
-            GoogleAccount(
-                sampleGoogleAccountProperties.subject ?: "fakeSubject",
-                testUserName,
-                "testUserEmail",
-                sampleGoogleAccountProperties.refreshToken,
-                sampleGoogleAccountProperties.accessToken,
-                sampleGoogleAccountProperties.expiresAt,
-                sampleGoogleAccountProperties.scope
-            )
-        )
-
-        testAppUserId = checkNotNull(appUserRepository.saveAndFlush(testAppUser).id) {
-            "🚨 Exception: testAppUserId is null."
-        }
-
-        val principal: OidcUser = CustomOidcUser(testAppUserId, listOf(SimpleGrantedAuthority("ROLE_USER")))
-        val auth = OAuth2AuthenticationToken(
-            principal, principal.authorities, "google"
-        )
-
-        @Suppress("UNCHECKED_CAST")
-        val repo = sessionRepository as SessionRepository<Session>
-        val session = repo.createSession()
-        val context: SecurityContext = SecurityContextHolder.createEmptyContext().apply {
-            authentication = auth
-        }
-
-        session.setAttribute("SPRING_SECURITY_CONTEXT", context)
-        val encodedSessionId = Base64.getEncoder().encodeToString(session.id.toByteArray())
-        repo.save(session)
-
-        if (!appUserRepository.existsById(testAppUserId)) {
-            throw IllegalStateException("🚨 Setup failed: Data not found in DB before request")
-        }
-        if (repo.findById(session.id) == null) {
-            throw IllegalStateException("🚨 Exception: Data not found in setup")
-        }
-
-        authedClient = webTestClient.mutate()
-            .defaultHeader(HttpHeaders.ORIGIN, localhost)
-            .defaultCookie("SESSION", encodedSessionId)
-            .responseTimeout(Duration.ofSeconds(30))
-            .build()
+        appUserRepository.deleteAll()
+        val authenticatedClientSetup = authenticatedClientFactory.create(port)
+        sampleAppUserId = authenticatedClientSetup.appUserId
+        authedClient = authenticatedClientSetup.client
     }
 
     @AfterEach
@@ -207,8 +136,8 @@ constructor(
 
         // Given
         transactionTemplate.execute {
-            val appUser = appUserRepository.findById(testAppUserId)
-                .orElseThrow { EntityNotFoundException("🚨 User not found with id $testAppUserId") }
+            val appUser = appUserRepository.findById(sampleAppUserId)
+                .orElseThrow { EntityNotFoundException("🚨 User not found with id $sampleAppUserId") }
 
             val serviceProvider =
                 serviceProviderRepository.findByDisplayName("Netflix") ?: throw EntityNotFoundException(

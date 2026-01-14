@@ -4,6 +4,7 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
 import com.matchalab.subscription_killer_api.subscription.Subscription
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -23,7 +24,8 @@ class SubscriptionService(
             serviceProviderId
         )
             ?: run {
-                val serviceProvider = serviceProviderService.findByIdOrNotFound(serviceProviderId)
+                val serviceProvider = serviceProviderService.findByIdWithSubscriptions(serviceProviderId)
+                    ?: throw EntityNotFoundException()
                 val subscription = Subscription(serviceProvider = serviceProvider, googleAccount = googleAccount)
                 subscription.associateWithParents(serviceProvider, googleAccount)
                 subscriptionRepository.save(subscription)

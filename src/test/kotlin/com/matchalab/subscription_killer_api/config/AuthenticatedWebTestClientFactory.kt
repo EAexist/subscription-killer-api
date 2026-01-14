@@ -1,12 +1,12 @@
-package com.matchalab.subscription_killer_api.perf
+package com.matchalab.subscription_killer_api.config
 
-import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.junit.jupiter.api.Assumptions
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestComponent
 import org.springframework.http.HttpHeaders
@@ -99,5 +99,12 @@ class AuthenticatedClientFactory(
 
     fun clear() {
         appUserRepository.deleteAll()
+    }
+
+    fun checkEnvironment() {
+        Assumptions.assumeTrue(
+            sampleGoogleAccountProperties.refreshToken != "placeholder",
+            "✅ Skipping test: No real refresh token found."
+        )
     }
 }

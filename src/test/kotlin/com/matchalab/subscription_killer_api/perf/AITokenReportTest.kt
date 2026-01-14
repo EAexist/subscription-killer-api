@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.perf
 
+import com.matchalab.subscription_killer_api.config.AuthenticatedClientFactory
 import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
 import com.matchalab.subscription_killer_api.config.SmallerSampleMessageConfig
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
