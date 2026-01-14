@@ -9,7 +9,7 @@ interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
     @Query("SELECT COUNT(s) FROM Subscription s WHERE s.serviceProvider.id = :serviceProviderId")
     fun countByServiceProviderId(serviceProviderId: UUID): Long
 
-    fun findByGoogleAccountIdAndServiceProviderId(
+    fun findByGoogleAccountSubjectAndServiceProviderId(
         googleAccountId: String,
         serviceProviderId: UUID
     ): Subscription?

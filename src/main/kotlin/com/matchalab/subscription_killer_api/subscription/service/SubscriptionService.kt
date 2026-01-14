@@ -18,7 +18,7 @@ class SubscriptionService(
         googleAccount: GoogleAccount,
         serviceProviderId: UUID
     ): Subscription {
-        return subscriptionRepository.findByGoogleAccountIdAndServiceProviderId(
+        return subscriptionRepository.findByGoogleAccountSubjectAndServiceProviderId(
             googleAccount.subject!!,
             serviceProviderId
         )

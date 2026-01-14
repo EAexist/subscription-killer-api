@@ -11,7 +11,7 @@ import java.util.*
         [
             UniqueConstraint(
                 name = "uk_report_provider",
-                columnNames = ["report_id", "service_provider_id"]
+                columnNames = ["google_account_id", "service_provider_id"]
             )]
 )
 class Subscription(

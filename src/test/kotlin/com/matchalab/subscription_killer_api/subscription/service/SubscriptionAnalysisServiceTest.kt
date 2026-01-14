@@ -41,6 +41,7 @@ class SubscriptionAnalysisServiceTest(
     private val googleAccountRepository = mockk<GoogleAccountRepository>()
 
     private val serviceProviderService = mockk<ServiceProviderService>()
+    private val subscriptionService = mockk<SubscriptionService>()
 
     private val appUserService = mockk<AppUserService>()
 
@@ -107,6 +108,7 @@ class SubscriptionAnalysisServiceTest(
             testMailProperties,
             progressService,
             ObservationRegistry.NOOP,
+            subscriptionService
         )
     }
 
