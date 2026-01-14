@@ -19,10 +19,10 @@ class Subscription(
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     var id: UUID? = null,
 
-    val registeredSince: Instant?,
-    val hasSubscribedNewsletterOrAd: Boolean,
-    val subscribedSince: Instant?,
-    val isNotSureIfPaymentIsOngoing: Boolean,
+    var registeredSince: Instant? = null,
+    var hasSubscribedNewsletterOrAd: Boolean = false,
+    var subscribedSince: Instant? = null,
+    var isNotSureIfPaymentIsOngoing: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_provider_id", nullable = false)

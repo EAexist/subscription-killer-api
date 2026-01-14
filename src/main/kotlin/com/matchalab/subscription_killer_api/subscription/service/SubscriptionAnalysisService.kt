@@ -41,6 +41,7 @@ class SubscriptionAnalysisService(
     private val mailProperties: MailProperties,
     private val progressService: ProgressService,
     private val observationRegistry: ObservationRegistry,
+    private val subscriptionService: SubscriptionService,
 ) {
 
     val after: Instant = DateTimeUtils.minusMonthsFromInstant(Instant.now(), mailProperties.analysisMonths)
@@ -87,18 +88,16 @@ class SubscriptionAnalysisService(
                 ?: throw IllegalStateException(
                     "Google Account not found for subject=$subject"
                 )
-        subscriptionDtos.forEach { it ->
-            val serviceProvider =
-                serviceProviderService.findByIdWithSubscriptions(it.serviceProviderId) ?: throw IllegalStateException()
-            val subscription = Subscription(
-                registeredSince = it.registeredSince,
-                hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd,
-                subscribedSince = it.subscribedSince,
-                isNotSureIfPaymentIsOngoing = it.isNotSureIfPaymentIsOngoing,
-                serviceProvider = serviceProvider,
-                googleAccount = googleAccount
-            )
-            subscription.associateWithParents(serviceProvider, googleAccount)
+        subscriptionDtos.forEach {
+            val subscription: Subscription =
+                subscriptionService.findByGoogleAccountAndServiceProviderIdOrCreate(googleAccount, it.serviceProviderId)
+
+            subscription.registeredSince = it.registeredSince
+            subscription.subscribedSince = it.subscribedSince
+            subscription.isNotSureIfPaymentIsOngoing = it.isNotSureIfPaymentIsOngoing
+            subscription.hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd
+
+            subscriptionService.save(subscription)
         }
         googleAccount.analyzedAt = Instant.now()
         googleAccountRepository.save(googleAccount)

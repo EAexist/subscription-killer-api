@@ -8,8 +8,11 @@ import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
 import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -28,6 +31,14 @@ class ServiceProviderService(
     }
 
     val maxNumberOfEmailDetectionRuleAnalysis: Long = 40
+
+
+    fun findByIdOrNotFound(id: UUID): ServiceProvider {
+        return serviceProviderRepository.findByIdOrNull(id) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "User profile not found"
+        )
+    }
 
     fun findByIdWithSubscriptions(id: UUID): ServiceProvider? {
         return serviceProviderRepository.findByIdWithSubscriptions(id)
