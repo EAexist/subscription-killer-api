@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.jpa") version "1.9.25"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
     kotlin("kapt") version "2.3.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.matchalab"
@@ -28,7 +29,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-web") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+    }
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.session:spring-session-jdbc")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -138,15 +141,28 @@ tasks.withType<Test> {
 }
 
 tasks.register<Zip>("buildZip") {
-
     dependsOn("generateGitProperties")
 
-    from(tasks.compileJava)
-    from(tasks.processResources)
-
     into("lib") {
-        from(configurations.runtimeClasspath) // Use runtimeClasspath for a runnable zip
+        from(tasks.jar)
+        from(configurations.runtimeClasspath)
     }
+}
+
+//tasks.register<Zip>("buildZip") {
+//
+//    dependsOn("generateGitProperties")
+//
+//    from(tasks.compileJava)
+//    from(tasks.processResources)
+//
+//    into("lib") {
+//        from(configurations.runtimeClasspath) // Use runtimeClasspath for a runnable zip
+//    }
+//}
+
+tasks.build {
+    dependsOn(tasks.getByName("buildZip"))
 }
 
 tasks.processResources {
@@ -157,13 +173,10 @@ tasks.withType<JavaExec> {
     jvmArgs("-Dfile.encoding=UTF-8")
 }
 
-tasks.build {
-    dependsOn(tasks.getByName("buildZip"))
-}
-
 gitProperties {
     failOnNoGitDirectory = false
 }
+
 
 // TODO : Use layers for dependencies.
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
