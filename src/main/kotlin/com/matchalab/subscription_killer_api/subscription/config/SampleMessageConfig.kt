@@ -22,6 +22,15 @@ class SampleMessageConfig(
         @Value("\${app.sample-messages.dir}") dir: String,
         @Value("\${app.sample-messages.fallback}") fallbackPath: String
     ): List<GmailMessage> {
+        return sampleRawMessages(loader, dir, fallbackPath).map { it.toGmailMessage(mailProperties.maxSnippetSize) }
+    }
+
+    @Bean
+    fun sampleRawMessages(
+        loader: ResourceLoader,
+        @Value("\${app.sample-messages.dir}") dir: String,
+        @Value("\${app.sample-messages.fallback}") fallbackPath: String
+    ): List<Message> {
 
         val resolver = PathMatchingResourcePatternResolver()
         val resources = resolver.getResources("classpath:$dir/*.json")
@@ -38,6 +47,6 @@ class SampleMessageConfig(
             }
 
         }
-        return messages.map { it.toGmailMessage(mailProperties.maxSnippetSize) }
+        return messages
     }
 }

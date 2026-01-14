@@ -73,26 +73,43 @@ fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
     val (name, email) = (matchResult?.destructured?.toList() ?: listOf(
         "",
         fromHeaderValue.trim()
-    )).map { if (doHidePrices) it.hidePrices() else it }
+    ))
 
     return GmailMessage(
         id = this.id,
         senderName = name,
         senderEmail = email,
-        subject = subjectHeaderValue,
+        subject = subjectHeaderValue.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it },
         internalDate = internalDate,
-        snippet = this.snippet.take(maxSnippetSize) ?: "",
+        snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }.take(maxSnippetSize)
+            ?: "",
     )
+}
+
+private fun String.cleanEmailText(): String {
+    return this
+        // 1. Decode common HTML entities found in your logs
+        .replace("&#39;", "'")
+        .replace("&nbsp;", " ")
+        // 2. Remove invisible/control/format characters (\p{C}) AND specific markers like the "͏" (Combining Grapheme Joiner)
+        .replace(Regex("[\\p{C}\\u034F\\u200B-\\u200D\\uFEFF]"), "")
+        // 3. Collapse all whitespace (newlines, tabs, multiple spaces) into one single space
+        .replace(Regex("\\s+"), " ")
+        .trim()
 }
 
 fun GmailMessage.toSummaryDto(): GmailMessageSummaryDto =
     GmailMessageSummaryDto(this.id, this.subject, this.snippet)
 
 fun String.hidePrices(): String {
-    val priceRegex = """\b(\$|€|£|USD|₩|원)?\s?\d{1,3}(?:,\d{3})*(?:\.\d+)?\b""".toRegex(RegexOption.IGNORE_CASE)
+    // Matches the full number followed by the currency suffix
+    val priceSuffixRegex = """\d[\d,.]*\s?(원|KRW|USD)""".toRegex(RegexOption.IGNORE_CASE)
+    // Matches the currency symbol followed by the full number
+    val pricePrefixRegex = """(\$|€|£|₩|USD)\s?\d[\d,.]*""".toRegex(RegexOption.IGNORE_CASE)
 
     return this
-        .replace(priceRegex, "[PRICE]")
+        .replace(priceSuffixRegex, "[PRICE]")
+        .replace(pricePrefixRegex, "[PRICE]")
 }
 
 fun String.hideDates(): String {
