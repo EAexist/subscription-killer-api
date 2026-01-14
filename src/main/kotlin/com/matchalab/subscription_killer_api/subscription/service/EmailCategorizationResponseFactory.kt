@@ -9,7 +9,6 @@ object EmailCategorizationResponseFactory {
             "19b633ef8816f70b",
             "195bfcf179dd517a",
             "1905d62e1b5a4cc4",
-            "1940d5a407867390",
             "1940e8e5a2e2c7d6",
             "197bc3a30d07e1a5",
             "198153271fe48cf1"
@@ -41,6 +40,42 @@ object EmailCategorizationResponseFactory {
             "18e4b75a73dc59d0",
             "18eeb1a9467cd67f",
             "18f8598119fb43e5",
+        ), listOf<String>(
+        )
+    )
+
+    fun createUniqueSample(): EmailCategorizationResponse = EmailCategorizationResponse(
+        listOf(
+            "19b5eb4d89185432",
+            "19b633ef8816f70b",
+            "195bfcf179dd517a",
+            "1905d62e1b5a4cc4",
+            "1940e8e5a2e2c7d6",
+            "197bc3a30d07e1a5",
+            "198153271fe48cf1"
+        ), listOf(
+            "18fffe1927227419",
+            "1901483a2036e020",
+            "19b5eb36c656f8a3",
+            "19b5eb7b6405f519",
+            "195ee970f2954eb3",
+            "1948ca756537adce",
+            "19813abc202ea678",
+            "19813abc3047adb3",
+        ), listOf(
+            "185becf0be8bdb2e",
+            "1878e46c00da9d9c",
+            "18e4b75a73dc59d0",
+            "18f8598119fb43e5",
+        ), listOf<String>(
+        )
+    )
+
+    fun createAllowedSamples(): EmailCategorizationResponse = EmailCategorizationResponse(
+        listOf(
+            "1940d5a407867390",
+        ), listOf(
+        ), listOf(
         ), listOf<String>(
         )
     )

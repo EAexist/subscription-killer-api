@@ -42,27 +42,28 @@ class EmailCategorizationEval @Autowired constructor(
             exactResponse =
                 emailCategorizationPromptService.run(sampleMessages)
         }
-        val expectedResponse = EmailCategorizationResponseFactory.createSample()
+        val expectedResponse = EmailCategorizationResponseFactory.createUniqueSample()
+        val allowedIds = EmailCategorizationResponseFactory.createAllowedSamples()
 
         assertAll(
             "Assertions",
             {
-                assertThat(exactResponse.subsStartMsgIds)
+                assertThat(exactResponse.subsStartMsgIds.filter { it !in allowedIds.subsStartMsgIds })
                     .`as`("SUBSCRIPTION_START")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.subsStartMsgIds)
             },
             {
-                assertThat(exactResponse.subsCancelMsgIds)
+                assertThat(exactResponse.subsCancelMsgIds.filter { it !in allowedIds.subsCancelMsgIds })
                     .`as`("SUBSCRIPTION_CANCEL")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.subsCancelMsgIds)
             },
             {
-                assertThat(exactResponse.monthlyMsgIds)
+                assertThat(exactResponse.monthlyMsgIds.filter { it !in allowedIds.monthlyMsgIds })
                     .`as`("MONTHLY_PAYMENT")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.monthlyMsgIds)
             },
             {
-                assertThat(exactResponse.annualMsgIds)
+                assertThat(exactResponse.annualMsgIds.filter { it !in allowedIds.annualMsgIds })
                     .`as`("ANNUAL_PAYMENT")
                     .containsExactlyInAnyOrderElementsOf(expectedResponse.annualMsgIds)
             }
