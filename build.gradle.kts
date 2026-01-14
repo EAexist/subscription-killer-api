@@ -1,3 +1,5 @@
+//https://kotlinlang.org/docs/kapt.html#annotation-processor-arguments
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -5,6 +7,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
+    kotlin("kapt") version "2.3.0"
 }
 
 group = "com.matchalab"
@@ -45,6 +48,12 @@ dependencies {
     // !Do not make this runtimeOnly() prevent to exclude from test environment: it prevents
     // compile.
     implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.1.5")
+
+    // Processes Java files
+    annotationProcessor("org.springframework:spring-context-indexer:7.0.2")
+    // Processes Kotlin files
+    kapt("org.springframework:spring-context-indexer:7.0.2")
+
 
     // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-libraries
     implementation("com.amazonaws:aws-lambda-java-core:1.4.0")
