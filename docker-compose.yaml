@@ -41,7 +41,7 @@ services:
       - ES_HOSTS=http://elasticsearch:9200
 
   grafana:
-    profiles: [ "observe" ]
+    profiles: [ "report" ]
     image: grafana/grafana:latest
     container_name: grafana
     ports:
