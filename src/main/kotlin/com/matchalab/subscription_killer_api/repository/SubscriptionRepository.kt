@@ -8,4 +8,9 @@ import java.util.*
 interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
     @Query("SELECT COUNT(s) FROM Subscription s WHERE s.serviceProvider.id = :serviceProviderId")
     fun countByServiceProviderId(serviceProviderId: UUID): Long
+
+    fun findByGoogleAccountIdAndServiceProviderId(
+        googleAccountId: String,
+        serviceProviderId: UUID
+    ): Subscription?
 }

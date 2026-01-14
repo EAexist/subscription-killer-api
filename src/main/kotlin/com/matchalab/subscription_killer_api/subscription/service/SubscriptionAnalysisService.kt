@@ -41,6 +41,7 @@ class SubscriptionAnalysisService(
     private val mailProperties: MailProperties,
     private val progressService: ProgressService,
     private val observationRegistry: ObservationRegistry,
+    private val subscriptionService: SubscriptionService,
 ) {
 
     val after: Instant = DateTimeUtils.minusMonthsFromInstant(Instant.now(), mailProperties.analysisMonths)
@@ -87,18 +88,16 @@ class SubscriptionAnalysisService(
                 ?: throw IllegalStateException(
                     "Google Account not found for subject=$subject"
                 )
-        subscriptionDtos.forEach { it ->
-            val serviceProvider =
-                serviceProviderService.findByIdWithSubscriptions(it.serviceProviderId) ?: throw IllegalStateException()
-            val subscription = Subscription(
-                registeredSince = it.registeredSince,
-                hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd,
-                subscribedSince = it.subscribedSince,
-                isNotSureIfSubscriptionIsOngoing = it.isNotSureIfSubscriptionIsOngoing,
-                serviceProvider = serviceProvider,
-                googleAccount = googleAccount
-            )
-            subscription.associateWithParents(serviceProvider, googleAccount)
+        subscriptionDtos.forEach {
+            val subscription: Subscription =
+                subscriptionService.findByGoogleAccountAndServiceProviderIdOrCreate(googleAccount, it.serviceProviderId)
+
+            subscription.registeredSince = it.registeredSince
+            subscription.subscribedSince = it.subscribedSince
+            subscription.isNotSureIfSubscriptionIsOngoing = it.isNotSureIfSubscriptionIsOngoing
+            subscription.hasSubscribedNewsletterOrAd = it.hasSubscribedNewsletterOrAd
+
+            subscriptionService.save(subscription)
         }
         googleAccount.analyzedAt = Instant.now()
         googleAccountRepository.save(googleAccount)
@@ -248,39 +247,39 @@ class SubscriptionAnalysisService(
         setServiceProviderProgress: ServiceProviderProgressCallback
     ): List<SubscriptionDto> {
 
-        logger.debug {
-            "🔊 | [analyzeSingleGoogleAccount] allMessages:\n${
-                allMessages.joinToString(",\n") { "senderEmail: ${it.senderEmail}, id: ${it.id}" }
-            }"
-        }
-
-        logger.debug {
-            "🔊 | [analyzeSingleGoogleAccount] serviceProviders:\n${
-                serviceProviders.joinToString("\n") {
-                    "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
-                }
-            }"
-        }
+//        logger.debug {
+//            "🔊 | [analyzeSingleGoogleAccount] allMessages:\n${
+//                allMessages.joinToString(",\n") { "senderEmail: ${it.senderEmail}, id: ${it.id}" }
+//            }"
+//        }
+//
+//        logger.debug {
+//            "🔊 | [analyzeSingleGoogleAccount] serviceProviders:\n${
+//                serviceProviders.joinToString("\n") {
+//                    "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
+//                }
+//            }"
+//        }
 
         val addressToServiceProvider = serviceProviders.flatMap { serviceProvider ->
             serviceProvider.emailSources.map { it.targetAddress to serviceProvider }
         }.toMap()
 
-        logger.debug {
-            "🔊 | [analyzeSingleGoogleAccount] all SenderEmails:\n${
-                allMessages.map { it.senderEmail }
-                    .distinct()
-                    .joinToString(",\t")
-            }"
-        }
-
-        logger.debug {
-            "🔊 | [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
-                addressToServiceProvider.entries.joinToString(
-                    "\n"
-                ) { (key, value) -> "  $key -> $value" }
-            }"
-        }
+//        logger.debug {
+//            "🔊 | [analyzeSingleGoogleAccount] all SenderEmails:\n${
+//                allMessages.map { it.senderEmail }
+//                    .distinct()
+//                    .joinToString(",\t")
+//            }"
+//        }
+//
+//        logger.debug {
+//            "🔊 | [analyzeSingleGoogleAccount] addressToServiceProvider:\n${
+//                addressToServiceProvider.entries.joinToString(
+//                    "\n"
+//                ) { (key, value) -> "  $key -> $value" }
+//            }"
+//        }
 
         val serviceProviderToAddressToMessages = allMessages
             .mapNotNull { message ->
@@ -291,6 +290,7 @@ class SubscriptionAnalysisService(
             .mapValues { (_, messages) ->
                 messages.groupBy { it.senderEmail }
             }
+
         logger.debug {
             "🔊 | [analyzeSingleGoogleAccount] Analyzing ${serviceProviderToAddressToMessages.keys.size} serviceProvider(s): ${serviceProviderToAddressToMessages.keys.map { it.displayName }}"
         }
@@ -334,12 +334,7 @@ class SubscriptionAnalysisService(
         ) {
 
             logger.debug { "[analyzeServiceProvider]  \uD83D\uDE80 displayName: ${serviceProvider.displayName}\n\t${addressToMessages.entries.joinToString { "${it.key}: ${it.value}" }}" }
-//            val parent = observationRegistry.currentObservation
 
-//            val updatedServiceProvider: ServiceProvider = observationRegistry.observe(
-//                "serviceProvider.updateRules",
-//                parent
-//            ) {
             val updatedServiceProvider: ServiceProvider =
                 serviceProviderService.updateEmailDetectionRules(serviceProvider, addressToMessages)
 //            }
