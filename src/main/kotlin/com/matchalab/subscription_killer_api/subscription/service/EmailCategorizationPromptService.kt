@@ -24,18 +24,18 @@ class EmailCategorizationPromptService(
         val promptParams =
             EmailCategorizationPromptParams(uniqueMessages.joinToString("\n") { it.toPromptParamString() })
 
-        logger.debug { "[run] ✨  Condensed messages: ${messages.size} -> ${uniqueMessages.size}" }
-        logger.debug { "[run] ✨  Calling chatClient for ${uniqueMessages.size} messages" }
+        logger.debug { "[run] ✨  ${messages.firstOrNull()?.senderEmail} Condensed messages: ${messages.size} -> ${uniqueMessages.size}" }
+        logger.debug { "[run] ✨  ${messages.firstOrNull()?.senderEmail} Calling chatClient for ${uniqueMessages.size} messages" }
 
         return chatClientService.call<Map<String, List<String>>>(
             promptTemplateProperties.filterAndCategorizeEmails,
             mapOf("emails" to promptParams.emails)
         ).let {
             EmailCategorizationResponse(
+                subsStartMsgIds = it["S"].orEmpty(),
+                subsCancelMsgIds = it["C"].orEmpty(),
                 monthlyMsgIds = it["M"].orEmpty(),
                 annualMsgIds = it["A"].orEmpty(),
-                subsStartMsgIds = it["S"].orEmpty(),
-                subsCancelMsgIds = it["C"].orEmpty()
             )
         }
     }

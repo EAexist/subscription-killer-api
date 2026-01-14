@@ -41,7 +41,7 @@ class EmailDetectionRuleService(
         messages: List<GmailMessage>
     ): Map<SubscriptionEventType, EmailDetectionRuleGenerationDto> {
 
-        logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.firstOrNull()?.senderEmail ?: "<NO EMAILS>"}" }
+        logger.debug { "[generateRules] \uD83D\uDE80 Generating email detection rule for email: ${messages.firstOrNull()?.senderEmail ?: "<NO EMAILS>"}\n\tmessages: ${messages}" }
 
         if (messages.isEmpty()) {
             return mapOf()
@@ -50,6 +50,8 @@ class EmailDetectionRuleService(
         val emailCategorizationResponse: EmailCategorizationResponse = emailCategorizationPromptService.run(messages)
 
         val subscriptionEventMessages = emailCategorizationResponse.toMessages(messages)
+
+        logger.debug { "[generateRules] \uD83D\uDE80 ${messages.firstOrNull()?.senderEmail ?: "<NO EMAILS>"}:\n\tsubscriptionEventMessages: ${subscriptionEventMessages}" }
 
         if (subscriptionEventMessages.isEmpty()) {
             return mapOf()
@@ -60,6 +62,14 @@ class EmailDetectionRuleService(
 
         val emailDetectionRuleGenerationDtos: List<EmailDetectionRuleGenerationDto> =
             emailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(emailCategorizationResponse)
+
+        logger.debug {
+            "[generateRules] \uD83D\uDE80 ${messages.firstOrNull()?.senderEmail ?: "<NO EMAILS>"}:\nemailDetectionRuleGenerationDtos:\n\t${
+                emailDetectionRuleGenerationDtos.joinToString(
+                    "\n\t"
+                )
+            }"
+        }
 
         return emailDetectionRuleGenerationDtos.associateBy { it.eventType }
     }

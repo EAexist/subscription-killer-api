@@ -249,6 +249,12 @@ class SubscriptionAnalysisService(
     ): List<SubscriptionDto> {
 
         logger.debug {
+            "🔊 | [analyzeSingleGoogleAccount] allMessages:\n${
+                allMessages.joinToString(",\n") { "senderEmail: ${it.senderEmail}, id: ${it.id}" }
+            }"
+        }
+
+        logger.debug {
             "🔊 | [analyzeSingleGoogleAccount] serviceProviders:\n${
                 serviceProviders.joinToString("\n") {
                     "[${it.displayName}] emailSource.targetAddress: ${it.emailSources.joinToString(", ") { emailSource -> emailSource.targetAddress }}"
@@ -327,7 +333,7 @@ class SubscriptionAnalysisService(
             "serviceProvider.displayName" to serviceProvider.displayName
         ) {
 
-            logger.debug { "\uD83D\uDE80 | [analyzeServiceProvider] displayName=${serviceProvider.displayName}" }
+            logger.debug { "[analyzeServiceProvider]  \uD83D\uDE80 displayName: ${serviceProvider.displayName}\n\t${addressToMessages.entries.joinToString { "${it.key}: ${it.value}" }}" }
 //            val parent = observationRegistry.currentObservation
 
 //            val updatedServiceProvider: ServiceProvider = observationRegistry.observe(
@@ -405,9 +411,17 @@ class SubscriptionAnalysisService(
         serviceProvider: ServiceProvider,
         addressToMessages: Map<String, List<GmailMessage>>
     ): SubscribedSinceDto {
+
+        var subscribedSinceDto: SubscribedSinceDto = SubscribedSinceDto(null)
+        var latestStartDay: Instant? = null
+        var latestCancelDay: Instant? = null
+        var latestMonthlyPayment: Instant? = null
+
         if (!(serviceProvider.isEmailDetectionRuleAvailable())) {
-            return SubscribedSinceDto(null)
+            return subscribedSinceDto
         }
+
+        // StartRule or MonthlyPayment Rule Exists.
 
         val emailSources: MutableList<EmailSource> = serviceProvider.emailSources
 
@@ -417,36 +431,40 @@ class SubscriptionAnalysisService(
                 messages?.let { emailSource to messages }
             }.toMap()
 
-        if (emailSourceToMessages.isEmpty()) return SubscribedSinceDto(null)
+        if (emailSourceToMessages.isEmpty()) return subscribedSinceDto
 
-        var latestSubscriptionStartMessage: GmailMessage? = null
+        if (!(serviceProvider.isEmailDetectionRuleComplete())) {
+            // Only StartRule Exists
 
-        if (serviceProvider.isSubscriptionStartRulePresent()) { // Service sends payment start message
-            latestSubscriptionStartMessage = getLatestSubscriptionStartMessage(serviceProvider, emailSourceToMessages)
-
-            if (latestSubscriptionStartMessage != null && serviceProvider.isSubscriptionCancelRulePresent()) {
-                // User got payment start message and service sends payment termination message
-
-                val latestCancel = getLatestSubscriptionCancelMessage(serviceProvider, emailSourceToMessages)
-
-                if (latestCancel == null || latestSubscriptionStartMessage.internalDate.isAfter(latestCancel.internalDate)) {
-                    // User got no termination message after payment start message
-                    return SubscribedSinceDto(latestSubscriptionStartMessage.internalDate)
-                }
-            }
+            latestStartDay = getLatestSubscriptionStartMessage(serviceProvider, emailSourceToMessages)?.internalDate
+            return SubscribedSinceDto(latestStartDay, true)
         }
 
-        // Service doesn't send termination message
-        if (serviceProvider.isMonthlyPaymentRulePresent()) { // Service sends paid state indicator message
-            val oldestConsecutive = getOldestConsecutiveSubscriptionStartMessage(serviceProvider, emailSourceToMessages)
-            if (oldestConsecutive != null) {
-                return SubscribedSinceDto(oldestConsecutive.internalDate)
+        // One of StartRule+CancelRule or MonthlyPayment Rule Exists.
+
+        if (serviceProvider.isSubscriptionStartRulePresent() && serviceProvider.isSubscriptionCancelRulePresent()) {
+            // StartRule+CancelRule Exists.
+
+            latestStartDay = getLatestSubscriptionStartMessage(serviceProvider, emailSourceToMessages)?.internalDate
+            latestCancelDay = getLatestSubscriptionCancelMessage(serviceProvider, emailSourceToMessages)?.internalDate
+
+            if ((latestStartDay != null) && ((latestCancelDay == null) || (latestStartDay.isAfter(latestCancelDay)))) {
+                // Has Start Message. Has No Cancel Message After Start Message.
+                return SubscribedSinceDto(latestStartDay)
             }
+            // No Start Message after Last Cancel Message.
+            return SubscribedSinceDto(null)
         }
 
-        // Service doesn't send termination message nor paid state indicator message
-        return latestSubscriptionStartMessage?.let { SubscribedSinceDto(it.internalDate, true) }
-            ?: SubscribedSinceDto(null)
+        // StartRule+CancelRule Doesn't Exist. MonthlyPayment Rule Exists.
+        val oldestConsecutive =
+            getOldestFirstOfConsecutiveMonthlySubscriptionMessage(serviceProvider, emailSourceToMessages)
+        if (oldestConsecutive != null) {
+            // No Monthly Payment Message.
+            return SubscribedSinceDto(oldestConsecutive.internalDate)
+        }
+        // No Monthly Payment Message.
+        return SubscribedSinceDto(null)
     }
 
     fun getLatestSubscriptionStartMessage(
@@ -456,9 +474,9 @@ class SubscriptionAnalysisService(
 
         return emailSourceToMessages.mapNotNull { (emailSource, messages) ->
             emailSource.paymentStartRule?.let {
-                matchFirstMessage(messages, it)
+                matchLastMessage(messages, it)
             }
-        }.minByOrNull { it.internalDate }
+        }.maxByOrNull { it.internalDate }
     }
 
     fun getLatestSubscriptionCancelMessage(
@@ -468,25 +486,24 @@ class SubscriptionAnalysisService(
 
         return emailSourceToMessages.mapNotNull { (emailSource, messages) ->
             emailSource.paymentCancelRule?.let {
-                matchFirstMessage(messages, it)
+                matchLastMessage(messages, it)
             }
-        }.minByOrNull { it.internalDate }
+        }.maxByOrNull { it.internalDate }
     }
 
-
-    fun getOldestConsecutiveSubscriptionStartMessage(
+    fun getOldestFirstOfConsecutiveMonthlySubscriptionMessage(
         serviceProvider: ServiceProvider,
         emailSourceToMessages: Map<EmailSource, List<GmailMessage>>
     ): GmailMessage? {
 
         return emailSourceToMessages.mapNotNull { (emailSource, messages) ->
             emailSource.monthlyPaymentRule?.let {
-                getConsecutiveSubscriptionStartMessage(it, messages)
+                getFirstOfConsecutiveMonthlySubscriptionMessage(it, messages)
             }
         }.minByOrNull { it.internalDate }
     }
 
-    fun getConsecutiveSubscriptionStartMessage(
+    fun getFirstOfConsecutiveMonthlySubscriptionMessage(
         monthlyPaymentRule: EmailDetectionRule,
         messages: List<GmailMessage>
     ): GmailMessage? {
@@ -524,14 +541,10 @@ class SubscriptionAnalysisService(
         return consecutiveSubscriptionStartMessage
     }
 
-    private fun matchFirstMessage(messages: List<GmailMessage>, rule: EmailDetectionRule): GmailMessage? {
-        for (message in messages) {
-            val isMatched = matchMessageToEvent(message, rule)
-            if (isMatched) {
-                return message
-            }
-        }
-        return null
+    private fun matchLastMessage(messages: List<GmailMessage>, rule: EmailDetectionRule): GmailMessage? {
+        return messages.filter { message ->
+            matchMessageToEvent(message, rule)
+        }.maxByOrNull { it.internalDate }
     }
 
     private fun matchMessageToEvent(message: GmailMessage, rule: EmailDetectionRule): Boolean {
