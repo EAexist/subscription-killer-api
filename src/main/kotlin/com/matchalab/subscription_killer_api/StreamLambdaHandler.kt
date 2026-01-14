@@ -20,9 +20,9 @@ class StreamLambdaHandler : RequestStreamHandler {
 
     @Throws(IOException::class)
     override fun handleRequest(
-            inputStream: InputStream,
-            outputStream: OutputStream,
-            context: Context
+        inputStream: InputStream,
+        outputStream: OutputStream,
+        context: Context
     ) {
         handler.proxyStream(inputStream, outputStream, context)
     }
@@ -32,10 +32,11 @@ class StreamLambdaHandler : RequestStreamHandler {
         private val handler:
                 SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> by lazy {
             try {
+                val profiles = "prod"
                 val initializedHandler =
-                        SpringBootLambdaContainerHandler.getAwsProxyHandler(
-                                SubscriptionKillerApiApplication::class.java
-                        )
+                    SpringBootLambdaContainerHandler.getAwsProxyHandler(
+                        SubscriptionKillerApiApplication::class.java, profiles
+                    )
 
                 // we use the onStartup method of the handler to register our custom filter
                 // initializedHandler.onStartup {servletContext ->
