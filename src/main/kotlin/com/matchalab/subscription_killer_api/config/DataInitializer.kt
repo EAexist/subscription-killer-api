@@ -43,7 +43,7 @@ class DataInitializer(
 
         return dtos.map { dto ->
             val provider = ServiceProvider(
-                displayName = dto.aliasNames["EN"] ?: "Unknown",
+                displayName = dto.aliasNames["KR"] ?: dto.aliasNames["EN"] ?: "Unknown",
                 logoDevSuffix = dto.logoDevSuffix,
                 websiteUrl = dto.websiteUrl,
                 aliasNames = dto.aliasNames.toMutableMap()

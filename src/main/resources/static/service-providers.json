@@ -217,7 +217,8 @@
   },
   {
     "aliasNames": {
-      "EN": "WATCHA"
+      "EN": "WATCHA",
+      "KO": "왓챠"
     },
     "emailAddresses": [
       "do-not-reply@watcha.com"
@@ -227,7 +228,7 @@
   },
   {
     "aliasNames": {
-      "EN": "noreply_melon",
+      "EN": "Melon",
       "KO": "멜론"
     },
     "emailAddresses": [
