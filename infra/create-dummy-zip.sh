@@ -1,0 +1,1 @@
+aws s3 cp dummy.zip s3://subscription-killer-api-stg-deploy/app-package.zip
