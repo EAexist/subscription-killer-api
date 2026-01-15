@@ -1,1 +1,0 @@
-Identify 20 global services/brands that provide a recurring monthly or annually paid subscription plan. These must be confirmed subscription models (e.g., SaaS, streaming, memberships). Include Netflix and Sketchfab. Avoid brands that primarily sell one-off products. Present this as a List<String> without any explanation.

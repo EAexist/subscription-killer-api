@@ -52,3 +52,6 @@ src/test/resources/private
 
 ### Scripts ###
 .local/
+
+### etc ###
+template.yml
