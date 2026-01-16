@@ -60,7 +60,7 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             .runtime(Runtime.JAVA_21)
             .memorySize(2048) // Required for Spring Boot performance
             .timeout(Duration.minutes(3))
-            .handler("com.matchalab.subscription_killer_api.StreamLambdaHandler::handleRequest") // Future entry point
+            .handler("run.sh")
             .code(
                 Code.fromAsset(artifactPath)
             )
