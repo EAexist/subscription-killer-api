@@ -77,6 +77,7 @@ class ServiceProviderService(
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
+                subscriptionPageUrl = it.subscriptionPageUrl,
                 canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
             )
         }
@@ -89,6 +90,7 @@ class ServiceProviderService(
                 displayName = it.displayName,
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
+                subscriptionPageUrl = it.subscriptionPageUrl,
                 canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
             )
         }

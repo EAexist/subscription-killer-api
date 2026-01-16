@@ -53,6 +53,7 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
         this.displayName,
         this.logoDevSuffix,
         this.websiteUrl,
+        this.subscriptionPageUrl,
         this.isEmailDetectionRuleAvailable()
     )
 }
@@ -82,7 +83,6 @@ fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
         subject = subjectHeaderValue.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it },
         internalDate = internalDate,
         snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }.take(maxSnippetSize)
-            ?: "",
     )
 }
 

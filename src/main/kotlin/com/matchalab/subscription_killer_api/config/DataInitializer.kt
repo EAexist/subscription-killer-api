@@ -46,6 +46,7 @@ class DataInitializer(
                 displayName = dto.aliasNames["KR"] ?: dto.aliasNames["EN"] ?: "Unknown",
                 logoDevSuffix = dto.logoDevSuffix,
                 websiteUrl = dto.websiteUrl,
+                subscriptionPageUrl = dto.subscriptionPageUrl,
                 aliasNames = dto.aliasNames.toMutableMap()
             )
             val sources = dto.emailAddresses.map {
@@ -62,6 +63,7 @@ class DataInitializer(
         val aliasNames: Map<String, String>,
         val logoDevSuffix: String,
         val websiteUrl: String,
+        val subscriptionPageUrl: String,
         val emailAddresses: List<String>
     )
 

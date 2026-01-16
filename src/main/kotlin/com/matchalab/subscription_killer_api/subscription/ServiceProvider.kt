@@ -11,6 +11,7 @@ class ServiceProvider(
     var displayName: String,
     var logoDevSuffix: String,
     var websiteUrl: String,
+    var subscriptionPageUrl: String,
 
     @ElementCollection
     @CollectionTable(

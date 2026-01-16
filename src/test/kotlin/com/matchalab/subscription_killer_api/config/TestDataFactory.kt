@@ -24,6 +24,7 @@ open class TestDataFactory(
             displayName,
             "$displayName.com",
             "www.$displayName.com",
+            "www.$displayName.com",
             mutableMapOf(LocaleType.EN.name to displayName),
             emailSources ?: mutableListOf<EmailSource>()
         )
@@ -56,7 +57,7 @@ open class TestDataFactory(
                 }
             }
         }
-        
+
         return messages
     }
 }
