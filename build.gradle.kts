@@ -112,6 +112,10 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
 
+    // TestContainer
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
 }
 
 kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
@@ -123,6 +127,8 @@ allOpen {
 }
 
 tasks.withType<Test> {
+    val envProfile = System.getenv("SPRING_PROFILES_ACTIVE")
+        ?: System.getProperty("spring.profiles.active")
 
     val tagsProperty = project.findProperty("includeTags") as String?
     val tags = tagsProperty?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
@@ -136,7 +142,7 @@ tasks.withType<Test> {
         }
     }
     val defaultProfiles = listOf("test", "dev")
-    val activeProfiles = (defaultProfiles + tags).distinct().joinToString(",")
+    val activeProfiles = (defaultProfiles + tags + (envProfile?.split(",") ?: emptyList())).distinct().joinToString(",")
     systemProperty("spring.profiles.active", activeProfiles)
 }
 

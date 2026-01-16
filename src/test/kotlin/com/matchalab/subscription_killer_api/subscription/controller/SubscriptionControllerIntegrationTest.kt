@@ -2,6 +2,7 @@ package com.matchalab.subscription_killer_api.subscription.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedClientFactory
 import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
+import com.matchalab.subscription_killer_api.config.SharedTestcontainersConfig
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.subscription.Subscription
@@ -42,7 +43,7 @@ private val logger = KotlinLogging.logger {}
 @AutoConfigureWebTestClient
 @EnableConfigurationProperties(SampleGoogleAccountProperties::class)
 @AutoConfigureObservability
-@Import(AuthenticatedClientFactory::class)
+@Import(AuthenticatedClientFactory::class, SharedTestcontainersConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SubscriptionControllerIntegrationTest
 @Autowired
