@@ -37,6 +37,9 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/GOOGLE_CLOUD_PROJECT")
         val SPRING_AI_GOOGLE_GENAI_API_KEY =
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_AI_GOOGLE_GENAI_API_KEY")
+        val corsAllowedOrigins = StringParameter.valueForStringParameter(
+            this, "/stg/subscription-killer-api/CORS_ALLOWED_ORIGINS"
+        )
 
         val handler = Function.Builder.create(this, "Handler")
 //            .reservedConcurrentExecutions(10)
@@ -59,6 +62,7 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
                     "DB_NAME" to dbName,
                     "DB_PASSWORD" to dbPassword,
                     "DB_USER" to dbUser,
+                    "APP_CORS_ALLOWED_ORIGINS" to corsAllowedOrigins
                 )
             )
             .build()

@@ -155,7 +155,11 @@ spring:
   config:
     activate:
       on-profile: prod
-app:
-  cors:
-    allowed-origins:
-      - https://subscription-killer-git-main-matchalab-project.vercel.app
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.matchalab.subscription_killer_api: INFO
+    org.springframework: INFO
+    org.springframework.security: INFO
