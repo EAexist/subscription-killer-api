@@ -7,7 +7,7 @@ env:
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "staging", "main" ]
 
 permissions:
   id-token: write # This is required for OIDC authentication
@@ -17,7 +17,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
 
     steps:
       - name: Checkout
@@ -41,7 +41,7 @@ jobs:
       - name: Deploy Lambda function via S3
         uses: aws-actions/aws-lambda-deploy@v1.1.0
         with:
-          function-name: subscription-killer-api-handler-staging
+          function-name: ${{ env.AWS_FUNCTION_NAME }}
           code-artifacts-dir: build/distributions
-          s3-bucket: subscription-killer-api-staging-deploy
+          s3-bucket: ${{ env.AWS_S3_BUCKET }}
           s3-key: subscription-killer-api.zip
