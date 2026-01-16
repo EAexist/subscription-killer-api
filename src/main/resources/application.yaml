@@ -8,8 +8,6 @@ spring:
 ---
 
 spring:
-  config:
-    import: "optional:file:.env[.properties]"
   application:
     name: subscription-killer-api
   datasource:
@@ -29,6 +27,14 @@ spring:
       chat: none
 server:
   forward-headers-strategy: framework
+management:
+  zipkin:
+    tracing:
+      export:
+        enabled: false
+logging:
+  charset:
+    console: UTF-8
 app:
   oauth2:
     redirect-uri: http://localhost:3000/report
@@ -47,9 +53,6 @@ app:
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v4.st
-logging:
-  charset:
-    console: UTF-8
 ---
 
 spring:
@@ -87,19 +90,17 @@ spring:
       on-profile: dev
   reactor:
     context-propagation: auto
-app:
-  cors:
-    allowed-origins:
-      - https://subscription-killer-git-main-matchalab-project.vercel.app
-      - https://subscription-killer-git-staging-matchalab-project.vercel.app
-      - https://localhost:3000
-      - http://localhost:3000
-  mail:
-    analysis-months: 8
-  min-request-interval-hours: 0
-  sample-messages:
-    dir: private/messages
-    fallback: static/messages/sample_messages_netflix_sketchfab.json
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  info:
+    git:
+      enabled: true
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
@@ -113,17 +114,19 @@ logging:
         session: DEBUG
       hibernate:
         SQL: DEBUG
-management:
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
-  info:
-    git:
-      enabled: true
+app:
+  cors:
+    allowed-origins:
+      - https://subscription-killer-git-main-matchalab-project.vercel.app
+      - https://subscription-killer-git-staging-matchalab-project.vercel.app
+      - https://localhost:3000
+      - http://localhost:3000
+  mail:
+    analysis-months: 8
+  min-request-interval-hours: 0
+  sample-messages:
+    dir: private/messages
+    fallback: static/messages/sample_messages_netflix_sketchfab.json
 ---
 
 spring:
