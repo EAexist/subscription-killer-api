@@ -40,13 +40,13 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 cp build/distributions/*.zip s3://${{ secrets.AWS_S3_BUCKET }}/subscription-killer-api.zip
+          aws s3 cp build/distributions/*.zip s3://${{ env.AWS_S3_BUCKET }}/subscription-killer-api.zip
 
       - name: Deploy Lambda Function
         run: |
           aws lambda update-function-code \
-            --function-name ${{ secrets.AWS_FUNCTION_NAME }} \
-            --s3-bucket ${{ secrets.AWS_S3_BUCKET }} \
+            --function-name ${{ env.AWS_FUNCTION_NAME }} \
+            --s3-bucket ${{ env.AWS_S3_BUCKET }} \
             --s3-key subscription-killer-api.zip
 
 #      - name: Deploy Lambda function via S3
