@@ -43,8 +43,7 @@ app:
   mail:
     analysis-months: 13
     max-snippet-size: 100
-  #  min-request-interval-hours: 72
-  min-request-interval-hours: 0
+  min-request-interval-hours: 72
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v4.st
@@ -97,6 +96,7 @@ app:
       - http://localhost:3000
   mail:
     analysis-months: 8
+  min-request-interval-hours: 0
   sample-messages:
     dir: private/messages
     fallback: static/messages/sample_messages_netflix_sketchfab.json
