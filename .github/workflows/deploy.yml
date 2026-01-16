@@ -27,7 +27,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
           # The role-to-assume should be the ARN of the IAM role you created for GitHub Actions OIDC
 
       - name: Grant execute permission for gradlew
@@ -40,19 +40,19 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 cp build/distributions/*.zip s3://${{ env.AWS_S3_BUCKET }}/subscription-killer-api.zip
+          aws s3 cp build/distributions/*.zip s3://${{ vars.AWS_S3_BUCKET }}/subscription-killer-api.zip
 
       - name: Deploy Lambda Function
         run: |
           aws lambda update-function-code \
-            --function-name ${{ env.AWS_FUNCTION_NAME }} \
-            --s3-bucket ${{ env.AWS_S3_BUCKET }} \
+            --function-name ${{ vars.AWS_FUNCTION_NAME }} \
+            --s3-bucket ${{ vars.AWS_S3_BUCKET }} \
             --s3-key subscription-killer-api.zip
 
 #      - name: Deploy Lambda function via S3
 #        uses: aws-actions/aws-lambda-deploy@v1.1.0
 #        with:
-#          function-name: ${{ env.AWS_FUNCTION_NAME }}
+#          function-name: ${{ vars.AWS_FUNCTION_NAME }}
 #          code-artifacts-dir: build/distributions
-#          s3-bucket: ${{ env.AWS_S3_BUCKET }}
+#          s3-bucket: ${{ vars.AWS_S3_BUCKET }}
 #          s3-key: subscription-killer-api.zip
