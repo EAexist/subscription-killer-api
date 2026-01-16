@@ -35,7 +35,7 @@ class ProgressService(
     }
 
     fun createEmitter(appUserId: UUID): SseEmitter {
-        val emitter = SseEmitter(30 * 60 * 1000L).apply {
+        val emitter = SseEmitter(5 * 60 * 1000L).apply {
             emitters[appUserId] = this
 
             val cleanup = {

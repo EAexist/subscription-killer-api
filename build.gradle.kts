@@ -47,10 +47,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testImplementation("org.assertj:assertj-core:3.27.6")
 
+    // Deprecated: aws api gateway & aws-serverless -> aws lambda web adapter. Why? To stream sse (api gateway timeouts at 30 seconds)
     // https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot3
     // !Do not make this runtimeOnly() prevent to exclude from test environment: it prevents
     // compile.
-    implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.1.5")
+//    implementation("com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.1.5")
 
     // Processes Java files
     annotationProcessor("org.springframework:spring-context-indexer:7.0.2")

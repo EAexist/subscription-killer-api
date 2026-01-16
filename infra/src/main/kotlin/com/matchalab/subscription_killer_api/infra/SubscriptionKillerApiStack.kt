@@ -18,6 +18,11 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
         Tags.of(this).add("Environment", env)
         Tags.of(this).add("Application", "SubscriptionKillerApi")
 
+        val webAdapterLayer = LayerVersion.fromLayerVersionArn(
+            this, "WebAdapterLayer",
+            "arn:aws:lambda:ap-northeast-2:753240598075:layer:LambdaAdapterLayerX86:25"
+        )
+
         val artifactPath = File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
 
         val SPRING_PROFILES_ACTIVE = "prod"
@@ -59,19 +64,31 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             .code(
                 Code.fromAsset(artifactPath)
             )
+            .layers(listOf(webAdapterLayer))
             .environment(
                 mapOf(
+                    // profile
                     "SPRING_PROFILES_ACTIVE" to SPRING_PROFILES_ACTIVE,
+
+                    // frontend
                     "FRONTEND_URL" to FRONTEND_URL,
-                    "APP_GOOGLE_CLIENT_ID" to appGoogleClientId,
-                    "APP_GOOGLE_CLIENT_SECRET" to appGoogleClientSecret,
-                    "GOOGLE_CLOUD_PROJECT" to GOOGLE_CLOUD_PROJECT,
-                    "SPRING_AI_GOOGLE_GENAI_API_KEY" to SPRING_AI_GOOGLE_GENAI_API_KEY,
+                    "APP_CORS_ALLOWED_ORIGINS" to corsAllowedOrigins,
+
+                    // database
                     "DB_ENDPOINT" to dbEndpoint,
                     "DB_NAME" to dbName,
                     "DB_PASSWORD" to dbPassword,
                     "DB_USER" to dbUser,
-                    "APP_CORS_ALLOWED_ORIGINS" to corsAllowedOrigins
+
+                    // google cloud
+                    "APP_GOOGLE_CLIENT_ID" to appGoogleClientId,
+                    "APP_GOOGLE_CLIENT_SECRET" to appGoogleClientSecret,
+                    "GOOGLE_CLOUD_PROJECT" to GOOGLE_CLOUD_PROJECT,
+                    "SPRING_AI_GOOGLE_GENAI_API_KEY" to SPRING_AI_GOOGLE_GENAI_API_KEY,
+
+                    // web adapter layer
+                    "AWS_LAMBDA_EXEC_WRAPPER" to "/opt/bootstrap",
+                    "AWS_LWA_INVOKE_MODE" to "response_stream",
                 )
             )
             .build()
