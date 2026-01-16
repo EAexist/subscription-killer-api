@@ -21,10 +21,12 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
         val artifactPath = File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
 
         val SPRING_PROFILES_ACTIVE = "prod"
-        val appGoogleClientId =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_ID")
-        val appGoogleClientSecret =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_SECRET")
+
+        // Frontend
+        val FRONTEND_URL =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/FRONTEND_URL")
+
+        // Database
         val dbEndpoint =
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_ENDPOINT")
         val dbName =
@@ -33,6 +35,12 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_PASSWORD")
         val dbUser =
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_USER")
+
+        // Google Cloud
+        val appGoogleClientId =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_ID")
+        val appGoogleClientSecret =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_SECRET")
         val GOOGLE_CLOUD_PROJECT =
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/GOOGLE_CLOUD_PROJECT")
         val SPRING_AI_GOOGLE_GENAI_API_KEY =
@@ -54,6 +62,7 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             .environment(
                 mapOf(
                     "SPRING_PROFILES_ACTIVE" to SPRING_PROFILES_ACTIVE,
+                    "FRONTEND_URL" to FRONTEND_URL,
                     "APP_GOOGLE_CLIENT_ID" to appGoogleClientId,
                     "APP_GOOGLE_CLIENT_SECRET" to appGoogleClientSecret,
                     "GOOGLE_CLOUD_PROJECT" to GOOGLE_CLOUD_PROJECT,

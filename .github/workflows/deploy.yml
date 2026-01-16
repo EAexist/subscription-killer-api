@@ -2,8 +2,10 @@
 
 name: Deploy to AWS Lambda
 
+
 env:
-  AWS_REGION: ap-northeast-2
+  # Is only referenced during ./gradlew test in "Build with Gradle"
+  FRONTEND_URL: 'http://frontend-sample.example.com'
 
 on:
   push:

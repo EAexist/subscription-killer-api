@@ -37,7 +37,7 @@ logging:
     console: UTF-8
 app:
   oauth2:
-    redirect-uri: http://localhost:3000/report
+    redirect-uri: ${FRONTEND_URL}/report
   cors:
     allowed-methods:
       - GET
@@ -117,10 +117,7 @@ logging:
 app:
   cors:
     allowed-origins:
-      - https://subscription-killer-git-main-matchalab-project.vercel.app
-      - https://subscription-killer-git-staging-matchalab-project.vercel.app
-      - https://localhost:3000
-      - http://localhost:3000
+      - ${FRONTEND_URL}
   mail:
     analysis-months: 8
   min-request-interval-hours: 0
