@@ -57,6 +57,10 @@ app:
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v4.st
+  guest-app-user:
+    subject: GUEST_APP_USER_SUBJECT
+    name: GUEST_APP_USER_NAME
+    email: guest@example.com
 ---
 
 spring:

@@ -5,12 +5,10 @@ import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.config.SampleMessageConfig
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("!google-auth || !gmail")
 @Component
 @Import(SampleMessageConfig::class)
 class MockGmailClientAdapter(

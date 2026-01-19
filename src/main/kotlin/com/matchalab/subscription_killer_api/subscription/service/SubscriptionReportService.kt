@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
+import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
@@ -19,6 +20,7 @@ private val logger = KotlinLogging.logger {}
 class SubscriptionReportService(
     private val appUserService: AppUserService,
     private val appProperties: AppProperties,
+    private val guestAppUserProperties: GuestAppUserProperties,
 ) {
 
     fun getUpdateEligibility(appUserId: UUID): ReportUpdateEligibilityDto {
@@ -31,7 +33,8 @@ class SubscriptionReportService(
             return ReportUpdateEligibilityDto(true)
         }
 
-        val availableSince: Instant = analyzedAt.plus(appProperties.minRequestIntervalHours, ChronoUnit.HOURS)
+        val availableSince: Instant = if (googleAccounts[0].subject == guestAppUserProperties.subject) analyzedAt else
+            analyzedAt.plus(appProperties.minRequestIntervalHours, ChronoUnit.HOURS)
         val canUpdate: Boolean = availableSince.isBefore(Instant.now())
 
         return ReportUpdateEligibilityDto(canUpdate, analyzedAt, availableSince)

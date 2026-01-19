@@ -44,6 +44,7 @@ open class WebSecurityConfig(
                 authorize(HttpMethod.OPTIONS, "/**", permitAll)
                 authorize(HttpMethod.GET, "/ping", permitAll)
                 authorize(HttpMethod.GET, "/login/**", permitAll)
+                authorize(HttpMethod.GET, "/api/v1/guest/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2Login {

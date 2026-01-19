@@ -21,4 +21,7 @@ interface AppUserRepository : JpaRepository<AppUser, UUID> {
 
     @Query("SELECT u FROM AppUser u LEFT JOIN FETCH u.googleAccounts WHERE u.id = :id")
     fun findByIdWithAccounts(id: UUID): AppUser?
+
+    @Query("SELECT COUNT(u) > 0 FROM AppUser u JOIN u.googleAccounts ga WHERE ga.subject = :subject")
+    fun existsByGoogleAccounts_Subject(subject: String): Boolean
 }

@@ -1,5 +1,8 @@
 package com.matchalab.subscription_killer_api.config
 
+import com.matchalab.subscription_killer_api.domain.AppUser
+import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
@@ -16,11 +19,32 @@ private val logger = KotlinLogging.logger {}
 @Component
 class DataInitializer(
     private val transactionTemplate: TransactionTemplate,
-    private val serviceProviderRepository: ServiceProviderRepository
+    private val serviceProviderRepository: ServiceProviderRepository,
+    private val appUserRepository: AppUserRepository,
+    private val guestAppUserProperties: GuestAppUserProperties,
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments) {
         transactionTemplate.execute {
             persistSampleData()
+            persistGuestAppUser()
+        }
+    }
+
+    open fun persistGuestAppUser() {
+        if (!appUserRepository.existsByGoogleAccounts_Subject(guestAppUserProperties.subject)) {
+            val guestGoogleAccount =
+                GoogleAccount(
+                    guestAppUserProperties.subject,
+                    guestAppUserProperties.name,
+                    guestAppUserProperties.email
+                )
+
+            val guestAppUser = AppUser(
+                name = guestAppUserProperties.name
+            )
+
+            guestAppUser.addGoogleAccount(guestGoogleAccount)
+            appUserRepository.save(guestAppUser)
         }
     }
 
