@@ -34,7 +34,6 @@ class SubscriptionKillerApiApplication {
 
     // /*
     //  * Create required HandlerAdapter, to avoid several default HandlerAdapter instances being
-    // created
     //  */
     // @Bean
     // fun handlerAdapter(): HandlerAdapter {

@@ -2,7 +2,7 @@
 set -eo pipefail
 
 if [ ! -f build/distributions/myapp.zip ]; then
-    echo "Error: ZIP file not found. Run ./gradlew buildZip."
+    echo "Error: ZIP file not found. Run ./gradlew buildLambdaWebAdapterZip."
     exit 1
 fi
 

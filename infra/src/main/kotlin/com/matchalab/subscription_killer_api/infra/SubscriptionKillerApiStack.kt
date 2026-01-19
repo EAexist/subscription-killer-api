@@ -30,16 +30,16 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
         // Frontend
         val FRONTEND_URL =
             StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/FRONTEND_URL")
+        val SERVICE_URL =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SERVICE_URL")
 
         // Database
-        val dbEndpoint =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_ENDPOINT")
-        val dbName =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_NAME")
-        val dbPassword =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_PASSWORD")
-        val dbUser =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/DB_USER")
+        val SPRING_DATASOURCE_URL =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_URL")
+        val SPRING_DATASOURCE_USERNAME =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_USERNAME")
+        val SPRING_DATASOURCE_PASSWORD =
+            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_PASSWORD")
 
         // Google Cloud
         val appGoogleClientId =
@@ -72,13 +72,13 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
 
                     // frontend
                     "FRONTEND_URL" to FRONTEND_URL,
+                    "SERVICE_URL" to SERVICE_URL,
                     "APP_CORS_ALLOWED_ORIGINS" to corsAllowedOrigins,
 
                     // database
-                    "DB_ENDPOINT" to dbEndpoint,
-                    "DB_NAME" to dbName,
-                    "DB_PASSWORD" to dbPassword,
-                    "DB_USER" to dbUser,
+                    "SPRING_DATASOURCE_URL" to SPRING_DATASOURCE_URL,
+                    "SPRING_DATASOURCE_USERNAME" to SPRING_DATASOURCE_USERNAME,
+                    "SPRING_DATASOURCE_PASSWORD" to SPRING_DATASOURCE_PASSWORD,
 
                     // google cloud
                     "APP_GOOGLE_CLIENT_ID" to appGoogleClientId,

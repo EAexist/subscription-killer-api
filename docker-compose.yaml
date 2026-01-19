@@ -10,6 +10,19 @@ services:
       - "POSTGRES_PASSWORD=hello_guest"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./server.crt:/var/lib/postgresql/server.crt:ro
+      - ./server.key:/var/lib/postgresql/server.key:ro
+    # Using a shell script to fix permissions at runtime
+    entrypoint: >
+      sh -c "
+      cp /var/lib/postgresql/server.key /tmp/server.key &&
+      chown postgres:postgres /tmp/server.key &&
+      chmod 600 /tmp/server.key &&
+      exec docker-entrypoint.sh postgres 
+      -c ssl=on 
+      -c ssl_cert_file=/var/lib/postgresql/server.crt 
+      -c ssl_key_file=/tmp/server.key
+      "
 
   elasticsearch:
     profiles: [ "observe" ]

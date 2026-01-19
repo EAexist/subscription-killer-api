@@ -147,16 +147,36 @@ tasks.withType<Test> {
     systemProperty("spring.profiles.active", activeProfiles)
 }
 
-tasks.register<Zip>("buildZip") {
+tasks.register<Zip>("buildLambdaWebAdapterZip") {
     dependsOn("generateGitProperties")
 
     into("lib") {
         from(tasks.jar)
         from(configurations.runtimeClasspath)
     }
+
+    from("run.sh") {
+        into("/")
+        filePermissions {
+            // This is the clean, type-safe way to set 755
+            user {
+                read = true
+                write = true
+                execute = true
+            }
+            group {
+                read = true
+                execute = true
+            }
+            other {
+                read = true
+                execute = true
+            }
+        }
+    }
 }
 
-//tasks.register<Zip>("buildZip") {
+//tasks.register<Zip>("buildLambdaWebAdapterZip") {
 //
 //    dependsOn("generateGitProperties")
 //
@@ -169,7 +189,7 @@ tasks.register<Zip>("buildZip") {
 //}
 
 tasks.build {
-    dependsOn(tasks.getByName("buildZip"))
+    dependsOn(tasks.getByName("buildLambdaWebAdapterZip"))
 }
 
 tasks.processResources {
@@ -183,7 +203,6 @@ tasks.withType<JavaExec> {
 gitProperties {
     failOnNoGitDirectory = false
 }
-
 
 // TODO : Use layers for dependencies.
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers

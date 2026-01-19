@@ -46,9 +46,12 @@ out/
 ### Secrets ###
 *.tmp
 .certs
-.env
+.env*
 src/test/resources/application-test-local.yaml
 src/test/resources/private
+src/main/resources/certs
+*.crt
+*.key
 
 ### Scripts ###
 .local/

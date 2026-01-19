@@ -36,7 +36,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew test buildZip
+        run: ./gradlew test buildLambdaWebAdapterZip
         env:
           SPRING_PROFILES_ACTIVE: ci
 
