@@ -20,7 +20,7 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
 
         val webAdapterLayer = LayerVersion.fromLayerVersionArn(
             this, "WebAdapterLayer",
-            "arn:aws:lambda:ap-northeast-2:753240598075:layer:LambdaAdapterLayerX86:25"
+            "arn:aws:lambda:ap-northeast-2:753240598075:layer:LambdaAdapterLayerArm64:25"
         )
 
         val artifactPath = File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
@@ -58,6 +58,8 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
 //            .reservedConcurrentExecutions(10)
             .functionName("subscription-killer-api-handler-$env")
             .runtime(Runtime.JAVA_21)
+            .architecture(Architecture.ARM_64) // Cost-effective than X86
+            .snapStart(SnapStartConf.ON_PUBLISHED_VERSIONS)
             .memorySize(2048) // Required for Spring Boot performance
             .timeout(Duration.minutes(3))
             .handler("run.sh")
@@ -89,13 +91,24 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
                     // web adapter layer
                     "AWS_LAMBDA_EXEC_WRAPPER" to "/opt/bootstrap",
                     "AWS_LWA_INVOKE_MODE" to "response_stream",
+
+                    // SnapStart
+                    "AWS_LWA_ASYNC_INIT" to "false",
+                    "READINESS_CHECK_TIMEOUT_MS" to "15000",
                 )
             )
             .build()
 
-        val fnUrl = handler.addFunctionUrl(
+        val version = handler.currentVersion
+
+        val alias = Alias.Builder.create(this, "LiveAlias")
+            .aliasName("live")
+            .version(version)
+            .build()
+
+        val fnUrl = alias.addFunctionUrl(
             FunctionUrlOptions.builder()
-                .authType(FunctionUrlAuthType.NONE) // Use NONE for public, or IAM for secure
+                .authType(FunctionUrlAuthType.NONE)
                 .invokeMode(InvokeMode.RESPONSE_STREAM) // CRITICAL for SSE
                 .build()
         )
