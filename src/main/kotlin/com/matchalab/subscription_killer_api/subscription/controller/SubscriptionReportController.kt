@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.time.Duration
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -62,23 +61,16 @@ class SubscriptionReportController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): ResponseEntity<Any> {
 
+        val reportUpdateEligibility: ReportUpdateEligibilityDto = reportService.getUpdateEligibility(appUserId)
+
         val appUser = appUserService.findByIdOrNotFound(appUserId)
 
-        var secondsUntilNextAllowed = 0L
+        val secondsUntilNextAllowed: Long = Duration.between(
+            Instant.now(),
+            reportUpdateEligibility.availableSince
+        ).toSeconds()
 
-        val isAnalysisAvailable: Boolean = appUser.googleAccounts.map { it.analyzedAt }.let { analyzedAts ->
-            if (analyzedAts.any { it == null }) true
-            else {
-                val oldestAnalyzedAt = analyzedAts.filterNotNull().min()
-                secondsUntilNextAllowed = Duration.between(
-                    Instant.now(),
-                    oldestAnalyzedAt.plus(appProperties.minRequestIntervalHours, ChronoUnit.HOURS)
-                ).toSeconds()
-                secondsUntilNextAllowed <= 0
-            }
-        }
-
-        if (!isAnalysisAvailable) {
+        if (!reportUpdateEligibility.canUpdate) {
             val problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.TOO_MANY_REQUESTS,
                 "Minimum interval between analyses is ${appProperties.minRequestIntervalHours} hours."

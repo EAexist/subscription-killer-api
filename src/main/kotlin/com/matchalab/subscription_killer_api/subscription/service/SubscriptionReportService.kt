@@ -60,4 +60,5 @@ class SubscriptionReportService(
 
         return SubscriptionReportResponseDto(accountReports, analyzedAt)
     }
+
 }

@@ -4,7 +4,7 @@ spring:
       prod:
         - "google-auth"
         - "gmail"
-        - "ai"
+#        - "ai"
 ---
 
 spring:
@@ -71,6 +71,9 @@ app:
     subject: GUEST_APP_USER_SUBJECT
     name: GUEST_APP_USER_NAME
     email: guest@example.com
+  sample-messages:
+    dir: private/messages
+    fallback: static/messages/sample_messages_netflix_sketchfab.json
 ---
 
 spring:
@@ -143,9 +146,6 @@ app:
   mail:
     analysis-months: 8
   min-request-interval-hours: 0
-  sample-messages:
-    dir: private/messages
-    fallback: static/messages/sample_messages_netflix_sketchfab.json
 ---
 
 spring:
@@ -192,7 +192,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
   level:
-    root: INFO
-    com.matchalab.subscription_killer_api: INFO
-    org.springframework: INFO
-    org.springframework.security: INFO
+    root: DEBUG
+    com.matchalab.subscription_killer_api: DEBUG
+    org.springframework: DEBUG
+    org.springframework.security: DEBUG
