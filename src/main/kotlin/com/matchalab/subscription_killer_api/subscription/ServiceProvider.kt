@@ -9,9 +9,9 @@ class ServiceProvider(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id")
     var id: UUID? = null,
     var displayName: String,
-    var logoDevSuffix: String,
+    var logoDevSuffix: String?,
     var websiteUrl: String,
-    var subscriptionPageUrl: String,
+    var subscriptionPageUrl: String?,
 
     @ElementCollection
     @CollectionTable(

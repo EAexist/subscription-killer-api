@@ -5,8 +5,8 @@ import java.util.*
 data class ServiceProviderResponseDto(
     val id: UUID,
     val displayName: String,
-    val logoDevSuffix: String,
+    val logoDevSuffix: String?,
     val websiteUrl: String,
-    val subscriptionPageUrl: String,
+    val subscriptionPageUrl: String?,
     val canAnalyzeSubscription: Boolean
 ) {}
