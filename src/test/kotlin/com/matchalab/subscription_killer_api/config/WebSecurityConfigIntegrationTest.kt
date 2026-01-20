@@ -1,18 +1,22 @@
 package com.matchalab.subscription_killer_api.config
 
+import com.matchalab.subscription_killer_api.security.config.CorsProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.cors.CorsConfiguration
@@ -22,19 +26,23 @@ import java.nio.charset.StandardCharsets
 
 private val logger = KotlinLogging.logger {}
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("google-auth")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @Import(
     SharedTestcontainersConfig::class
 )
-class WebSecurityConfigIntegrationTest {
+@EnableConfigurationProperties(CorsProperties::class)
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+class WebSecurityConfigIntegrationTest(private val corsProperties: CorsProperties) {
 
     @Autowired
     lateinit var client: WebTestClient
 
     @Autowired
     lateinit var wac: WebApplicationContext
+
 
     @Autowired
     lateinit var corsConfigurationSource: CorsConfigurationSource
@@ -84,14 +92,10 @@ class WebSecurityConfigIntegrationTest {
             .isForbidden()
     }
 
+    fun allowedOrigins() = corsProperties.allowedOrigins
+
     @ParameterizedTest
-    @ValueSource(
-        strings = [
-            "https://localhost:3000",
-            "https://subscription-killer-git-main-matchalab-project.vercel.app",
-            "https://subscription-killer-git-staging-matchalab-project.vercel.app",
-        ]
-    )
+    @MethodSource("allowedOrigins")
     fun `should only allow subscription-killer frontend origins`(origin: String) {
         assertAllowedCorsGetRequest(origin)
     }
