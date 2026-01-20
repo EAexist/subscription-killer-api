@@ -63,14 +63,13 @@ class SubscriptionReportController(
 
         val reportUpdateEligibility: ReportUpdateEligibilityDto = reportService.getUpdateEligibility(appUserId)
 
-        val appUser = appUserService.findByIdOrNotFound(appUserId)
-
-        val secondsUntilNextAllowed: Long = Duration.between(
-            Instant.now(),
-            reportUpdateEligibility.availableSince
-        ).toSeconds()
-
         if (!reportUpdateEligibility.canUpdate) {
+
+            val secondsUntilNextAllowed: Long = Duration.between(
+                Instant.now(),
+                reportUpdateEligibility.availableSince
+            ).toSeconds()
+            
             val problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.TOO_MANY_REQUESTS,
                 "Minimum interval between analyses is ${appProperties.minRequestIntervalHours} hours."
