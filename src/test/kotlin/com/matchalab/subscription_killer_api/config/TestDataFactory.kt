@@ -31,9 +31,10 @@ open class TestDataFactory(
 
     fun createEmailSource(
         targetAddress: String,
-        eventRules: MutableList<EmailDetectionRule> = mutableListOf()
+        eventRules: MutableList<EmailDetectionRule> = mutableListOf(),
+        analyzedMessageIds: MutableSet<String> = mutableSetOf()
     ) =
-        EmailSource(null, targetAddress, eventRules)
+        EmailSource(null, targetAddress, eventRules, analyzedMessageIds = analyzedMessageIds)
 
     fun loadSampleMessages(): List<GmailMessage> {
         val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"

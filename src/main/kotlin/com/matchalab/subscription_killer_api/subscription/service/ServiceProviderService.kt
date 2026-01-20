@@ -149,8 +149,11 @@ class ServiceProviderService(
 
         if ((!provider.isEmailDetectionRuleComplete()) && isEmailDetectionRuleAnalysisAvailable) {
             provider.emailSources.forEach { emailSource ->
-                val messages: List<GmailMessage> = addressToMessages[emailSource.targetAddress] ?: emptyList()
+                val messages: List<GmailMessage> =
+                    addressToMessages[emailSource.targetAddress]?.filter { it.id !in emailSource.analyzedMessageIds }
+                        ?: emptyList()
                 if (messages.isNotEmpty()) {
+                    emailSource.analyzedMessageIds.addAll(messages.map { it.id })
                     val newEmailDetectionRules = emailDetectionRuleService.generateRules(emailSource, messages)
                     emailSource.addEmailDetectionRules(
                         newEmailDetectionRules

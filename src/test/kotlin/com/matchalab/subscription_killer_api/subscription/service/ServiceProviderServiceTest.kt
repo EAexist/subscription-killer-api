@@ -232,7 +232,8 @@ class ServiceProviderServiceTest() {
                                         mockNetflixEmailDetectionRuleGenerationDto_SUBSCRIPTION_CANCEL,
                                         testUpdateAt
                                     )
-                                )).toMutableList()
+                                )).toMutableList(),
+                                fakeGmailMessages.map { it.id }.toMutableSet()
                             )
                         )
                     )

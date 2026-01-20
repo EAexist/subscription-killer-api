@@ -192,7 +192,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
   level:
-    root: DEBUG
+    root: INFO
     com.matchalab.subscription_killer_api: DEBUG
-    org.springframework: DEBUG
+    org.springframework: INFO
     org.springframework.security: DEBUG

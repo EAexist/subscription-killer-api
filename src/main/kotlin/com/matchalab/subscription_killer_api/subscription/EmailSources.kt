@@ -31,7 +31,11 @@ class EmailSource(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_provider_id", nullable = false)
     var serviceProvider: ServiceProvider? = null,
-) {
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    val analyzedMessageIds: MutableSet<String> = mutableSetOf(),
+
+    ) {
 
     val paymentStartRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.SUBSCRIPTION_START) && it.isActive }
     val paymentCancelRule: EmailDetectionRule? get() = eventRules.find { (it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL) && it.isActive }
