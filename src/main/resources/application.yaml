@@ -12,9 +12,19 @@ spring:
     name: subscription-killer-api
   datasource:
     driver-class-name: org.postgresql.Driver
+    hikari:
+      keepalive-time: 30000
+      max-lifetime: 600000
+      connection-test-query: SELECT 1
+      initialization-fail-timeout: 1
   jpa:
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
   session:
     jdbc:
       initialize-schema: always
