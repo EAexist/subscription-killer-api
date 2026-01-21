@@ -4,7 +4,7 @@ spring:
       prod:
         - "google-auth"
         - "gmail"
-#        - "ai"
+        - "ai"
 ---
 
 spring:
@@ -193,6 +193,6 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
   level:
     root: INFO
-    com.matchalab.subscription_killer_api: DEBUG
+    com.matchalab.subscription_killer_api: INFO
     org.springframework: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
