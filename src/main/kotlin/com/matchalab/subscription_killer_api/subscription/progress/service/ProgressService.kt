@@ -35,6 +35,7 @@ class ProgressService(
     }
 
     fun createEmitter(appUserId: UUID): SseEmitter {
+
         val emitter = SseEmitter(5 * 60 * 1000L).apply {
             emitters[appUserId] = this
 
@@ -44,6 +45,15 @@ class ProgressService(
             onCompletion { cleanup() }
             onTimeout { cleanup() }
             onError { cleanup() }
+        }
+
+        if (!progresses.containsKey(appUserId)) {
+
+            emitter.send(
+                SseEmitter.event().name("progress-update")
+                    .data(AppUserAnalysisProgressUpdate(AnalysisProgressStatus.COMPLETED))
+            )
+            emitter.complete()
         }
 
         progresses[appUserId]?.values?.let { progresses ->

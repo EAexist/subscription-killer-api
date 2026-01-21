@@ -102,14 +102,10 @@ class SubscriptionReportController(
         @AuthenticatedUser appUserId: UUID,
         @RequestHeader("Accept") acceptHeader: String
     ): ResponseEntity<*> {
-        if (!progressService.isOnProgress(appUserId)) {
-            return ResponseEntity.noContent().build<Void>()
-        }
-
         if (!acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
-            return ResponseEntity.ok().build<Void>()
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON).build<Void>()
         }
-
         return ResponseEntity.ok(progressService.createEmitter(appUserId))
     }
 }
