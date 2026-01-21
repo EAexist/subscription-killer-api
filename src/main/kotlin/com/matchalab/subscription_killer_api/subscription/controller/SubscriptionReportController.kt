@@ -21,7 +21,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -69,7 +68,7 @@ class SubscriptionReportController(
                 Instant.now(),
                 reportUpdateEligibility.availableSince
             ).toSeconds()
-            
+
             val problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.TOO_MANY_REQUESTS,
                 "Minimum interval between analyses is ${appProperties.minRequestIntervalHours} hours."
@@ -98,13 +97,19 @@ class SubscriptionReportController(
         return ResponseEntity.accepted().build()
     }
 
-    @GetMapping("/updates", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun subscribeProgress(@AuthenticatedUser appUserId: UUID): ResponseEntity<SseEmitter> {
-        val isOnProgress = progressService.isOnProgress(appUserId)
-        return if (isOnProgress) {
-            ResponseEntity.ok(progressService.createEmitter(appUserId))
-        } else {
-            ResponseEntity.noContent().build()
+    @GetMapping("/updates")
+    fun subscribeProgress(
+        @AuthenticatedUser appUserId: UUID,
+        @RequestHeader("Accept") acceptHeader: String
+    ): ResponseEntity<*> {
+        if (!progressService.isOnProgress(appUserId)) {
+            return ResponseEntity.noContent().build<Void>()
         }
+
+        if (!acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+            return ResponseEntity.ok().build<Void>()
+        }
+
+        return ResponseEntity.ok(progressService.createEmitter(appUserId))
     }
 }
