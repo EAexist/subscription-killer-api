@@ -10,6 +10,7 @@ import com.matchalab.subscription_killer_api.utils.readJsonList
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
+import org.springframework.context.annotation.Profile
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import org.springframework.transaction.support.TransactionTemplate
@@ -17,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate
 private val logger = KotlinLogging.logger {}
 
 @Component
+@Profile("dev")
 class DataInitializer(
     private val transactionTemplate: TransactionTemplate,
     private val serviceProviderRepository: ServiceProviderRepository,
