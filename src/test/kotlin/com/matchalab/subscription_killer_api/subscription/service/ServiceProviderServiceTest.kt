@@ -233,7 +233,8 @@ class ServiceProviderServiceTest() {
                                         testUpdateAt
                                     )
                                 )).toMutableList(),
-                                fakeGmailMessages.map { it.id }.toMutableSet()
+                                fakeGmailMessages.filter { it.senderEmail == netflixEmailAddress }.map { it.id }
+                                    .toMutableSet()
                             )
                         )
                     )
