@@ -8,7 +8,7 @@
   <h3 align="center">Subscription Killer API</h3>
 
   <p align="center">
-    API Server supporting Next.js Web App.
+    API Server supporting Next.js Web App
     <br />
     <br />
     <a href="https://subscription-killer-git-staging-matchalab-project.vercel.app">View Demo</a>
