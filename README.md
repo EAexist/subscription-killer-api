@@ -68,7 +68,10 @@ This API Server supports Subscription Killer service.
 <!-- LICENSE -->
 ## License
 
-Distributed under the project_license. See `LICENSE.txt` for more information.  
+Copyright (c) 2026 Hyeon Pyo. All rights reserved.
+
+No permission is granted for commercial use, distribution, or modification without explicit consent.
+
 
 <!-- CONTACT -->
 ## Contact
