@@ -28,7 +28,7 @@ Subsciption Killer help users reclaim control over their finances by identifying
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This API Server supports Subscription Killer servcice. 
+This API Server supports Subscription Killer service. 
 
 * **High-Performance Architecture**
 
