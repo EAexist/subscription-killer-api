@@ -11,7 +11,7 @@
     API Server supporting Next.js Web App
     <br />
     <br />
-    <a href="https://subscription-killer-git-staging-matchalab-project.vercel.app">View Demo</a>
+    <a href="https://subscription-killer-git-staging-matchalab-project.vercel.app" target="_blank" rel="noopener noreferrer">View Demo</a>
   </p>
 </div>
 
