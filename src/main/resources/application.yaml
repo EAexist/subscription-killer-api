@@ -32,6 +32,8 @@ spring:
   ai:
     model:
       chat: none
+  flyway:
+    enabled: true
 server:
   forward-headers-strategy: framework
   servlet:
@@ -115,6 +117,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    # Run this to generate V1__schema.sql
+#    properties:
+#      hibernate:
+#        hbm2ddl:
+#          auto: create
 management:
   tracing:
     enabled: true
