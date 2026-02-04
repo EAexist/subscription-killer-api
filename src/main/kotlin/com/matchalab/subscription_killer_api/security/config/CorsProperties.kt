@@ -6,5 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class CorsProperties(
     val allowedOrigins: List<String> = emptyList(),
     val allowedMethods: List<String> = emptyList(),
-    val maxAge: Long = 0
+    val maxAge: Long
 )

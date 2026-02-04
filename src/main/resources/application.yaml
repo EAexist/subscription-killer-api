@@ -5,6 +5,15 @@ spring:
         - "google-auth"
         - "gmail"
         - "ai"
+      test:
+        - "google-auth"
+        - "google-account-samples"
+      benchmark:
+        - "google-auth"
+        - "dev"
+        - "google-account-samples"
+        - "gmail"
+        - "ai"
 ---
 
 spring:
@@ -20,11 +29,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        temp:
-          use_jdbc_metadata_defaults: false
   session:
     jdbc:
       initialize-schema: always
@@ -34,6 +38,7 @@ spring:
       chat: none
   flyway:
     enabled: true
+    baseline-on-migrate: true
 server:
   forward-headers-strategy: framework
   servlet:
@@ -43,11 +48,11 @@ server:
         secure: true
         path: /
 
-management:
-  zipkin:
-    tracing:
-      export:
-        enabled: false
+#management:
+#  zipkin:
+#    tracing:
+#      export:
+#        enabled: false
 logging:
   charset:
     console: UTF-8
@@ -65,6 +70,8 @@ app:
   mail:
     analysis-months: 13
     max-snippet-size: 100
+    samples-dir: private/messages
+    samples-fallback: static/messages/sample_messages_netflix_sketchfab.json
   min-request-interval-hours: 72
   prompts:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
@@ -73,9 +80,6 @@ app:
     subject: GUEST_APP_USER_SUBJECT
     name: GUEST_APP_USER_NAME
     email: guest@example.com
-  sample-messages:
-    dir: private/messages
-    fallback: static/messages/sample_messages_netflix_sketchfab.json
 ---
 
 spring:
@@ -118,10 +122,10 @@ spring:
     hibernate:
       ddl-auto: update
     # Run this to generate V1__schema.sql
-#    properties:
-#      hibernate:
-#        hbm2ddl:
-#          auto: create
+    #    properties:
+    #      hibernate:
+    #        hbm2ddl:
+    #          auto: create
 management:
   tracing:
     enabled: true
@@ -130,6 +134,8 @@ management:
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
+      export:
+        enabled: true
   info:
     git:
       enabled: true
@@ -150,8 +156,6 @@ app:
   cors:
     allowed-origins:
       - ${FRONTEND_URL}
-  mail:
-    analysis-months: 8
   min-request-interval-hours: 0
 ---
 

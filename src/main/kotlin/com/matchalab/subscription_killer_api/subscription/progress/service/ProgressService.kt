@@ -54,6 +54,7 @@ class ProgressService(
                     .data(AppUserAnalysisProgressUpdate(AnalysisProgressStatus.COMPLETED))
             )
             emitter.complete()
+            return emitter
         }
 
         progresses[appUserId]?.values?.let { progresses ->

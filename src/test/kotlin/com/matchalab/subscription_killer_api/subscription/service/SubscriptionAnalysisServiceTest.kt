@@ -49,7 +49,8 @@ class SubscriptionAnalysisServiceTest(
 
     private val progressService = mockk<ProgressService>(relaxUnitFun = true)
 
-    private val testMailProperties = MailProperties(analysisMonths = 13L, maxSnippetSize = 150)
+    private val testMailProperties =
+        MailProperties(analysisMonths = 13L, maxSnippetSize = 150, samplesDir = "", samplesFallback = "")
 
     private lateinit var subscriptionAnalysisService: SubscriptionAnalysisService
 

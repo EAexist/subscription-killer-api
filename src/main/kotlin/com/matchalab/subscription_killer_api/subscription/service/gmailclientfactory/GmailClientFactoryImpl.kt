@@ -3,6 +3,7 @@ package com.matchalab.subscription_killer_api.subscription.service.gmailclientfa
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication
 import com.google.api.client.auth.oauth2.TokenRequest
 import com.google.api.client.auth.oauth2.TokenResponse
+import com.google.api.client.auth.oauth2.TokenResponseException
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.json.gson.GsonFactory
@@ -17,11 +18,14 @@ import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapterImpl
 import com.matchalab.subscription_killer_api.utils.observe
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.ObservationRegistry
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+
+private val logger = KotlinLogging.logger {}
 
 @Profile("google-auth && gmail")
 @Service
@@ -111,6 +115,14 @@ class GmailClientFactoryImpl(
                 )
         tokenRequest.set("refresh_token", refreshToken)
 
-        return tokenRequest.execute()
+        return try {
+            tokenRequest.execute()
+        } catch (e: TokenResponseException) {
+            // This is the "Gold Mine" of debugging info
+            logger.error { "❌ Google OAuth Error: ${e.details?.error}" }
+            logger.error { "❌ Error Description: ${e.details?.errorDescription}" }
+            logger.error { "❌ Full Details: ${e.details}" }
+            throw e
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.matchalab.subscription_killer_api.subscription.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedClientFactory
-import com.matchalab.subscription_killer_api.config.SampleGoogleAccountProperties
 import com.matchalab.subscription_killer_api.config.SharedTestcontainersConfig
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
@@ -18,7 +17,6 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -41,7 +39,7 @@ private val logger = KotlinLogging.logger {}
 @Tag("google-auth")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-@EnableConfigurationProperties(SampleGoogleAccountProperties::class)
+//@EnableConfigurationProperties(GoogleAccountProperties::class)
 @AutoConfigureObservability
 @Import(AuthenticatedClientFactory::class, SharedTestcontainersConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

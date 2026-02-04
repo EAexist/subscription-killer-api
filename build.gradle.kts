@@ -7,8 +7,10 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
-    kotlin("kapt") version "2.3.0"
+    kotlin("kapt") version "1.9.25"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("maven-publish")
+    id("java-test-fixtures")
 }
 
 group = "com.matchalab"
@@ -118,6 +120,13 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
 
+    /* Test Fixture */
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    testImplementation(testFixtures(project(":")))
+//    testFixturesImplementation(project(":subscription-killer-api"))
+
     // Flyway
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
     implementation("org.flywaydb:flyway-core:11.17.0")
@@ -134,23 +143,23 @@ allOpen {
 }
 
 tasks.withType<Test> {
-    val envProfile = System.getenv("SPRING_PROFILES_ACTIVE")
-        ?: System.getProperty("spring.profiles.active")
+    // 1. Get the profile from the CLI or Environment
+    val activeProfile = project.findProperty("spring.profiles.active")?.toString()
+        ?: System.getenv("SPRING_PROFILES_ACTIVE")
+        ?: "test" // fallback
+
+    systemProperty("spring.profiles.active", activeProfile)
 
     val tagsProperty = project.findProperty("includeTags") as String?
-    val tags = tagsProperty?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
-
     useJUnitPlatform {
-        if (tags.isNotEmpty()) {
-            val tagExpression = "none() | (${tags.joinToString(" | ")})"
-            includeTags(tagExpression)
-        } else {
-            includeTags("none()")
+        tagsProperty?.split(",")?.forEach { tag ->
+            includeTags(tag.trim())
         }
     }
-    val defaultProfiles = listOf("test", "dev")
-    val activeProfiles = (defaultProfiles + tags + (envProfile?.split(",") ?: emptyList())).distinct().joinToString(",")
-    systemProperty("spring.profiles.active", activeProfiles)
+
+    doFirst {
+        logger.lifecycle("Running tests with Profile: [$activeProfile] and Tags: [$tagsProperty]")
+    }
 }
 
 tasks.register<Zip>("buildLambdaWebAdapterZip") {
@@ -182,17 +191,15 @@ tasks.register<Zip>("buildLambdaWebAdapterZip") {
     }
 }
 
-//tasks.register<Zip>("buildLambdaWebAdapterZip") {
-//
-//    dependsOn("generateGitProperties")
-//
-//    from(tasks.compileJava)
-//    from(tasks.processResources)
-//
-//    into("lib") {
-//        from(configurations.runtimeClasspath) // Use runtimeClasspath for a runnable zip
-//    }
-//}
+tasks.bootJar {
+    enabled = false
+}
+
+tasks.jar {
+    enabled = true
+    archiveClassifier.set("")
+}
+
 
 tasks.build {
     dependsOn(tasks.getByName("buildLambdaWebAdapterZip"))
@@ -212,3 +219,36 @@ gitProperties {
 
 // TODO : Use layers for dependencies.
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
+
+
+/* Maven Publish To Custom Repo (build/repo).
+*  Command: ./gradlew publish */
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+            groupId = project.group.toString()
+            artifactId = "subscription-killer-api"
+            version = project.version.toString()
+
+            pom {
+                name.set("subscription-killer-api")
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "workspace-repo"
+            url = rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
+        }
+    }
+}
+
+tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().configureEach {
+    notCompatibleWithConfigurationCache("maven-publish is not fully CC compatible")
+}
+tasks.withType<org.gradle.api.publish.maven.tasks.GenerateMavenPom>().configureEach {
+    notCompatibleWithConfigurationCache("maven-publish uses Project internals")
+}
