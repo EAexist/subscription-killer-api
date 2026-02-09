@@ -83,7 +83,6 @@ class SubscriptionReportController(
 
         progressService.initializeProgress(appUserId)
 
-        val parent = observationRegistry.currentObservation
 
         CoroutineScope(dispatcher + observationRegistry.asContextElement()).launch {
             observationRegistry.observeSuspend(

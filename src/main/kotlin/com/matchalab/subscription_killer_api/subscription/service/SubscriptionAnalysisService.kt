@@ -325,7 +325,6 @@ class SubscriptionAnalysisService(
         addressToMessages: Map<String, List<GmailMessage>>
     ): SubscriptionDto {
 
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observe(
             "analyze_service_provider",
@@ -408,9 +407,8 @@ class SubscriptionAnalysisService(
     ): SubscribedSinceDto {
 
         var subscribedSinceDto: SubscribedSinceDto = SubscribedSinceDto(null)
-        var latestStartDay: Instant? = null
-        var latestCancelDay: Instant? = null
-        var latestMonthlyPayment: Instant? = null
+        var latestStartDay: Instant?
+        var latestCancelDay: Instant?
 
         if (!(serviceProvider.isEmailDetectionRuleAvailable())) {
             return subscribedSinceDto

@@ -21,7 +21,7 @@ final class ChatClientServiceImpl(
     private val maxPromptPreviewLength = 100
 //    private val chatClient: ChatClient = chatClientBuilder.build()
 
-    open override fun <T : Any> call(
+    override fun <T : Any> call(
         promptTemplateStream: Resource,
         params: Map<String, Any>,
         responseType: Class<T>
@@ -29,8 +29,7 @@ final class ChatClientServiceImpl(
         logger.info { "?? [call]" }
 
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
-        val promptPreview = promptTemplate.replace(Regex("\\s+"), " ").take(maxPromptPreviewLength)
-
+ 
         return runCatching {
             val json = chatClient.prompt()
                 .options(

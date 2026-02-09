@@ -16,7 +16,6 @@ class ObservingGmailClientAdapter(
 ) : GmailClientAdapter {
 
     override suspend fun listMessageIds(query: String): List<String> {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
             "gmail_client_adapter list_message_ids",
@@ -28,7 +27,6 @@ class ObservingGmailClientAdapter(
     }
 
     override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
             "gmail_client_adapter get_messages",
@@ -39,7 +37,6 @@ class ObservingGmailClientAdapter(
     }
 
     override suspend fun getFirstMessageId(addresses: List<String>): String? {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
             "gmail_client_adapter get_first_messageId",

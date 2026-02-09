@@ -38,7 +38,6 @@ abstract class AbstractGmailClientFactoryImpl(
 
     protected fun createClient(subject: String): Gmail {
 
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observe(
             "gmail create_client",

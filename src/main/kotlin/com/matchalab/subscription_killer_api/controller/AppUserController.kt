@@ -22,11 +22,7 @@ class AuthController() {
 //        @AuthenticationPrincipal customUserDetails: CustomUserDetails?
 
     ): ResponseEntity<AppUserResponseDto> {
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-        }
         return ResponseEntity.status(HttpStatus.OK)
-//            .body(customUserDetails.appUser.toResponseDto())
             .body(AppUserResponseDto("name", listOf()))
     }
 }

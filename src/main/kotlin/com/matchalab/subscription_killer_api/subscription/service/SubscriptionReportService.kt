@@ -47,7 +47,7 @@ class SubscriptionReportService(
             appUserService.findByIdOrNotFound(appUserId).googleAccounts
         val hasAnalyzedSubscription = googleAccounts.any {
             it.analyzedAt != null
-        } ?: false
+        }
 
         if (!hasAnalyzedSubscription) {
             return null
