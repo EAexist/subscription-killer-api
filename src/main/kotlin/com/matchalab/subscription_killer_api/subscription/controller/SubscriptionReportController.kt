@@ -7,7 +7,6 @@ import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReport
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionAnalysisService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionReportService
-import com.matchalab.subscription_killer_api.utils.observeSuspend
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.kotlin.asContextElement
 import io.micrometer.observation.ObservationRegistry
@@ -83,14 +82,8 @@ class SubscriptionReportController(
 
         progressService.initializeProgress(appUserId)
 
-
         CoroutineScope(dispatcher + observationRegistry.asContextElement()).launch {
-            observationRegistry.observeSuspend(
-                "subscription_report_controller analyze",
-                "app_user.id" to appUserId.toString()
-            ) {
-                analysisService.analyze(appUserId)
-            }
+            analysisService.analyze(appUserId)
         }
         return ResponseEntity.accepted().build()
     }
