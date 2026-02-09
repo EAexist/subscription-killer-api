@@ -8,6 +8,12 @@ spring:
       test:
         - "google-auth"
         - "google-account-samples"
+      benchmark-dev:
+        - "google-auth"
+        - "dev"
+        - "google-account-samples"
+        - "gmail"
+        - "ai"
       benchmark:
         - "google-auth"
         - "dev"
@@ -139,6 +145,14 @@ management:
   info:
     git:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
@@ -159,30 +173,6 @@ app:
   min-request-interval-hours: 0
 ---
 
-spring:
-  config:
-    activate:
-      on-profile: ai
-  ai:
-    model:
-      chat: google-genai
-    retry:
-      max-attempts: 1
-    google:
-      genai:
-        project-id: ${GOOGLE_CLOUD_PROJECT}
-        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
-        chat:
-          options:
-            model: gemini-3-flash-preview
-            temperature: 0.1
-            thinking-level: LOW
-    #            thinking-budget: 0
-    chat:
-      observations:
-        log-prompt: false
-        log-completion: false
----
 
 spring:
   config:

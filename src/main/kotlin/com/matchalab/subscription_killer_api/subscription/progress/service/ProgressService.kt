@@ -29,6 +29,7 @@ class ProgressService(
 
     private val emitters = ConcurrentHashMap<UUID, SseEmitter>()
     private val progresses = ConcurrentHashMap<UUID, ConcurrentHashMap<String, AnalysisProgress>>()
+    private val lastSentStatuses = ConcurrentHashMap<UUID, AnalysisProgressStatus>()
 
     fun isOnProgress(appUserId: UUID): Boolean {
         return progresses.containsKey(appUserId)
@@ -41,6 +42,7 @@ class ProgressService(
 
             val cleanup = {
                 emitters.remove(appUserId)
+                lastSentStatuses.remove(appUserId)
             }
             onCompletion { cleanup() }
             onTimeout { cleanup() }
@@ -80,6 +82,7 @@ class ProgressService(
                 emitter.send(
                     SseEmitter.event().name("progress-update").data(update)
                 )
+                lastSentStatuses[appUserId] = update.status
                 serviceProviderUpdates.forEach {
                     emitter.send(
                         SseEmitter.event().name("progress-update").data(it)
@@ -102,21 +105,29 @@ class ProgressService(
         val progressUpdate: AppUserAnalysisProgressUpdate? = totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
 
         progressUpdate?.let { update ->
-            emitters[appUserId]?.let { emitter ->
-                try {
-                    emitter.send(
-                        SseEmitter.event().name("progress-update")
-                            .data(update)
-                    )
-                    if (totalStatus === AnalysisProgressStatus.COMPLETED) {
-                        emitter.complete()
+            val lastSentStatus = lastSentStatuses[appUserId]
+            
+            // Only send if status has changed
+            if (lastSentStatus != update.status) {
+                emitters[appUserId]?.let { emitter ->
+                    try {
+                        emitter.send(
+                            SseEmitter.event().name("progress-update")
+                                .data(update)
+                        )
+                        lastSentStatuses[appUserId] = update.status
+                        
+                        if (totalStatus === AnalysisProgressStatus.COMPLETED) {
+                            emitter.complete()
+                        }
+                    } catch (e: Exception) {
+                        emitter.completeWithError(e)
                     }
-                } catch (e: Exception) {
-                    emitter.completeWithError(e)
                 }
-            }
-            if (totalStatus === AnalysisProgressStatus.COMPLETED) {
-                progresses.remove(appUserId)
+                if (totalStatus === AnalysisProgressStatus.COMPLETED) {
+                    progresses.remove(appUserId)
+                    lastSentStatuses.remove(appUserId)
+                }
             }
         }
     }

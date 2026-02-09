@@ -1,0 +1,11 @@
+spring:
+  flyway:
+    clean-disabled: false
+    clean-on-validation-error: false
+  sql:
+    init:
+      mode: always
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

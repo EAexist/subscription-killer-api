@@ -1,29 +1,6 @@
 [
   {
     "aliasNames": {
-      "EN": "Netflix"
-    },
-    "emailAddresses": [
-      "info@account.netflix.com"
-    ],
-    "subscriptionPageUrl": "www.netflix.com/signup",
-    "websiteUrl": "www.netflix.com",
-    "logoDevSuffix": "netflix.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "YouTube Premium"
-    },
-    "emailAddresses": [
-      "payments-noreply@google.com",
-      "googlepay-noreply@google.com"
-    ],
-    "subscriptionPageUrl": "www.youtube.com/premium",
-    "websiteUrl": "www.youtube.com",
-    "logoDevSuffix": "youtube.com"
-  },
-  {
-    "aliasNames": {
       "EN": "WOW Membership",
       "KO": "쿠팡 와우 멤버십"
     },
@@ -33,6 +10,17 @@
     "subscriptionPageUrl": "www.coupang.com/np/campaigns/83",
     "websiteUrl": "www.coupang.com",
     "logoDevSuffix": "coupang.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Netflix"
+    },
+    "emailAddresses": [
+      "info@account.netflix.com"
+    ],
+    "subscriptionPageUrl": "www.netflix.com/signup",
+    "websiteUrl": "www.netflix.com",
+    "logoDevSuffix": "netflix.com"
   },
   {
     "aliasNames": {
@@ -48,6 +36,30 @@
   },
   {
     "aliasNames": {
+      "EN": "Coupang Play",
+      "KO": "쿠팡플레이"
+    },
+    "emailAddresses": [
+      "noreply@coupang.com"
+    ],
+    "subscriptionPageUrl": "www.coupangplay.com",
+    "websiteUrl": "www.coupangplay.com",
+    "logoDevSuffix": "coupang.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Baemin Club",
+      "KO": "배민클럽"
+    },
+    "emailAddresses": [
+      "noreply@baemin.com"
+    ],
+    "subscriptionPageUrl": "baemin.com",
+    "websiteUrl": "www.baemin.com",
+    "logoDevSuffix": "baemin.com"
+  },
+  {
+    "aliasNames": {
       "EN": "TVING",
       "KO": "티빙"
     },
@@ -57,28 +69,6 @@
     "subscriptionPageUrl": "www.tving.com/membership",
     "websiteUrl": "www.tving.com",
     "logoDevSuffix": "tving.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Disney+"
-    },
-    "emailAddresses": [
-      "disneyplus@mail.disneyplus.com"
-    ],
-    "subscriptionPageUrl": "www.disneyplus.com/welcome",
-    "websiteUrl": "www.disneyplus.com",
-    "logoDevSuffix": "disneyplus.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Wavve"
-    },
-    "emailAddresses": [
-      "noreply@wavve.com"
-    ],
-    "subscriptionPageUrl": "www.wavve.com/voucher/index.html",
-    "websiteUrl": "www.wavve.com",
-    "logoDevSuffix": "wavve.com"
   },
   {
     "aliasNames": {
@@ -94,15 +84,49 @@
   },
   {
     "aliasNames": {
-      "EN": "Millie",
-      "KO": "밀리의 서재"
+      "EN": "ChatGPT Plus"
     },
     "emailAddresses": [
-      "help@millie.town"
+      "noreply@tm.openai.com"
     ],
-    "subscriptionPageUrl": "www.millie.co.kr/v3/customer/price",
-    "websiteUrl": "www.millie.co.kr",
-    "logoDevSuffix": "millie.co.kr"
+    "subscriptionPageUrl": "chatgpt.com/pricing",
+    "websiteUrl": "chatgpt.com",
+    "logoDevSuffix": "openai.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "T universe",
+      "KO": "T우주"
+    },
+    "emailAddresses": [
+      "noreply@tworld.co.kr"
+    ],
+    "subscriptionPageUrl": "m.tworld.co.kr/product/tuniverse",
+    "websiteUrl": "www.tworld.co.kr",
+    "logoDevSuffix": "tworld.co.kr"
+  },
+  {
+    "aliasNames": {
+      "EN": "Samsung Care+",
+      "KO": "삼성케어플러스"
+    },
+    "emailAddresses": [
+      "samsungcareplus@samsung.com"
+    ],
+    "subscriptionPageUrl": "www.samsung.com/sec/samsung-care-plus",
+    "websiteUrl": "www.samsung.com",
+    "logoDevSuffix": "samsung.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Wavve"
+    },
+    "emailAddresses": [
+      "noreply@wavve.com"
+    ],
+    "subscriptionPageUrl": "www.wavve.com/voucher/index.html",
+    "websiteUrl": "www.wavve.com",
+    "logoDevSuffix": "wavve.com"
   },
   {
     "aliasNames": {
@@ -120,6 +144,40 @@
   },
   {
     "aliasNames": {
+      "EN": "Disney+"
+    },
+    "emailAddresses": [
+      "disneyplus@mail.disneyplus.com"
+    ],
+    "subscriptionPageUrl": "www.disneyplus.com/welcome",
+    "websiteUrl": "www.disneyplus.com",
+    "logoDevSuffix": "disneyplus.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Microsoft 365"
+    },
+    "emailAddresses": [
+      "msa@communication.microsoft.com"
+    ],
+    "subscriptionPageUrl": "www.microsoft.com/microsoft-365/buy/microsoft-365",
+    "websiteUrl": "www.microsoft.com",
+    "logoDevSuffix": "microsoft.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Millie",
+      "KO": "밀리의 서재"
+    },
+    "emailAddresses": [
+      "help@millie.town"
+    ],
+    "subscriptionPageUrl": "www.millie.co.kr/v3/customer/price",
+    "websiteUrl": "www.millie.co.kr",
+    "logoDevSuffix": "millie.co.kr"
+  },
+  {
+    "aliasNames": {
       "EN": "Kurly Members",
       "KO": "컬리멤버스"
     },
@@ -129,18 +187,6 @@
     "subscriptionPageUrl": "www.kurly.com/m2/membership/kurly-membership",
     "websiteUrl": "www.kurly.com",
     "logoDevSuffix": "kurly.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Baemin Club",
-      "KO": "배민클럽"
-    },
-    "emailAddresses": [
-      "noreply@baemin.com"
-    ],
-    "subscriptionPageUrl": "baemin.com",
-    "websiteUrl": "www.baemin.com",
-    "logoDevSuffix": "baemin.com"
   },
   {
     "aliasNames": {
@@ -156,17 +202,6 @@
   },
   {
     "aliasNames": {
-      "EN": "Watcha"
-    },
-    "emailAddresses": [
-      "do-not-reply@watcha.com"
-    ],
-    "subscriptionPageUrl": "watcha.com/browse/video",
-    "websiteUrl": "www.watcha.com",
-    "logoDevSuffix": "watcha.com"
-  },
-  {
-    "aliasNames": {
       "EN": "genie",
       "KO": "지니뮤직"
     },
@@ -176,171 +211,6 @@
     "subscriptionPageUrl": "www.genie.co.kr/buy/pamphlet",
     "websiteUrl": "www.genie.co.kr",
     "logoDevSuffix": "genie.co.kr"
-  },
-  {
-    "aliasNames": {
-      "EN": "Ridi Select",
-      "KO": "리디셀렉트"
-    },
-    "emailAddresses": [
-      "noreply@ridi.com"
-    ],
-    "subscriptionPageUrl": "select.ridibooks.com/vouchers",
-    "websiteUrl": "select.ridibooks.com",
-    "logoDevSuffix": "ridibooks.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "FLO"
-    },
-    "emailAddresses": [
-      "noreply@music-flo.com"
-    ],
-    "subscriptionPageUrl": "www.music-flo.com/purchase/voucher",
-    "websiteUrl": "www.music-flo.com",
-    "logoDevSuffix": "music-flo.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Microsoft 365"
-    },
-    "emailAddresses": [
-      "msa@communication.microsoft.com"
-    ],
-    "subscriptionPageUrl": "www.microsoft.com/microsoft-365/buy/microsoft-365",
-    "websiteUrl": "www.microsoft.com",
-    "logoDevSuffix": "microsoft.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "T universe",
-      "KO": "T우주"
-    },
-    "emailAddresses": [
-      "noreply@tworld.co.kr"
-    ],
-    "subscriptionPageUrl": "m.tworld.co.kr/product/tuniverse",
-    "websiteUrl": "www.tworld.co.kr",
-    "logoDevSuffix": "tworld.co.kr"
-  },
-  {
-    "aliasNames": {
-      "EN": "Spotify"
-    },
-    "emailAddresses": [
-      "no-reply@spotify.com"
-    ],
-    "subscriptionPageUrl": "www.spotify.com/premium",
-    "websiteUrl": "www.spotify.com",
-    "logoDevSuffix": "spotify.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Laftel",
-      "KO": "라프텔"
-    },
-    "emailAddresses": [
-      "noreply@laftel.net"
-    ],
-    "subscriptionPageUrl": "laftel.net/membership",
-    "websiteUrl": "laftel.net",
-    "logoDevSuffix": "laftel.net"
-  },
-  {
-    "aliasNames": {
-      "EN": "CLASS101"
-    },
-    "emailAddresses": [
-      "noreply@class101.net"
-    ],
-    "subscriptionPageUrl": "class101.net/plus/ko",
-    "websiteUrl": "class101.net"
-  },
-  {
-    "aliasNames": {
-      "EN": "Welaaa",
-      "KO": "윌라"
-    },
-    "emailAddresses": [
-      "noreply@welaaa.com"
-    ],
-    "subscriptionPageUrl": "www.willa.co.kr/membership/intro",
-    "websiteUrl": "www.willa.co.kr"
-  },
-  {
-    "aliasNames": {
-      "EN": "Sandollcloud",
-      "KO": "산돌구름"
-    },
-    "emailAddresses": [],
-    "subscriptionPageUrl": "www.sandollcloud.com/pricing",
-    "websiteUrl": "www.sandollcloud.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Mangoboard",
-      "KO": "망고보드"
-    },
-    "emailAddresses": [
-      "noreply@mangoboard.net"
-    ],
-    "subscriptionPageUrl": "www.mangoboard.net/MangoPrice.do",
-    "websiteUrl": "www.mangoboard.net"
-  },
-  {
-    "aliasNames": {
-      "EN": "Canva"
-    },
-    "emailAddresses": [
-      "noreply@canva.com"
-    ],
-    "subscriptionPageUrl": "www.canva.com/pricing",
-    "websiteUrl": "www.canva.com",
-    "logoDevSuffix": "canva.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Notion"
-    },
-    "emailAddresses": [
-      "notify@mail.notion.so"
-    ],
-    "subscriptionPageUrl": "www.notion.so/pricing",
-    "websiteUrl": "www.notion.so",
-    "logoDevSuffix": "notion.so"
-  },
-  {
-    "aliasNames": {
-      "EN": "CLOVA Note",
-      "KO": "클로바노트"
-    },
-    "emailAddresses": [
-      "no_reply@worksmobile.com"
-    ],
-    "subscriptionPageUrl": "naver.worksmobile.com/pricing/clovanote/",
-    "websiteUrl": "clovanote.naver.com",
-    "logoDevSuffix": "naver.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "bubble"
-    },
-    "emailAddresses": [
-      "noreply@lysn.com"
-    ],
-    "subscriptionPageUrl": "www.lysn.com",
-    "websiteUrl": "www.lysn.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Weverse Membership"
-    },
-    "emailAddresses": [
-      "noreply@weverse.io"
-    ],
-    "subscriptionPageUrl": "weverse.io",
-    "websiteUrl": "weverse.io",
-    "logoDevSuffix": "weverse.io"
   },
   {
     "aliasNames": {
@@ -356,47 +226,25 @@
   },
   {
     "aliasNames": {
-      "EN": "WashSwat",
-      "KO": "세탁특공대"
+      "EN": "Watcha"
     },
     "emailAddresses": [
-      "noreply@washswat.com"
+      "do-not-reply@watcha.com"
     ],
-    "subscriptionPageUrl": "www.getfresh.co.kr",
-    "websiteUrl": "www.getfresh.co.kr"
+    "subscriptionPageUrl": "watcha.com/browse/video",
+    "websiteUrl": "www.watcha.com",
+    "logoDevSuffix": "watcha.com"
   },
   {
     "aliasNames": {
-      "EN": "Laundrygo",
-      "KO": "런드리고"
+      "EN": "FLO"
     },
     "emailAddresses": [
-      "noreply@laundrygo.com"
+      "noreply@music-flo.com"
     ],
-    "subscriptionPageUrl": "www.laundrygo.com",
-    "websiteUrl": "www.laundrygo.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Sooldamhwa",
-      "KO": "술담화"
-    },
-    "emailAddresses": [
-      "noreply@sooldamhwa.com"
-    ],
-    "subscriptionPageUrl": "www.sooldamhwa.com/subscription",
-    "websiteUrl": "www.sooldamhwa.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Wisely",
-      "KO": "와이즐리"
-    },
-    "emailAddresses": [
-      "noreply@wisely.store"
-    ],
-    "subscriptionPageUrl": "www.wiselycompany.com/membership",
-    "websiteUrl": "www.wiselycompany.com"
+    "subscriptionPageUrl": "www.music-flo.com/purchase/voucher",
+    "websiteUrl": "www.music-flo.com",
+    "logoDevSuffix": "music-flo.com"
   },
   {
     "aliasNames": {
@@ -411,130 +259,70 @@
   },
   {
     "aliasNames": {
-      "EN": "ChatGPT Plus"
+      "EN": "Notion"
     },
     "emailAddresses": [
-      "noreply@tm.openai.com"
+      "notify@mail.notion.so"
     ],
-    "subscriptionPageUrl": "chatgpt.com/pricing",
-    "websiteUrl": "chatgpt.com",
-    "logoDevSuffix": "openai.com"
+    "subscriptionPageUrl": "www.notion.so/pricing",
+    "websiteUrl": "www.notion.so",
+    "logoDevSuffix": "notion.so"
   },
   {
     "aliasNames": {
-      "EN": "QUAT"
+      "EN": "Spotify"
     },
     "emailAddresses": [
-      "noreply@quat.io"
+      "no-reply@spotify.com"
     ],
-    "subscriptionPageUrl": "quat.me",
-    "websiteUrl": "quat.me"
+    "subscriptionPageUrl": "www.spotify.com/premium",
+    "websiteUrl": "www.spotify.com",
+    "logoDevSuffix": "spotify.com"
   },
   {
     "aliasNames": {
-      "EN": "SNOW VIP"
+      "EN": "Ridi Select",
+      "KO": "리디셀렉트"
     },
     "emailAddresses": [
-      "noreply@snow.me"
+      "noreply@ridi.com"
     ],
-    "subscriptionPageUrl": "snow.me",
-    "websiteUrl": "snow.me"
+    "subscriptionPageUrl": "select.ridibooks.com/vouchers",
+    "websiteUrl": "select.ridibooks.com",
+    "logoDevSuffix": "ridibooks.com"
   },
   {
     "aliasNames": {
-      "EN": "EPIK Pro"
+      "EN": "Pickle Plus",
+      "KO": "피클플러스"
     },
     "emailAddresses": [
-      "noreply@snowcorp.com"
+      "help@pickle.plus"
     ],
-    "subscriptionPageUrl": "snow.me",
-    "websiteUrl": "snow.me"
+    "subscriptionPageUrl": "pickle.plus",
+    "websiteUrl": "pickle.plus"
   },
   {
     "aliasNames": {
-      "EN": "Apple Music"
+      "EN": "Welaaa",
+      "KO": "윌라"
     },
     "emailAddresses": [
-      "no_reply@email.apple.com"
+      "noreply@welaaa.com"
     ],
-    "subscriptionPageUrl": "www.apple.com/apple-music",
-    "websiteUrl": "music.apple.com",
-    "logoDevSuffix": "apple.com"
+    "subscriptionPageUrl": "www.willa.co.kr/membership/intro",
+    "websiteUrl": "www.willa.co.kr"
   },
   {
     "aliasNames": {
-      "EN": "Duolingo Plus"
+      "EN": "Wrtn Plus",
+      "KO": "뤼튼 플러스"
     },
     "emailAddresses": [
-      "no-reply@duolingo.com"
+      "support@wrtn.ai"
     ],
-    "subscriptionPageUrl": "www.duolingo.com/super",
-    "websiteUrl": "www.duolingo.com",
-    "logoDevSuffix": "duolingo.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "QANDA Premium",
-      "KO": "콴다 프리미엄"
-    },
-    "emailAddresses": [
-      "noreply@mathpresso.com"
-    ],
-    "subscriptionPageUrl": "qanda.ai/ko/premium",
-    "websiteUrl": "qanda.ai"
-  },
-  {
-    "aliasNames": {
-      "EN": "Fredit Membership",
-      "KO": "프레딧 멤버십"
-    },
-    "emailAddresses": [
-      "noreply@fredit.co.kr"
-    ],
-    "subscriptionPageUrl": "fredit.co.kr/benefit/membership",
-    "websiteUrl": "fredit.co.kr"
-  },
-  {
-    "aliasNames": {
-      "EN": "Hancom Docs",
-      "KO": "한컴독스"
-    },
-    "emailAddresses": [
-      "noreply@hancomdocs.com"
-    ],
-    "subscriptionPageUrl": "www.hancomdocs.com/pricing",
-    "websiteUrl": "www.hancomdocs.com",
-    "logoDevSuffix": "hancom.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "fol:in",
-      "KO": ""
-    },
-    "emailAddresses": [],
-    "subscriptionPageUrl": "www.folin.co/membership",
-    "websiteUrl": "www.folin.co"
-  },
-  {
-    "aliasNames": {
-      "EN": "LongBlack",
-      "KO": "롱블랙"
-    },
-    "emailAddresses": [
-      "help@longblack.co"
-    ],
-    "subscriptionPageUrl": "www.longblack.co/membership",
-    "websiteUrl": "www.longblack.co"
-  },
-  {
-    "aliasNames": {
-      "EN": "PUBLY"
-    },
-    "emailAddresses": [
-      "help@publy.co"
-    ],
-    "subscriptionPageUrl": "publy.co/membership",
-    "websiteUrl": "publy.co"
+    "subscriptionPageUrl": "wrtn.ai",
+    "websiteUrl": "wrtn.ai"
   },
   {
     "aliasNames": {
@@ -560,102 +348,14 @@
   },
   {
     "aliasNames": {
-      "EN": "Wrtn Plus",
-      "KO": "뤼튼 플러스"
+      "EN": "Canva"
     },
     "emailAddresses": [
-      "support@wrtn.ai"
+      "noreply@canva.com"
     ],
-    "subscriptionPageUrl": "wrtn.ai",
-    "websiteUrl": "wrtn.ai"
-  },
-  {
-    "aliasNames": {
-      "EN": "LINER Pro"
-    },
-    "emailAddresses": [
-      "contact@getliner.com"
-    ],
-    "subscriptionPageUrl": "getliner.com/premium",
-    "websiteUrl": "getliner.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Midjourney"
-    },
-    "emailAddresses": [
-      "billing@midjourney.com"
-    ],
-    "subscriptionPageUrl": "www.midjourney.com/account",
-    "websiteUrl": "www.midjourney.com",
-    "logoDevSuffix": "midjourney.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Runway"
-    },
-    "emailAddresses": [
-      "support@runwayml.com"
-    ],
-    "subscriptionPageUrl": "runwayml.com/pricing",
-    "websiteUrl": "runwayml.com",
-    "logoDevSuffix": "runwayml.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Character.ai"
-    },
-    "emailAddresses": [
-      "support@character.ai"
-    ],
-    "subscriptionPageUrl": "character.ai",
-    "websiteUrl": "character.ai",
-    "logoDevSuffix": "character.ai"
-  },
-  {
-    "aliasNames": {
-      "EN": "King of Math",
-      "KO": "수학대왕"
-    },
-    "emailAddresses": [
-      "help@mathking.io"
-    ],
-    "subscriptionPageUrl": "www.mathking.kr",
-    "websiteUrl": "www.mathking.kr"
-  },
-  {
-    "aliasNames": {
-      "EN": "Udemy"
-    },
-    "emailAddresses": [
-      "no-reply@e.udemymail.com"
-    ],
-    "subscriptionPageUrl": "www.udemy.com/personal-plan",
-    "websiteUrl": "www.udemy.com",
-    "logoDevSuffix": "udemy.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Coursera"
-    },
-    "emailAddresses": [
-      "no-reply@m.coursera.org",
-      "no-reply@t.mail.coursera.org"
-    ],
-    "subscriptionPageUrl": "www.coursera.org/courseraplus",
-    "websiteUrl": "www.coursera.org",
-    "logoDevSuffix": "coursera.org"
-  },
-  {
-    "aliasNames": {
-      "EN": "LinkedIn Premium"
-    },
-    "emailAddresses": [
-      "linkedin_support@cs.linkedin.com"
-    ],
-    "subscriptionPageUrl": "www.linkedin.com/premium",
-    "websiteUrl": "www.linkedin.com",
-    "logoDevSuffix": "linkedin.com"
+    "subscriptionPageUrl": "www.canva.com/pricing",
+    "websiteUrl": "www.canva.com",
+    "logoDevSuffix": "canva.com"
   },
   {
     "aliasNames": {
@@ -681,101 +381,14 @@
   },
   {
     "aliasNames": {
-      "EN": "Dropbox"
+      "EN": "GitHub Copilot"
     },
     "emailAddresses": [
-      "no-reply@dropbox.com"
+      "noreply@github.com"
     ],
-    "subscriptionPageUrl": "www.dropbox.com/plans",
-    "websiteUrl": "www.dropbox.com",
-    "logoDevSuffix": "dropbox.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "monday.com"
-    },
-    "emailAddresses": [
-      "support@monday.com"
-    ],
-    "subscriptionPageUrl": "monday.com/pricing",
-    "websiteUrl": "monday.com",
-    "logoDevSuffix": "monday.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "maily"
-    },
-    "emailAddresses": [
-      "help@maily.so"
-    ],
-    "subscriptionPageUrl": "maily.so",
-    "websiteUrl": "maily.so"
-  },
-  {
-    "aliasNames": {
-      "EN": "Coupang Play",
-      "KO": "쿠팡플레이"
-    },
-    "emailAddresses": [
-      "noreply@coupang.com"
-    ],
-    "subscriptionPageUrl": "www.coupangplay.com",
-    "websiteUrl": "www.coupangplay.com",
-    "logoDevSuffix": "coupang.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "DeepL Pro"
-    },
-    "emailAddresses": [
-      "support@deepl.com"
-    ],
-    "subscriptionPageUrl": "www.deepl.com/pro",
-    "websiteUrl": "www.deepl.com",
-    "logoDevSuffix": "deepl.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Vrew"
-    },
-    "emailAddresses": [
-      "vrew-support@voyagerx.com"
-    ],
-    "subscriptionPageUrl": "vrew.voyagerx.com/ko/pricing",
-    "websiteUrl": "vrew.voyagerx.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "ElevenLabs"
-    },
-    "emailAddresses": [
-      "support@elevenlabs.io"
-    ],
-    "subscriptionPageUrl": "elevenlabs.io/pricing",
-    "websiteUrl": "elevenlabs.io",
-    "logoDevSuffix": "elevenlabs.io"
-  },
-  {
-    "aliasNames": {
-      "EN": "SurveyMonkey"
-    },
-    "emailAddresses": [
-      "no-reply@surveymonkeyuser.com"
-    ],
-    "subscriptionPageUrl": "www.surveymonkey.com/pricing",
-    "websiteUrl": "www.surveymonkey.com",
-    "logoDevSuffix": "surveymonkey.com"
-  },
-  {
-    "aliasNames": {
-      "EN": "Atlassian"
-    },
-    "emailAddresses": [
-      "noreply@atlassian.com"
-    ],
-    "subscriptionPageUrl": "www.atlassian.com/software/pricing",
-    "websiteUrl": "www.atlassian.com",
-    "logoDevSuffix": "atlassian.com"
+    "subscriptionPageUrl": "github.com/features/copilot",
+    "websiteUrl": "github.com",
+    "logoDevSuffix": "github.com"
   },
   {
     "aliasNames": {
@@ -791,69 +404,92 @@
   },
   {
     "aliasNames": {
-      "EN": "GitHub Copilot"
+      "EN": "Laundrygo",
+      "KO": "런드리고"
     },
     "emailAddresses": [
-      "noreply@github.com"
+      "noreply@laundrygo.com"
     ],
-    "subscriptionPageUrl": "github.com/features/copilot",
-    "websiteUrl": "github.com",
-    "logoDevSuffix": "github.com"
+    "subscriptionPageUrl": "www.laundrygo.com",
+    "websiteUrl": "www.laundrygo.com"
   },
   {
     "aliasNames": {
-      "EN": "Fast Campus",
-      "KO": "패스트캠퍼스"
+      "EN": "WashSwat",
+      "KO": "세탁특공대"
     },
     "emailAddresses": [
-      "help@fastcampus.co.kr"
+      "noreply@washswat.com"
     ],
-    "subscriptionPageUrl": "fastcampus.co.kr",
-    "websiteUrl": "fastcampus.co.kr"
+    "subscriptionPageUrl": "www.getfresh.co.kr",
+    "websiteUrl": "www.getfresh.co.kr"
   },
   {
     "aliasNames": {
-      "EN": "HBR"
+      "EN": "QANDA Premium",
+      "KO": "콴다 프리미엄"
     },
     "emailAddresses": [
-      "help@hbrkorea.com"
+      "noreply@mathpresso.com"
     ],
-    "subscriptionPageUrl": "hbr.org/subscribing",
-    "websiteUrl": "hbr.org",
-    "logoDevSuffix": "hbr.org"
+    "subscriptionPageUrl": "qanda.ai/ko/premium",
+    "websiteUrl": "qanda.ai"
   },
   {
     "aliasNames": {
-      "EN": "Samsung Care+",
-      "KO": "삼성케어플러스"
+      "EN": "Laftel",
+      "KO": "라프텔"
     },
     "emailAddresses": [
-      "samsungcareplus@samsung.com"
+      "noreply@laftel.net"
     ],
-    "subscriptionPageUrl": "www.samsung.com/sec/samsung-care-plus",
-    "websiteUrl": "www.samsung.com",
-    "logoDevSuffix": "samsung.com"
+    "subscriptionPageUrl": "laftel.net/membership",
+    "websiteUrl": "laftel.net",
+    "logoDevSuffix": "laftel.net"
   },
   {
     "aliasNames": {
-      "EN": "Pickle Plus",
-      "KO": "피클플러스"
+      "EN": "Hancom Docs",
+      "KO": "한컴독스"
     },
     "emailAddresses": [
-      "help@pickle.plus"
+      "noreply@hancomdocs.com"
     ],
-    "subscriptionPageUrl": "pickle.plus",
-    "websiteUrl": "pickle.plus"
+    "subscriptionPageUrl": "www.hancomdocs.com/pricing",
+    "websiteUrl": "www.hancomdocs.com",
+    "logoDevSuffix": "hancom.com"
   },
   {
     "aliasNames": {
-      "EN": "Gemini Advanced"
+      "EN": "DeepL Pro"
     },
     "emailAddresses": [
-      "google-gemini-noreply@google.com"
+      "support@deepl.com"
     ],
-    "subscriptionPageUrl": "gemini.google.com/advanced",
-    "websiteUrl": "gemini.google.com",
-    "logoDevSuffix": "google.com"
+    "subscriptionPageUrl": "www.deepl.com/pro",
+    "websiteUrl": "www.deepl.com",
+    "logoDevSuffix": "deepl.com"
+  },
+  {
+    "aliasNames": {
+      "EN": "Weverse Membership"
+    },
+    "emailAddresses": [
+      "noreply@weverse.io"
+    ],
+    "subscriptionPageUrl": "weverse.io",
+    "websiteUrl": "weverse.io",
+    "logoDevSuffix": "weverse.io"
+  },
+  {
+    "aliasNames": {
+      "EN": "Duolingo Plus"
+    },
+    "emailAddresses": [
+      "no-reply@duolingo.com"
+    ],
+    "subscriptionPageUrl": "www.duolingo.com/super",
+    "websiteUrl": "www.duolingo.com",
+    "logoDevSuffix": "duolingo.com"
   }
 ]

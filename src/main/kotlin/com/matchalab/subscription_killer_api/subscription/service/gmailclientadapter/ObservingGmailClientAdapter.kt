@@ -16,12 +16,10 @@ class ObservingGmailClientAdapter(
 ) : GmailClientAdapter {
 
     override suspend fun listMessageIds(query: String): List<String> {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
-            "gmail.listMessageIds",
-            parent,
-            "gmail.query" to query
+            "gmail_client_adapter list_message_ids",
+            "query" to query
         ) {
             // Optional: attach high-cardinality data like query as a KeyValue
             delegate.listMessageIds(query)
@@ -29,24 +27,20 @@ class ObservingGmailClientAdapter(
     }
 
     override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
-            "gmail.getMessages",
-            parent,
-            "gmail.fields" to plan.fields
+            "gmail_client_adapter get_messages",
+            "fields" to plan.fields
         ) {
             delegate.getMessages(messageIds, plan)
         }
     }
 
     override suspend fun getFirstMessageId(addresses: List<String>): String? {
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observeSuspend(
-            "gmail.getFirstMessageId",
-            parent,
-            "gmail.addresses" to (addresses.firstOrNull() ?: "none")
+            "gmail_client_adapter get_first_messageId",
+            "addresses" to (addresses.firstOrNull() ?: "none")
         ) {
             delegate.getFirstMessageId(addresses)
         }

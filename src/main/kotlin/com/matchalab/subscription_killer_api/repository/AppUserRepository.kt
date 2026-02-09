@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query
 import java.util.*
 
 interface AppUserRepository : JpaRepository<AppUser, UUID> {
+
+    fun existsByName(name: String): Boolean
+    
     @Query(
         """
         SELECT DISTINCT u 

@@ -15,8 +15,8 @@ import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import com.matchalab.subscription_killer_api.utils.observe
 import com.matchalab.subscription_killer_api.utils.observeSuspend
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.core.instrument.kotlin.asContextElement
 import io.micrometer.observation.ObservationRegistry
-import io.micrometer.observation.annotation.Observed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -61,24 +61,28 @@ class SubscriptionAnalysisService(
     )
 
     suspend fun analyze(appUserId: UUID) {
+        observationRegistry.observeSuspend(
+            "analyze",
+        ) {
 
-        val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
+            val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
-        coroutineScope {
-            googleAccountSubjects.map { subject ->
-                async(Dispatchers.IO) {
-                    // @TOOD Prevent Frequent Re-analysis
-                    val subscriptionDtos: List<SubscriptionDto> = analyzeSingleGoogleAccount(appUserId, subject)
-                    saveAndMapToDto(subject, subscriptionDtos)
+            coroutineScope {
+                googleAccountSubjects.map { subject ->
+                    async(Dispatchers.IO) {
+                        // @TOOD Prevent Frequent Re-analysis
+                        val subscriptionDtos: List<SubscriptionDto> = analyzeSingleGoogleAccount(appUserId, subject)
+                        saveAndMapToDto(subject, subscriptionDtos)
+                    }
                 }
-            }
-        }.awaitAll()
+            }.awaitAll()
 
-        progressService.setProgress(
-            appUserId,
-            googleAccountSubjects.first(),
-            AnalysisProgressStatus.COMPLETED
-        )
+            progressService.setProgress(
+                appUserId,
+                googleAccountSubjects.first(),
+                AnalysisProgressStatus.COMPLETED
+            )
+        }
 
     }
 
@@ -103,15 +107,11 @@ class SubscriptionAnalysisService(
         googleAccountRepository.save(googleAccount)
     }
 
-    @Observed
     suspend fun analyzeSingleGoogleAccount(appUserId: UUID, googleAccountSubject: String): List<SubscriptionDto> {
 
-        val parent = observationRegistry.currentObservation
-
         return observationRegistry.observeSuspend(
-            "analysis.account",
-            parent,
-            "googleAccount.subject" to googleAccountSubject
+            "analyze_google_account",
+            "google_account.subject" to googleAccountSubject
         ) {
             try {
 
@@ -189,12 +189,12 @@ class SubscriptionAnalysisService(
                 val subscriptions: List<SubscriptionDto> = coroutineScope {
 
                     val registeredSinceMapDeferred =
-                        async(Dispatchers.IO) {
+                        async(Dispatchers.IO + observationRegistry.asContextElement()) {
                             batchComputeRegisteredSince(gmailClientAdapter, serviceProviders)
                         }
 
                     val subscriptionsDeferred =
-                        async(Dispatchers.IO) {
+                        async(Dispatchers.IO + observationRegistry.asContextElement()) {
                             computeSubscriptions(
                                 serviceProviders,
                                 allMessages,
@@ -325,12 +325,11 @@ class SubscriptionAnalysisService(
         addressToMessages: Map<String, List<GmailMessage>>
     ): SubscriptionDto {
 
-        val parent = observationRegistry.currentObservation
 
         return observationRegistry.observe(
-            "analysis.serviceProvider",
-            parent,
-            "serviceProvider.displayName" to serviceProvider.displayName
+            "analyze_service_provider",
+//            parent,
+            "service_provider.display_name" to serviceProvider.displayName
         ) {
 
             logger.debug { "[analyzeServiceProvider]  \uD83D\uDE80 displayName: ${serviceProvider.displayName}\n\t${addressToMessages.entries.joinToString { "${it.key}: ${it.value}" }}" }
@@ -408,9 +407,8 @@ class SubscriptionAnalysisService(
     ): SubscribedSinceDto {
 
         var subscribedSinceDto: SubscribedSinceDto = SubscribedSinceDto(null)
-        var latestStartDay: Instant? = null
-        var latestCancelDay: Instant? = null
-        var latestMonthlyPayment: Instant? = null
+        var latestStartDay: Instant?
+        var latestCancelDay: Instant?
 
         if (!(serviceProvider.isEmailDetectionRuleAvailable())) {
             return subscribedSinceDto

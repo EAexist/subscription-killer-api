@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Instant
 
 @ConfigurationProperties(prefix = "app.google-account")
-data class GoogleAccountProperties(
+data class SampleGoogleAccountListProperties(
     val samples: List<SampleGoogleAccountProperties> = emptyList()
 )
 

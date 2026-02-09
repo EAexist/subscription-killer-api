@@ -7,7 +7,9 @@ import com.matchalab.subscription_killer_api.ai.service.call
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.utils.hideDates
+import com.matchalab.subscription_killer_api.utils.observe
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.micrometer.observation.ObservationRegistry
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.ZoneId
@@ -40,6 +42,7 @@ data class AggregatedGmailMessage(
 class EmailCategorizationPromptService(
     private val chatClientService: ChatClientService,
     private val promptTemplateProperties: PromptTemplateProperties,
+    private val observationRegistry: ObservationRegistry
 ) {
 
     fun run(messages: List<GmailMessage>): EmailCategorizationResponse {
@@ -52,16 +55,21 @@ class EmailCategorizationPromptService(
         logger.debug { "[run] ✨  ${messages.firstOrNull()?.senderEmail} Condensed messages: ${messages.size} -> ${aggregatedMessages.size}" }
         logger.debug { "[run] ✨  ${messages.firstOrNull()?.senderEmail} Calling chatClient for ${aggregatedMessages.size} messages" }
 
-        return chatClientService.call<Map<String, List<String>>>(
-            promptTemplateProperties.filterAndCategorizeEmails,
-            mapOf("emails" to promptParams.emails)
-        ).let {
-            EmailCategorizationResponse(
-                subsStartMsgIds = it["S"].orEmpty(),
-                subsCancelMsgIds = it["C"].orEmpty(),
-                monthlyMsgIds = it["M"].orEmpty(),
-                annualMsgIds = it["A"].orEmpty(),
-            )
+        return observationRegistry.observe(
+            "prompt_service email_categorization",
+            "task" to "email_categorization"
+        ) {
+            chatClientService.call<Map<String, List<String>>>(
+                promptTemplateProperties.filterAndCategorizeEmails,
+                mapOf("emails" to promptParams.emails)
+            ).let {
+                EmailCategorizationResponse(
+                    subsStartMsgIds = it["S"].orEmpty(),
+                    subsCancelMsgIds = it["C"].orEmpty(),
+                    monthlyMsgIds = it["M"].orEmpty(),
+                    annualMsgIds = it["A"].orEmpty(),
+                )
+            }
         }
     }
 

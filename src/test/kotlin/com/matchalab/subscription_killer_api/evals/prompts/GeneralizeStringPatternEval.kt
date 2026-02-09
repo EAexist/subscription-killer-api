@@ -22,7 +22,7 @@ import kotlin.test.Test
 
 private val logger = KotlinLogging.logger {}
 
-@Tag("ai")
+@Tag("prompt-eval")
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )

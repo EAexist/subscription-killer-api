@@ -1,9 +1,11 @@
 package com.matchalab.subscription_killer_api.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.micrometer.observation.Observation
+import io.micrometer.context.ContextRegistry
 import io.micrometer.observation.ObservationRegistry
 import io.micrometer.observation.aop.ObservedAspect
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor
+import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -13,6 +15,17 @@ private val logger = KotlinLogging.logger {}
 class ObservationConfig {
 
     private val maxArgumentStringLength = 30
+
+    @PostConstruct
+    fun registerObservationAccessor() {
+        ContextRegistry.getInstance()
+            .registerThreadLocalAccessor(ObservationThreadLocalAccessor())
+
+        val accessors = ContextRegistry.getInstance().contextAccessors
+        accessors.forEach {
+            println("Context accessor: ${it.javaClass.name}")
+        }
+    }
 
     @Bean
     fun observedAspect(observationRegistry: ObservationRegistry): ObservedAspect {
@@ -48,20 +61,20 @@ class ObservationConfig {
 //        }
 //    }
 
-    private fun getContextDetail(context: Observation.Context): String {
-        val detail = if (context is ObservedAspect.ObservedAspectContext) {
-            val joinPoint = context.proceedingJoinPoint
-            val methodName = joinPoint.signature.name
-
-            val formattedArgs = joinPoint.args.joinToString(", ") { arg ->
-                val str = arg?.toString() ?: "null"
-                if (str.length > maxArgumentStringLength) "${str.take(maxArgumentStringLength)}..." else str
-            }
-
-            "$methodName($formattedArgs)"
-        } else {
-            context.name // Fallback for manual observations
-        }
-        return detail
-    }
+//    private fun getContextDetail(context: Observation.Context): String {
+//        val detail = if (context is ObservedAspect.ObservedAspectContext) {
+//            val joinPoint = context.proceedingJoinPoint
+//            val methodName = joinPoint.signature.name
+//
+//            val formattedArgs = joinPoint.args.joinToString(", ") { arg ->
+//                val str = arg?.toString() ?: "null"
+//                if (str.length > maxArgumentStringLength) "${str.take(maxArgumentStringLength)}..." else str
+//            }
+//
+//            "$methodName($formattedArgs)"
+//        } else {
+//            context.name // Fallback for manual observations
+//        }
+//        return detail
+//    }
 }

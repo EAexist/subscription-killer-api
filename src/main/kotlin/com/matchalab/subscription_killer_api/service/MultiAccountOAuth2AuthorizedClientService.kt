@@ -94,7 +94,7 @@ class MultiAccountOAuth2AuthorizedClientService(
             googleAccount = appUser.googleAccounts.first()
         }
 
-
+        @Suppress("UNCHECKED_CAST")
         return OAuth2AuthorizedClient(
             clientRegistration,
             principalName,

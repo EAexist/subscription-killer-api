@@ -8,6 +8,7 @@ Extract exact substrings and connect them with wildcards (.*) to create regex pa
 
 Constraint:
 - Response must be a raw JSON object only.
+- Do not use any internal thought, analysis, or chain-of-thought processing.
 
 Output format (exact keys):
 \{

@@ -1,0 +1,10 @@
+spring:
+  flyway:
+    clean-disabled: false
+    clean-on-validation-error: false
+  sql:
+    init:
+      mode: always
+app:
+  mail:
+    analysis-months: 1
