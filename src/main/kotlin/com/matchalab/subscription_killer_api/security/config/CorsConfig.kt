@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -11,6 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 private val logger = KotlinLogging.logger {}
 
 @Configuration
+@Profile("!benchmark")
 @EnableConfigurationProperties(CorsProperties::class)
 class CorsConfig(val corsProperties: CorsProperties) {
 

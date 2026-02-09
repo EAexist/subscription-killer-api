@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 @Primary
 class ProxyGmailClientFactory(
-    private val gmailClientFactoryImpl: GmailClientFactoryImpl,
+    private val gmailClientFactoryImpl: AbstractGmailClientFactoryImpl,
     private val mockGmailClientFactory: MockGmailClientFactory,
     private val guestAppUserProperties: GuestAppUserProperties,
     private val observationRegistry: ObservationRegistry

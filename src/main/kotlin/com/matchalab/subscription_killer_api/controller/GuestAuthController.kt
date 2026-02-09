@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.controller
 
-import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.service.AppUserService
 import jakarta.servlet.http.HttpServletRequest
@@ -20,12 +19,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/guest")
 class GuestAuthController(
     private val appUserService: AppUserService,
-    private val guestAppUserProperties: GuestAppUserProperties,
 ) {
     @GetMapping
     fun loginAsGuest(request: HttpServletRequest): ResponseEntity<Void> {
 
-        val guestAppUser = appUserService.findByGoogleAccounts_Subject(guestAppUserProperties.subject)!!
+        val guestAppUser = appUserService.getGuestAppUser()
         val authorities = listOf(SimpleGrantedAuthority(guestAppUser.userRole.authority))
 //        val mockAttributes = mapOf(
 //            "sub" to "guest_sub_1234",

@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.service
 
+import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
@@ -14,7 +15,14 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 @Service
-class AppUserService(private val appUserRepository: AppUserRepository) {
+class AppUserService(
+    private val appUserRepository: AppUserRepository,
+    private val guestAppUserProperties: GuestAppUserProperties
+) {
+
+    fun existsByName(name: String): Boolean {
+        return appUserRepository.existsByName(name)
+    }
 
     fun findByIdOrNull(appUserId: UUID): AppUser? {
         return appUserRepository.findByIdOrNull(appUserId)
@@ -37,6 +45,10 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
 
     fun findByGoogleAccounts_Subject(googleSub: String): AppUser? {
         return appUserRepository.findByGoogleAccounts_Subject(googleSub)
+    }
+
+    fun getGuestAppUser(): AppUser {
+        return findByGoogleAccounts_Subject(guestAppUserProperties.subject)!!
     }
 
     fun save(appUser: AppUser): AppUser {

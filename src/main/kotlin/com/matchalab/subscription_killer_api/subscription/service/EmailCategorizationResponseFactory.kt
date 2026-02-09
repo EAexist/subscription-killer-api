@@ -9,7 +9,6 @@ object EmailCategorizationResponseFactory {
             "19b633ef8816f70b",
             "195bfcf179dd517a",
             "1905d62e1b5a4cc4",
-            "1940e8e5a2e2c7d6",
             "197bc3a30d07e1a5",
             "198153271fe48cf1"
         ), listOf(
@@ -50,7 +49,6 @@ object EmailCategorizationResponseFactory {
             "19b633ef8816f70b",
             "195bfcf179dd517a",
             "1905d62e1b5a4cc4",
-            "1940e8e5a2e2c7d6",
             "197bc3a30d07e1a5",
             "198153271fe48cf1"
         ), listOf(

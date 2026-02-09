@@ -114,6 +114,8 @@ dependencies {
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+//    implementation("io.micrometer:micrometer-kotlin")
 
     // TestContainer
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -191,15 +193,10 @@ tasks.register<Zip>("buildLambdaWebAdapterZip") {
     }
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 tasks.jar {
     enabled = true
     archiveClassifier.set("")
 }
-
 
 tasks.build {
     dependsOn(tasks.getByName("buildLambdaWebAdapterZip"))

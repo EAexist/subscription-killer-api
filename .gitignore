@@ -47,7 +47,8 @@ out/
 *.tmp
 .certs
 .env*
-src/test/resources/application-test-local.yaml
+application-test-local.yaml
+application-google-account-samples.yaml
 src/test/resources/private
 src/main/resources/certs
 *.crt

@@ -16,6 +16,11 @@ interface EmailSourceRepository : JpaRepository<EmailSource, UUID> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE email_source SET event_rules = '[]'", nativeQuery = true)
+    @Query(value = "UPDATE email_source SET event_rules = '[]'::json", nativeQuery = true)
     fun clearAllEventRules(): Int
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE email_source SET analyzed_message_ids = '[]'::json", nativeQuery = true)
+    fun clearAllAnalyzedMessageIds(): Int
 }

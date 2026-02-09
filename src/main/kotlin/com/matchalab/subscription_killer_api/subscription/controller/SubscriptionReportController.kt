@@ -87,9 +87,8 @@ class SubscriptionReportController(
 
         CoroutineScope(dispatcher + observationRegistry.asContextElement()).launch {
             observationRegistry.observeSuspend(
-                "analysis.task",
-                parent,
-                "user.id" to appUserId.toString()
+                "subscription_report_controller analyze",
+                "app_user.id" to appUserId.toString()
             ) {
                 analysisService.analyze(appUserId)
             }

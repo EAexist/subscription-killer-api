@@ -12,10 +12,10 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 @TestConfiguration
-@EnableConfigurationProperties(GoogleAccountProperties::class)
+@EnableConfigurationProperties(SampleGoogleAccountListProperties::class)
 class DatabaseTestUtils(
     private val appUserRepository: AppUserRepository,
-    private val googleAccountProperties: GoogleAccountProperties,
+    private val googleAccountProperties: SampleGoogleAccountListProperties,
 ) {
     private val sampleUserName: String = "sampleUserName"
     private lateinit var sampleAppUserId: UUID
@@ -50,7 +50,7 @@ class DatabaseTestUtils(
                 )
             )
         }
-        
+
         sampleAppUserId = checkNotNull(appUserRepository.saveAndFlush(sampleAppUser).id) {
             "🚨 Exception: sampleAppUserId is null."
         }

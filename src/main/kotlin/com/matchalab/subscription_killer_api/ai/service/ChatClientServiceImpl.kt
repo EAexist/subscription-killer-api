@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.google.genai.GoogleGenAiChatOptions
-import org.springframework.ai.google.genai.common.GoogleGenAiThinkingLevel
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
@@ -27,7 +26,7 @@ final class ChatClientServiceImpl(
         params: Map<String, Any>,
         responseType: Class<T>
     ): T {
-        logger.info { "✨  [call]" }
+        logger.info { "?? [call]" }
 
         val promptTemplate: String = promptTemplateStream.getContentAsString(Charsets.UTF_8).trimIndent()
         val promptPreview = promptTemplate.replace(Regex("\\s+"), " ").take(maxPromptPreviewLength)
@@ -35,8 +34,11 @@ final class ChatClientServiceImpl(
         return runCatching {
             val json = chatClient.prompt()
                 .options(
-                    GoogleGenAiChatOptions.builder().thinkingLevel(GoogleGenAiThinkingLevel.LOW)
-                        .includeThoughts(false).responseMimeType("application/json").build()
+                    GoogleGenAiChatOptions.builder()
+//                        .thinkingLevel(GoogleGenAiThinkingLevel.LOW)
+                        .includeThoughts(false)
+                        .responseMimeType("application/json")
+                        .build()
                 )
 //                    .advisors { AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT }
                 .user { u ->
@@ -48,9 +50,9 @@ final class ChatClientServiceImpl(
             objectMapper.readValue(json, responseType)
         }.onSuccess { entity ->
             val entityString = entity.toString()
-            logger.info { "✨  [call] Result\n\tprompt: $promptTemplate\n\tresult: $entityString" }
+            logger.info { "?? [call] Result\n\tprompt: $promptTemplate\n\tresult: $entityString" }
         }.onFailure { e ->
-            println("❌  [call] Failed: ${e.message}")
+            println("?? [call] Failed: ${e.message}")
         }.getOrThrow()
     }
 
