@@ -13,18 +13,6 @@
   },
   {
     "aliasNames": {
-      "EN": "YouTube Premium"
-    },
-    "emailAddresses": [
-      "payments-noreply@google.com",
-      "googlepay-noreply@google.com"
-    ],
-    "subscriptionPageUrl": "www.youtube.com/premium",
-    "websiteUrl": "www.youtube.com",
-    "logoDevSuffix": "youtube.com"
-  },
-  {
-    "aliasNames": {
       "EN": "Netflix"
     },
     "emailAddresses": [
@@ -282,17 +270,6 @@
   },
   {
     "aliasNames": {
-      "EN": "Apple Music"
-    },
-    "emailAddresses": [
-      "no_reply@email.apple.com"
-    ],
-    "subscriptionPageUrl": "www.apple.com/apple-music",
-    "websiteUrl": "music.apple.com",
-    "logoDevSuffix": "apple.com"
-  },
-  {
-    "aliasNames": {
       "EN": "Spotify"
     },
     "emailAddresses": [
@@ -346,17 +323,6 @@
     ],
     "subscriptionPageUrl": "wrtn.ai",
     "websiteUrl": "wrtn.ai"
-  },
-  {
-    "aliasNames": {
-      "EN": "Gemini Advanced"
-    },
-    "emailAddresses": [
-      "google-gemini-noreply@google.com"
-    ],
-    "subscriptionPageUrl": "gemini.google.com/advanced",
-    "websiteUrl": "gemini.google.com",
-    "logoDevSuffix": "google.com"
   },
   {
     "aliasNames": {
