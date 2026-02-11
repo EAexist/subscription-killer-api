@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-@Profile("google-auth && gmail && !benchmark")
+@Profile("google-auth && gmail")
 @Service
 class CachingGmailClientFactoryImpl(
     googleAccountRepository: GoogleAccountRepository,
@@ -28,7 +28,9 @@ class CachingGmailClientFactoryImpl(
     private val adapterCache = ConcurrentHashMap<String, GmailClientAdapter>()
 
     override fun isTokenExpiringSoon(account: GoogleAccount): Boolean {
-        return account.expiresAt?.isBefore(Instant.now().plusSeconds(googleClientProperties.tokenRefreshThresholdSeconds))
+        return account.expiresAt?.isBefore(
+            Instant.now().plusSeconds(googleClientProperties.tokenRefreshThresholdSeconds)
+        )
             ?: true
     }
 
@@ -41,5 +43,9 @@ class CachingGmailClientFactoryImpl(
                 observationRegistry
             )
         }
+    }
+
+    fun clearCache() {
+        return adapterCache.clear()
     }
 }

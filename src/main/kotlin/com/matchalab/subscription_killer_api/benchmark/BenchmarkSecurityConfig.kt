@@ -20,60 +20,61 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-@Profile("benchmark")
-@EnableConfigurationProperties(CorsProperties::class)
-class BenchmarkSecurityConfig(
-    private val corsProperties: CorsProperties,
-    // Optional OAuth2 dependencies - will be null if not available
-    private val multiAccountOAuth2AuthorizedClientService: MultiAccountOAuth2AuthorizedClientService?,
-    private val customSuccessHandler: CustomSuccessHandler?,
-    private val customOidcUserService: CustomOidcUserService?
-) {
+@Profile(
+    "benchmark || benchmark-dev")
+    @EnableConfigurationProperties(CorsProperties::class)
+    class BenchmarkSecurityConfig(
+        private val corsProperties: CorsProperties,
+        // Optional OAuth2 dependencies - will be null if not available
+        private val multiAccountOAuth2AuthorizedClientService: MultiAccountOAuth2AuthorizedClientService?,
+        private val customSuccessHandler: CustomSuccessHandler?,
+        private val customOidcUserService: CustomOidcUserService?
+    ) {
 
-    @Bean("benchmarkSecurityFilterChain")
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http {
-            securityMatcher("/benchmark/**", "/actuator/**")
-            cors {
-                configurationSource = corsConfigurationSource()
-            }
-            csrf { disable() }
-            authorizeHttpRequests {
-                authorize(anyRequest, permitAll)
-            }
+        @Bean("benchmarkSecurityFilterChain")
+        fun filterChain(http: HttpSecurity): SecurityFilterChain {
+            http {
+                securityMatcher("/benchmark/**", "/actuator/**")
+                cors {
+                    configurationSource = corsConfigurationSource()
+                }
+                csrf { disable() }
+                authorizeHttpRequests {
+                    authorize(anyRequest, permitAll)
+                }
 
-            // Only configure OAuth2 if beans are available
-            multiAccountOAuth2AuthorizedClientService?.let { oauth2Service ->
-                oauth2Login {
-                    authorizedClientService = oauth2Service
-                    customSuccessHandler?.let { handler ->
-                        authenticationSuccessHandler = handler
-                    }
-                    customOidcUserService?.let { oidcService ->
-                        userInfoEndpoint {
-                            oidcUserService = oidcService
+                // Only configure OAuth2 if beans are available
+                multiAccountOAuth2AuthorizedClientService?.let { oauth2Service ->
+                    oauth2Login {
+                        authorizedClientService = oauth2Service
+                        customSuccessHandler?.let { handler ->
+                            authenticationSuccessHandler = handler
+                        }
+                        customOidcUserService?.let { oidcService ->
+                            userInfoEndpoint {
+                                oidcUserService = oidcService
+                            }
                         }
                     }
                 }
-            }
 
-            exceptionHandling {
-                authenticationEntryPoint = HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+                exceptionHandling {
+                    authenticationEntryPoint = HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+                }
             }
+            return http.build()
         }
-        return http.build()
-    }
 
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOriginPatterns = listOf("*")
-        configuration.allowedMethods = listOf("*")
-        configuration.allowedHeaders = listOf("*")
-        configuration.allowCredentials = true
+        @Bean
+        fun corsConfigurationSource(): CorsConfigurationSource {
+            val configuration = CorsConfiguration()
+            configuration.allowedOriginPatterns = listOf("*")
+            configuration.allowedMethods = listOf("*")
+            configuration.allowedHeaders = listOf("*")
+            configuration.allowCredentials = true
 
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
+            val source = UrlBasedCorsConfigurationSource()
+            source.registerCorsConfiguration("/**", configuration)
+            return source
+        }
     }
-}

@@ -8,6 +8,12 @@ spring:
       test:
         - "google-auth"
         - "google-account-samples"
+      benchmark-dev:
+        - "google-auth"
+        - "dev"
+        - "google-account-samples"
+        - "gmail"
+        - "ai"
       benchmark:
         - "google-auth"
         - "dev"
@@ -74,8 +80,8 @@ app:
     samples-fallback: static/messages/sample_messages_netflix_sketchfab.json
   min-request-interval-hours: 72
   prompts:
-    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
-    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v4.st
+    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v5.st
+    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v5.st
   guest-app-user:
     subject: GUEST_APP_USER_SUBJECT
     name: GUEST_APP_USER_NAME

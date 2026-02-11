@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
-@Profile("benchmark")
-class BenchmarkFlywayConfig {
+@Profile(
+    "benchmark || benchmark-dev")
+    class BenchmarkFlywayConfig {
     @Bean
     fun flywayMigrationStrategy() = FlywayMigrationStrategy { flyway ->
         flyway.clean()

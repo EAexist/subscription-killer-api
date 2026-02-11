@@ -5,7 +5,6 @@ spring:
   sql:
     init:
       mode: always
-management:
-  zipkin:
-    tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
+app:
+  mail:
+    analysis-months: 1

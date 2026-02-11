@@ -13,39 +13,40 @@ import org.springframework.stereotype.Component
 private val logger = KotlinLogging.logger {}
 
 @Component
-@Profile("benchmark")
-@EnableConfigurationProperties(BenchmarkGoogleAccountListProperties::class)
-class BenchmarkAppUserInitializer(
-    private val appUserService: AppUserService,
-    private val benchmarkGoogleAccountListProperties: BenchmarkGoogleAccountListProperties,
-) : CommandLineRunner {
+@Profile(
+    "benchmark || benchmark-dev")
+    @EnableConfigurationProperties(BenchmarkGoogleAccountListProperties::class)
+    class BenchmarkAppUserInitializer(
+        private val appUserService: AppUserService,
+        private val benchmarkGoogleAccountListProperties: BenchmarkGoogleAccountListProperties,
+    ) : CommandLineRunner {
 
-    val benchmarkAppUserName: String = "BENCHMARK_SAMPLE_APP_USER_NAME"
+        val benchmarkAppUserName: String = "BENCHMARK_SAMPLE_APP_USER_NAME"
 
-    @Transactional
-    override fun run(vararg args: String?) {
+        @Transactional
+        override fun run(vararg args: String?) {
 
-        if (!appUserService.existsByName(benchmarkAppUserName)) {
-            val benchmarkUser = AppUser(
-                name = benchmarkAppUserName
-            )
-
-            benchmarkGoogleAccountListProperties.samples.forEach {
-                benchmarkUser.addGoogleAccount(
-                    GoogleAccount(
-                        it.subject,
-                        benchmarkAppUserName,
-                        it.email,
-                        it.refreshToken,
-                        it.accessToken,
-                        it.expiresAt,
-                        it.scope
-                    )
+            if (!appUserService.existsByName(benchmarkAppUserName)) {
+                val benchmarkUser = AppUser(
+                    name = benchmarkAppUserName
                 )
-            }
 
-            appUserService.save(benchmarkUser)
-            println("✅ Benchmark user initialized with Real API access.")
+                benchmarkGoogleAccountListProperties.samples.forEach {
+                    benchmarkUser.addGoogleAccount(
+                        GoogleAccount(
+                            it.subject,
+                            benchmarkAppUserName,
+                            it.email,
+                            it.refreshToken,
+                            it.accessToken,
+                            it.expiresAt,
+                            it.scope
+                        )
+                    )
+                }
+
+                appUserService.save(benchmarkUser)
+                println("✅ Benchmark user initialized with Real API access.")
+            }
         }
     }
-}
