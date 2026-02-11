@@ -101,15 +101,6 @@ class SubscriptionAnalysisService(
                         emailSourceToMessagesList.associate { (emailSource, messages) -> emailSource to messages }
                     }
 
-            for (provider in serviceProviderToEmailSourceToMessages.keys) {
-                progressService.setServiceProviderProgress(
-                    appUserId,
-                    googleAccountSubjects.first(),
-                    provider.id!!,
-                    ServiceProviderAnalysisProgressStatus.STARTED
-                )
-            }
-
             // Filter EmailSources that rule isn't complete [Async]
             val emailSourceToMessagesToUpdate: Map<EmailSource, List<GmailMessage>> =
                 serviceProviderToEmailSourceToMessages.filter { !it.key.isEmailDetectionRuleComplete() }
@@ -146,6 +137,15 @@ class SubscriptionAnalysisService(
                 }
 
                 Pair(emailDetectionRules, registeredSince)
+            }
+
+            for (provider in serviceProviderToEmailSourceToMessages.keys) {
+                progressService.setServiceProviderProgress(
+                    appUserId,
+                    googleAccountSubjects.first(),
+                    provider.id!!,
+                    ServiceProviderAnalysisProgressStatus.STARTED
+                )
             }
 
             // Wait for email detection rules to complete before computing subscriptions
