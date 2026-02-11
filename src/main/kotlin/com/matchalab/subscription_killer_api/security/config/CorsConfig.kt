@@ -12,7 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 private val logger = KotlinLogging.logger {}
 
 @Configuration
-@Profile("!benchmark")
+@Profile("!benchmark && !benchmark-dev")
 @EnableConfigurationProperties(CorsProperties::class)
 class CorsConfig(val corsProperties: CorsProperties) {
 
