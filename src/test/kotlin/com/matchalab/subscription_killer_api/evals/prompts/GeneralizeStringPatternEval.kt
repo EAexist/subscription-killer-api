@@ -6,9 +6,9 @@ import com.matchalab.subscription_killer_api.ai.dto.toMessages
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.matchMessagesOrEmpty
-import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationResponseFactory
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailCategorizationResponseFactory
 import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
-import com.matchalab.subscription_killer_api.subscription.service.EmailTemplateExtractionPromptService
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailTemplateExtractionPromptService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.Observation
 import io.micrometer.observation.ObservationRegistry
@@ -49,7 +49,7 @@ class GeneralizeStringPatternEval @Autowired constructor(
                 emailTemplateExtractionPromptService.run(subscriptionEventMessages)
         }
 
-        logger.debug { exactResponse.result.joinToString("\n") { "\n\t${it.messageIds}\n\t${it.template}" } }
+        logger.debug { exactResponse.result.joinToString("\n") { "\n\t${it.messageId}\n\t${it.template}" } }
 
         val emailDetectionRuleGenerationDtos: List<EmailDetectionRuleGenerationDto> =
             exactResponse.toEmailDetectionRuleGenerationDto(emailCategorizationResponse)

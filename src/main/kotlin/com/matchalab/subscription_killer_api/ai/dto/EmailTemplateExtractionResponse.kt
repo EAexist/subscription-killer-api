@@ -9,7 +9,7 @@ data class EmailTemplateExtractionResponse(
 )
 
 data class EmailTemplateExtractionResult(
-    val messageIds: List<String>,
+    val messageId: String,
     val template: EmailTemplate,
 )
 
@@ -44,7 +44,7 @@ fun EmailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(
     }
     return this.result
         .groupBy { result ->
-            idToType[result.messageIds.first()]
+            idToType[result.messageId]
         }
         .map { (eventType, results) ->
             EmailDetectionRuleGenerationDto(

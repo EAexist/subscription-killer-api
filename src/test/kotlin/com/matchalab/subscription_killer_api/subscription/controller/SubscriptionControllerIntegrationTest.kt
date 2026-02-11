@@ -39,7 +39,6 @@ private val logger = KotlinLogging.logger {}
 @Tag("google-auth")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-//@EnableConfigurationProperties(GoogleAccountProperties::class)
 @AutoConfigureObservability
 @Import(AuthenticatedClientFactory::class, SharedTestcontainersConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
