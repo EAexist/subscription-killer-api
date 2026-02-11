@@ -2,8 +2,8 @@ package com.matchalab.subscription_killer_api.evals.prompts
 
 import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
-import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationPromptService
-import com.matchalab.subscription_killer_api.subscription.service.EmailCategorizationResponseFactory
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailCategorizationPromptService
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailCategorizationResponseFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.Observation
 import io.micrometer.observation.ObservationRegistry

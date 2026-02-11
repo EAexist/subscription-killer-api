@@ -95,6 +95,7 @@ private fun String.cleanEmailText(): String {
         .replace(Regex("[\\p{C}\\u034F\\u200B-\\u200D\\uFEFF]"), "")
         // 3. Collapse all whitespace (newlines, tabs, multiple spaces) into one single space
         .replace(Regex("\\s+"), " ")
+        .hideDates()
         .trim()
 }
 

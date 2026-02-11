@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription.service
+package com.matchalab.subscription_killer_api.subscription.service.prompt
 
 import com.matchalab.subscription_killer_api.ai.dto.EmailCategorizationResponse
 

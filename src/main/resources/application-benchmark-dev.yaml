@@ -7,4 +7,12 @@ spring:
       mode: always
 app:
   mail:
-    analysis-months: 1
+    analysis-months: 6
+logging:
+  level:
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG

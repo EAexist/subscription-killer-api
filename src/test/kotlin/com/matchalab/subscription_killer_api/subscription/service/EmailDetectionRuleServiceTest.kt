@@ -1,5 +1,7 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailCategorizationPromptService
+import com.matchalab.subscription_killer_api.subscription.service.prompt.EmailTemplateExtractionPromptService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach

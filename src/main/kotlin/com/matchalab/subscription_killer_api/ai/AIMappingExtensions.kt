@@ -5,6 +5,5 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-fun GmailMessage.toPromptParamString(): String =
-    "${this.id}|${this.subject}|${this.snippet}"
-
+fun GmailMessage.toPromptParamString(index: Int): String =
+    "${index}|${this.subject}|${this.snippet}"
