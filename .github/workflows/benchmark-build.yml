@@ -59,7 +59,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           ./gradlew clean bootBuildImage \
-          --imageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
+          --no-configuration-cache \
+          -PimageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
           -Pdocker.publish.username=${{ github.actor }} \
           -Pdocker.publish.password=${{ secrets.GITHUB_TOKEN }} \
           -PGIT_COMMIT=${{ github.sha }} \

@@ -224,6 +224,11 @@ tasks.withType<BootBuildImage>().configureEach {
 
     publish.set(true)
 
+    imageName.set(
+        project.findProperty("imageName")?.toString()
+            ?: "ghcr.io/eaexist/subscription-killer-api:${project.version}"
+    )
+
     environment.set(
         mapOf(
             "BP_OCI_REVISION" to (project.findProperty("GIT_COMMIT")?.toString() ?: "unknown"),
