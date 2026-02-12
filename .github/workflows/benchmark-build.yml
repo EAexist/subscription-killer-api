@@ -57,6 +57,9 @@ jobs:
           ./gradlew bootBuildImage \
           --publishImage \
           --imageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
+          -Pdocker.publish.registry=ghcr.io \
+          -Pdocker.publish.username=${{ github.actor }} \
+          -Pdocker.publish.password=${{ secrets.GITHUB_TOKEN }} \
           -PGIT_COMMIT=${{ github.sha }} \
           -PGIT_TAG=${{ github.ref_name }}
 

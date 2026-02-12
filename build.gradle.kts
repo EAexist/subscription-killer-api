@@ -227,6 +227,15 @@ tasks.named<BootBuildImage>("bootBuildImage") {
             "BP_OCI_REF_NAME" to (project.findProperty("GIT_TAG")?.toString() ?: "untagged")
         )
     )
+
+    // fix local daemon usage error in github workflow environment.
+    docker {
+        publishRegistry {
+            url.set("https://ghcr.io")
+            username.set(project.findProperty("docker.publish.username")?.toString() ?: "")
+            password.set(project.findProperty("docker.publish.password")?.toString() ?: "")
+        }
+    }
 }
 
 /* Maven Publish To Custom Repo (build/repo).
