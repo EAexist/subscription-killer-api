@@ -220,10 +220,10 @@ gitProperties {
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
 
 /* BootBuildIamge */
-tasks.named<BootBuildImage>("bootBuildImage") {
+tasks.withType<BootBuildImage>().configureEach {
 
     publish.set(true)
-    
+
     environment.set(
         mapOf(
             "BP_OCI_REVISION" to (project.findProperty("GIT_COMMIT")?.toString() ?: "unknown"),
