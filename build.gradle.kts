@@ -217,6 +217,15 @@ gitProperties {
 // TODO : Use layers for dependencies.
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
 
+/* BootBuildIamge */
+tasks.named<BootBuildImage>("bootBuildImage") {
+    environment.set(
+        mapOf(
+            "BP_OCI_REVISION" to (project.findProperty("GIT_COMMIT")?.toString() ?: "unknown"),
+            "BP_OCI_REF_NAME" to (project.findProperty("GIT_TAG")?.toString() ?: "untagged")
+        )
+    )
+}
 
 /* Maven Publish To Custom Repo (build/repo).
 *  Command: ./gradlew publish */

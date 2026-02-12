@@ -1,0 +1,58 @@
+name: Benchmark Build
+
+on:
+  push:
+    tags:
+      - 'benchmark-*'
+    branches:
+      - ci-pref-benchmark
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      actions: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          ./gradlew bootBuildImage \
+          --imageName=ghcr.io/${{ github.repository }}:${{ github.sha }} \
+          -PGIT_COMMIT=${{ github.sha }} \
+          -PGIT_TAG=${{ github.ref_name }}
+
+      - name: Trigger Benchmark
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ secrets.BENCHMARK_REPO }}/dispatches \
+            -d '{"event_type": "new_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "ghcr.io/${{ github.repository }}:${{ github.sha }}"}}'
