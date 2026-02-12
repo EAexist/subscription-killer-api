@@ -45,10 +45,17 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      - name: Prepare Docker Metadata
+        id: meta
+        run: |
+          # Lowercase the owner
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_name=ghcr.io/${OWNER}/subscription-killer-api" >> $GITHUB_OUTPUT
+
       - name: Build and Push Docker Image
         run: |
           ./gradlew bootBuildImage \
-          --imageName=ghcr.io/${{ github.repository_owner | lower }}/subscription-killer-api:${{ github.sha }} \
+          --imageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
           -PGIT_COMMIT=${{ github.sha }} \
           -PGIT_TAG=${{ github.ref_name }}
 
@@ -58,4 +65,4 @@ jobs:
             -H "Authorization: token ${{ secrets.PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ secrets.BENCHMARK_REPO }}/dispatches \
-            -d '{"event_type": "new_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "ghcr.io/${{ github.repository_owner | lower }}/subscription-killer-api:${{ github.sha }}"}}'
+            -d '{"event_type": "new_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "ghcr.io/${{ env.LOWERCASE_OWNER }}/subscription-killer-api:${{ github.sha }}"}}'
