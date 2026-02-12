@@ -54,8 +54,9 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          ./gradlew bootBuildImage \
+          ./gradlew clean bootBuildImage \
           --publishImage \
+          --pullPolicy ALWAYS \
           --imageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
           -Pdocker.publish.registry=ghcr.io \
           -Pdocker.publish.username=${{ github.actor }} \
