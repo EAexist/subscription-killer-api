@@ -1,5 +1,9 @@
 name: Benchmark Build
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     tags:
@@ -35,12 +39,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      #      - name: Log in to GitHub Container Registry
+      #        uses: docker/login-action@v3
+      #        with:
+      #          registry: ghcr.io
+      #          username: ${{ github.actor }}
+      #          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
@@ -55,10 +59,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           ./gradlew clean bootBuildImage \
-          --publishImage \
-          --pullPolicy ALWAYS \
           --imageName=${{ steps.meta.outputs.image_name }}:${{ github.sha }} \
-          -Pdocker.publish.registry=ghcr.io \
           -Pdocker.publish.username=${{ github.actor }} \
           -Pdocker.publish.password=${{ secrets.GITHUB_TOKEN }} \
           -PGIT_COMMIT=${{ github.sha }} \

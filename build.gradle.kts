@@ -221,6 +221,9 @@ gitProperties {
 
 /* BootBuildIamge */
 tasks.named<BootBuildImage>("bootBuildImage") {
+
+    publish.set(true)
+    
     environment.set(
         mapOf(
             "BP_OCI_REVISION" to (project.findProperty("GIT_COMMIT")?.toString() ?: "unknown"),
