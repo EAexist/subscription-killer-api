@@ -48,7 +48,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           ./gradlew bootBuildImage \
-          --imageName=ghcr.io/${{ github.repository_owner }}/subscription-killer-api:${{ github.sha }} \
+          --imageName=ghcr.io/${{ github.repository_owner | lower }}/subscription-killer-api:${{ github.sha }} \
           -PGIT_COMMIT=${{ github.sha }} \
           -PGIT_TAG=${{ github.ref_name }}
 
@@ -58,4 +58,4 @@ jobs:
             -H "Authorization: token ${{ secrets.PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ secrets.BENCHMARK_REPO }}/dispatches \
-            -d '{"event_type": "new_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "ghcr.io/${{ github.repository_owner }}/subscription-killer-api:${{ github.sha }}"}}'
+            -d '{"event_type": "new_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "ghcr.io/${{ github.repository_owner | lower }}/subscription-killer-api:${{ github.sha }}"}}'
