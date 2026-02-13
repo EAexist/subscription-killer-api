@@ -64,8 +64,13 @@ jobs:
           tags: ${{ steps.meta.outputs.image_name }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=${{ github.ref_name }}
             org.opencontainers.image.source=${{ github.repository }}
-            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+            org.opencontainers.image.title=subscription-killer-api
+            org.opencontainers.image.description=Spring Boot API for Subscription Killer
+            git.commit=${{ github.sha }}
+            git.tag=${{ github.ref_name }}
 
       - name: Trigger Benchmark
         run: |
