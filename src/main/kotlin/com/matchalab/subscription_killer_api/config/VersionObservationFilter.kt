@@ -4,8 +4,10 @@ import io.micrometer.common.KeyValue
 import io.micrometer.observation.Observation
 import io.micrometer.observation.ObservationFilter
 import org.springframework.boot.info.GitProperties
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
+@Profile("!benchmark && !benchmark-dev")
 @Component
 class VersionObservationFilter(
     private val gitProperties: GitProperties
