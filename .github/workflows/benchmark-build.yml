@@ -1,0 +1,80 @@
+name: Benchmark Build
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    tags:
+      - '*-benchmark'
+
+jobs:
+  build-and-push:
+    if: github.ref_name == 'develop' || contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      actions: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare Docker Metadata
+        id: meta
+        run: |
+          # Lowercase the owner
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_name=ghcr.io/${OWNER}/subscription-killer-api" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.image_name }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=${{ github.ref_name }}
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+            org.opencontainers.image.title=subscription-killer-api
+            org.opencontainers.image.description=Spring Boot API for Subscription Killer
+            git.commit=${{ github.sha }}
+            git.tag=${{ github.ref_name }}
+
+      - name: Trigger Benchmark
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ secrets.BENCHMARK_REPO }}/dispatches \
+            -d '{"event_type": "new_ai_benchmark_build", "client_payload": {"image_tag": "${{ github.sha }}", "image_name": "${{ steps.meta.outputs.image_name }}:${{ github.sha }}", "branch": "chore/ai-benchmark-ci"}}'

@@ -3,7 +3,6 @@ package com.matchalab.subscription_killer_api.benchmark
 import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionAnalysisService
-import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.CachingGmailClientFactoryImpl
 import org.springframework.context.annotation.Profile
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +20,6 @@ class BenchmarkController(
     private val appUserService: AppUserService,
     private val emailSourceRepository: EmailSourceRepository,
     private val benchmarkGoogleAccountListProperties: BenchmarkGoogleAccountListProperties,
-    private val cachingGmailClientFactoryImpl: CachingGmailClientFactoryImpl,
 ) {
 
     @PostMapping("/analyze")
@@ -35,7 +33,6 @@ class BenchmarkController(
 
         emailSourceRepository.clearAllEventRules()
         emailSourceRepository.clearAllAnalyzedMessageIds()
-        cachingGmailClientFactoryImpl.clearCache()
 
         return ResponseEntity.ok().build()
     }

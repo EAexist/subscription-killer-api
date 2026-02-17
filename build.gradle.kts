@@ -1,5 +1,7 @@
 //https://kotlinlang.org/docs/kapt.html#annotation-processor-arguments
 
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -217,6 +219,32 @@ gitProperties {
 // TODO : Use layers for dependencies.
 // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-layers
 
+/* BootBuildIamge */
+tasks.withType<BootBuildImage>().configureEach {
+
+    publish.set(true)
+
+    imageName.set(
+        project.findProperty("imageName")?.toString()
+            ?: "ghcr.io/eaexist/subscription-killer-api:${project.version}"
+    )
+
+    environment.set(
+        mapOf(
+            "BP_OCI_REVISION" to (project.findProperty("GIT_COMMIT")?.toString() ?: "unknown"),
+            "BP_OCI_REF_NAME" to (project.findProperty("GIT_TAG")?.toString() ?: "untagged")
+        )
+    )
+
+    // fix local daemon usage error in github workflow environment.
+    docker {
+        publishRegistry {
+            url.set("https://ghcr.io")
+            username.set(project.findProperty("docker.publish.username")?.toString() ?: "")
+            password.set(project.findProperty("docker.publish.password")?.toString() ?: "")
+        }
+    }
+}
 
 /* Maven Publish To Custom Repo (build/repo).
 *  Command: ./gradlew publish */
