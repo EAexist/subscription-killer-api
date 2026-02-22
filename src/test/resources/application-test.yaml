@@ -1,6 +1,6 @@
-spring:
-  config:
-    import: "classpath:application-google-account-samples.yaml"
+#spring:
+#  config:
+#    import: "classpath:application-google-account-samples.yaml"
 #management:
 #  observations:
 #    enabled: false

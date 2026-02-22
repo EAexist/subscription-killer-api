@@ -7,7 +7,7 @@ spring:
       mode: always
 app:
   mail:
-    analysis-months: 6
+    analysis-months: 1
 logging:
   level:
     org:

@@ -6,20 +6,17 @@ spring:
         - "gmail"
         - "ai"
       test:
+        - "dev"
         - "google-auth"
         - "google-account-samples"
       benchmark-dev:
-        - "google-auth"
         - "dev"
+        - "google-auth"
         - "google-account-samples"
-        - "gmail"
-        - "ai"
       benchmark:
-        - "google-auth"
         - "dev"
+        - "google-auth"
         - "google-account-samples"
-        - "gmail"
-        - "ai"
 ---
 
 spring:
@@ -156,6 +153,10 @@ management:
     export:
       prometheus:
         enabled: true
+  observations:
+    enable:
+      spring:
+        ai: false
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"

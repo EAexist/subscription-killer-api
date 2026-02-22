@@ -3,6 +3,9 @@ package com.matchalab.subscription_killer_api.utils
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
+import com.matchalab.subscription_killer_api.datasets.GmailApiMessage
+import com.matchalab.subscription_killer_api.datasets.Header
+import com.matchalab.subscription_killer_api.datasets.Payload
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
@@ -58,16 +61,30 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
     )
 }
 
-fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
+fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage =
+    this.toGmailApiMessage().toGmailMessage(maxSnippetSize)
+
+
+fun Message.toGmailApiMessage(): GmailApiMessage {
+    val headers = this.payload?.headers?.map { Header(it.name, it.value) } ?: emptyList()
+    return GmailApiMessage(
+        id = this.id,
+        internalDate = this.internalDate,
+        snippet = this.snippet,
+        payload = Payload(headers = headers)
+    )
+}
+
+fun GmailApiMessage.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
 
     val doHidePrices = true
 
     val internalDate = this.internalDate.let { DateTimeUtils.epochMilliToInstant(it) }
-    val headers = this.payload?.headers
+    val headers = this.payload.headers
     val fromHeaderValue =
-        headers?.find { it.name.equals("From", ignoreCase = true) }?.value ?: ""
+        headers.find { it.name.equals("From", ignoreCase = true) }?.value ?: ""
     val subjectHeaderValue =
-        headers?.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
+        headers.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
 
     val regex = """^(.+)\s+<(.+)>$""".toRegex()
     val matchResult = regex.find(fromHeaderValue)

@@ -82,6 +82,9 @@ dependencies {
     implementation("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http")
 
+    // Source: https://mvnrepository.com/artifact/com.knuddels/jtokkit
+    implementation("com.knuddels:jtokkit:1.1.0")
+
     // kotlinx-coroutines-core
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
@@ -117,7 +120,9 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-//    implementation("io.micrometer:micrometer-kotlin")
+
+    // Source: https://mvnrepository.com/artifact/io.micrometer/micrometer-observation-test
+    testImplementation("io.micrometer:micrometer-observation-test")
 
     // TestContainer
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -147,17 +152,21 @@ allOpen {
 }
 
 tasks.withType<Test> {
-    // 1. Get the profile from the CLI or Environment
+
     val activeProfile = project.findProperty("spring.profiles.active")?.toString()
         ?: System.getenv("SPRING_PROFILES_ACTIVE")
         ?: "test" // fallback
 
-    systemProperty("spring.profiles.active", activeProfile)
+    environment("SPRING_PROFILES_ACTIVE", activeProfile)
 
     val tagsProperty = project.findProperty("includeTags") as String?
     useJUnitPlatform {
-        tagsProperty?.split(",")?.forEach { tag ->
-            includeTags(tag.trim())
+        if (!tagsProperty.isNullOrBlank()) {
+            tagsProperty.split(",").forEach { tag ->
+                includeTags(tag.trim())
+            }
+        } else {
+            excludeTags("gmail", "ai", "prompt-eval")
         }
     }
 
@@ -242,6 +251,14 @@ tasks.withType<BootBuildImage>().configureEach {
             url.set("https://ghcr.io")
             username.set(project.findProperty("docker.publish.username")?.toString() ?: "")
             password.set(project.findProperty("docker.publish.password")?.toString() ?: "")
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir("datasets")
         }
     }
 }
