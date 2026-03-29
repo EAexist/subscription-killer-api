@@ -1,4 +1,3 @@
-HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -47,7 +46,8 @@ out/
 *.tmp
 .certs
 .env*
-src/test/resources/application-test-local.yaml
+!.env*.example
+application-test-local.yaml
 src/test/resources/private
 src/main/resources/certs
 *.crt
@@ -58,3 +58,12 @@ src/main/resources/certs
 
 ### etc ###
 template.yml
+
+### AI Agents ###
+.codeiumignore
+
+### Dataset ###
+src/dataset/resources/data/*.json
+src/dataset/resources/data/*.jsonl
+
+logs/
