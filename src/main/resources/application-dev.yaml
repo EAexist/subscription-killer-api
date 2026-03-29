@@ -1,0 +1,52 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  main:
+    lazy-initialization: true
+  reactor:
+    context-propagation: auto
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
+management:
+  tracing:
+    enabled: false
+    sampling:
+      probability: 1.0
+  info:
+    git:
+      enabled: true
+  observations:
+    enable:
+      spring:
+        ai: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+#  zipkin:
+#    tracing:
+#      endpoint: http://localhost:9411/api/v2/spans
+#      export:
+#        enabled: true
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
+  level:
+#    root: INFO
+    com.matchalab.subscription_killer_api: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+        security.oauth2: DEBUG
+        security.oauth2.client: DEBUG
+        session: DEBUG
+      hibernate:
+        SQL: DEBUG
+    io:
+      micrometer:
+        observation:
+          contextpropagation=DEBUG:
+  min-request-interval-hours: 0
