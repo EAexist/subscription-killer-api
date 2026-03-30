@@ -2,20 +2,16 @@ package com.matchalab.subscription_killer_api.ai.dto
 
 import com.matchalab.subscription_killer_api.subscription.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
-import com.matchalab.subscription_killer_api.subscription.service.EmailDetectionRuleGenerationDto
-
-data class EmailTemplateExtractionResponse(
-    val result: List<EmailTemplateExtractionResult> = emptyList()
-)
+import com.matchalab.subscription_killer_api.subscription.service.SubscriptionEventRuleGenerationDto
 
 data class EmailTemplateExtractionResult(
-    val messageIds: List<String>,
+    val messageId: String,
     val template: EmailTemplate,
 )
 
-fun EmailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(
+fun List<EmailTemplateExtractionResult>.toSubscriptionEventRuleGenerationDto(
     emailCategorizationResponse: EmailCategorizationResponse
-): List<EmailDetectionRuleGenerationDto> {
+): List<SubscriptionEventRuleGenerationDto> {
     val idToType = mutableMapOf<String, SubscriptionEventType>().apply {
         emailCategorizationResponse.subsStartMsgIds.forEach {
             put(
@@ -42,17 +38,12 @@ fun EmailTemplateExtractionResponse.toEmailDetectionRuleGenerationDto(
             )
         }
     }
-    return this.result
-        .groupBy { result ->
-            idToType[result.messageIds.first()]
-        }
-        .map { (eventType, results) ->
-            EmailDetectionRuleGenerationDto(
+    return this
+        .map { result ->
+            val eventType = idToType[result.messageId]
+            SubscriptionEventRuleGenerationDto(
                 eventType = eventType!!,
-                template = EmailTemplate(
-                    subjectRegex = results.joinToString("|") { "(${it.template.subjectRegex})" },
-                    snippetRegex = results.joinToString("|") { "(${it.template.snippetRegex})" }
-                )
+                template = result.template
             )
         }
 }
