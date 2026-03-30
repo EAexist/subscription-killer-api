@@ -1,6 +1,6 @@
 package com.matchalab.subscription_killer_api.ai.dto
 
-import com.matchalab.subscription_killer_api.subscription.EmailTemplate
+import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.service.SubscriptionEventRuleGenerationDto
 
