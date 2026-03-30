@@ -2,6 +2,8 @@ package com.matchalab.subscription_killer_api.subscription
 
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.Instant
 import java.util.*
 
@@ -19,10 +21,11 @@ class Subscription(
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     var id: UUID? = null,
 
+    /*@TODO: When the db gets large (>100), consider migrating to Relations*/
+    @JdbcTypeCode(SqlTypes.JSON)
+    var subscriptionEvents: MutableList<SubscriptionEvent> = mutableListOf(),
+
     var registeredSince: Instant? = null,
-    var hasSubscribedNewsletterOrAd: Boolean = false,
-    var subscribedSince: Instant? = null,
-    var isNotSureIfSubscriptionIsOngoing: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_provider_id", nullable = false)
@@ -30,13 +33,14 @@ class Subscription(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "google_account_id", nullable = false)
-    var googleAccount: GoogleAccount? = null,
+    var googleAccount: GoogleAccount,
 ) {
     fun associateWithParents(serviceProvider: ServiceProvider, googleAccount: GoogleAccount) {
         this.serviceProvider = serviceProvider
-        serviceProvider.subscriptions.add(this)
-
         this.googleAccount = googleAccount
-        googleAccount.subscriptions.add(this)
+    }
+
+    fun addEvent(subscriptionEvent : SubscriptionEvent) {
+        this.subscriptionEvents.add(subscriptionEvent)
     }
 }

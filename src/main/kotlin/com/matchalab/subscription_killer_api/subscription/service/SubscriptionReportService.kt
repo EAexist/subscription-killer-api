@@ -2,6 +2,7 @@ package com.matchalab.subscription_killer_api.subscription.service
 
 import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.subscription_killer_api.service.GoogleAccountService
 import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
 import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
@@ -19,21 +20,16 @@ private val logger = KotlinLogging.logger {}
 @Service
 class SubscriptionReportService(
     private val appUserService: AppUserService,
+    private val googleAccountService: GoogleAccountService,
     private val appProperties: AppProperties,
     private val guestAppUserProperties: GuestAppUserProperties,
 ) {
 
     fun getUpdateEligibility(appUserId: UUID): ReportUpdateEligibilityDto {
-        val googleAccounts =
-            appUserService.findByIdOrNotFound(appUserId).googleAccounts
 
-        val analyzedAt: Instant? = googleAccounts.map { it.analyzedAt }.minWithOrNull(compareBy { it })
+        val analyzedAt: Instant = appUserService.findMinAnalyzedAtByUserId(appUserId) ?: return ReportUpdateEligibilityDto(true)
 
-        if (analyzedAt == null) {
-            return ReportUpdateEligibilityDto(true)
-        }
-
-        val availableSince: Instant = if (googleAccounts[0].subject == guestAppUserProperties.subject) analyzedAt else
+        val availableSince: Instant = if (false) analyzedAt else
             analyzedAt.plus(appProperties.minRequestIntervalHours, ChronoUnit.HOURS)
         val canUpdate: Boolean = availableSince.isBefore(Instant.now())
 
@@ -43,16 +39,14 @@ class SubscriptionReportService(
 
     fun getReport(appUserId: UUID): SubscriptionReportResponseDto? {
 
-        val googleAccounts =
-            appUserService.findByIdOrNotFound(appUserId).googleAccounts
-        val hasAnalyzedSubscription = googleAccounts.any {
-            it.analyzedAt != null
-        } ?: false
+        val hasAnalyzedSubscription = googleAccountService.existsAnalyzedSubscriptionByAppUserId(appUserId)
 
         if (!hasAnalyzedSubscription) {
             return null
         }
 
+        val googleAccounts =
+            appUserService.findGoogleAccountsWithFullSubscriptions(appUserId)
         val accountReports: List<AccountReportDto> = googleAccounts.map {
             it.toReportDto()
         }
