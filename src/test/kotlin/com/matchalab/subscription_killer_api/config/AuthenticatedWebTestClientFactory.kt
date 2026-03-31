@@ -1,14 +1,10 @@
 package com.matchalab.subscription_killer_api.config
 
-import com.matchalab.subscription_killer_api.domain.AppUser
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.junit.jupiter.api.Assumptions
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestComponent
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContext
@@ -28,12 +24,13 @@ data class AuthenticatedClientSetup(
 )
 
 @TestComponent
-@EnableConfigurationProperties(SampleGoogleAccountProperties::class)
+@Import(DatabaseTestUtils::class)
 class AuthenticatedClientFactory(
     private val appUserRepository: AppUserRepository,
     private val sessionRepository: SessionRepository<out Session>,
     private val webTestClient: WebTestClient,
-    private val sampleGoogleAccountProperties: SampleGoogleAccountProperties,
+    private val guestAppUserProperties: GuestAppUserProperties,
+    private val databaseTestUtils: DatabaseTestUtils,
 ) {
     private val localhost = "https://localhost:3000"
     private val sampleUserName: String = "sampleUserName"
@@ -41,30 +38,7 @@ class AuthenticatedClientFactory(
 
     fun create(port: Int): AuthenticatedClientSetup {
 
-        clear()
-
-        val sampleAppUser =
-            AppUser(
-                null,
-                sampleUserName,
-                UserRoleType.USER,
-                mutableListOf<GoogleAccount>()
-            )
-        sampleAppUser.addGoogleAccount(
-            GoogleAccount(
-                sampleGoogleAccountProperties.subject ?: "fakeSubject",
-                sampleUserName,
-                "sampleUserEmail",
-                sampleGoogleAccountProperties.refreshToken,
-                sampleGoogleAccountProperties.accessToken,
-                sampleGoogleAccountProperties.expiresAt,
-                sampleGoogleAccountProperties.scope
-            )
-        )
-
-        sampleAppUserId = checkNotNull(appUserRepository.saveAndFlush(sampleAppUser).id) {
-            "🚨 Exception: sampleAppUserId is null."
-        }
+        val sampleAppUserId = databaseTestUtils.setUser()
 
         val principal: OidcUser = CustomOidcUser(sampleAppUserId, listOf(SimpleGrantedAuthority("ROLE_USER")))
         val auth = OAuth2AuthenticationToken(
@@ -98,13 +72,6 @@ class AuthenticatedClientFactory(
     }
 
     fun clear() {
-        appUserRepository.deleteAll()
-    }
-
-    fun checkEnvironment() {
-        Assumptions.assumeTrue(
-            sampleGoogleAccountProperties.refreshToken != "placeholder",
-            "✅ Skipping test: No real refresh token found."
-        )
+        databaseTestUtils.clear()
     }
 }

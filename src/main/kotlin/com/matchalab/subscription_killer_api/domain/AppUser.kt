@@ -13,7 +13,8 @@ class AppUser(
     var userRole: UserRoleType = UserRoleType.USER,
     
     @OneToMany(mappedBy = "appUser", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var googleAccounts: MutableList<GoogleAccount> = mutableListOf()
+    var googleAccounts: MutableList<GoogleAccount> = mutableListOf(),
+
 ) {
     fun addGoogleAccount(googleAccount: GoogleAccount) {
         this.googleAccounts.add(googleAccount)

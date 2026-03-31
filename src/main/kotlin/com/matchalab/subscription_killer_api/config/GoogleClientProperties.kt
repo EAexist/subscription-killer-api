@@ -3,7 +3,7 @@ package com.matchalab.subscription_killer_api.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Profile
 
-@Profile("google-auth")
+@Profile("oauth")
 @ConfigurationProperties(prefix = "app.google")
 data class GoogleClientProperties(
     val clientId: String,

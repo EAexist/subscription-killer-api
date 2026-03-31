@@ -10,9 +10,9 @@ class GoogleAccount(
     var name: String,
     var email: String,
 
-    // Google OAuth
+    // @TODO: Enable the encryption
     @Column(columnDefinition = "TEXT")
-//        @Convert(converter = TokenEncryptionConverter::class)
+    //        @Convert(converter = TokenEncryptionConverter::class)
     var refreshToken: String? = null,
 
     @Column(columnDefinition = "TEXT")
@@ -21,12 +21,11 @@ class GoogleAccount(
     var expiresAt: Instant? = null,
     var scope: String? = null,
 
-    // Subscriptions
     var analyzedAt: Instant? = null,
+
     @OneToMany(mappedBy = "googleAccount", cascade = [CascadeType.ALL], orphanRemoval = true)
     var subscriptions: MutableList<Subscription> = mutableListOf(),
 
-    // Bidirectional Owning Entities
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id", nullable = false)
     var appUser: AppUser? = null
@@ -47,15 +46,5 @@ class GoogleAccount(
     fun updateAccessToken(refreshToken: String, expiresAt: Instant?) {
         this.refreshToken = refreshToken
         this.expiresAt = expiresAt
-    }
-
-    fun addSubscription(subscription: Subscription) {
-        this.subscriptions.add(subscription)
-        subscription.googleAccount = this
-    }
-
-    fun updateSubscriptions(subscriptions: List<Subscription>) {
-        this.subscriptions.clear()
-        subscriptions.forEach { addSubscription(it) }
     }
 }

@@ -20,7 +20,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("google-auth")
+@Profile("oauth")
 @Service
 class MultiAccountOAuth2AuthorizedClientService(
     private val clientRegistrationRepository: ClientRegistrationRepository,
@@ -94,7 +94,7 @@ class MultiAccountOAuth2AuthorizedClientService(
             googleAccount = appUser.googleAccounts.first()
         }
 
-
+        @Suppress("UNCHECKED_CAST")
         return OAuth2AuthorizedClient(
             clientRegistration,
             principalName,
