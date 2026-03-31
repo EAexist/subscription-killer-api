@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.subscription_killer_api.ai.observation.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.context.ContextRegistry

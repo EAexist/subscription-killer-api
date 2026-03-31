@@ -1,10 +1,9 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.subscription_killer_api.ai.observation.config
 
 import io.micrometer.common.KeyValue
 import io.micrometer.observation.Observation
 import io.micrometer.observation.ObservationFilter
 import org.springframework.boot.info.GitProperties
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component

@@ -16,10 +16,14 @@ fi
 
 echo "Current branch: $CURRENT_BRANCH"
 
-# 1. Add all local changes and commit
+# 1. Add all local changes and commit if there are any
 echo "Adding all changes and committing..."
 git add .
-git commit -m "wip: testing benchmark workflow trigger with perf test tag"
+if ! git diff-index --quiet HEAD; then
+    git commit -m "wip: testing benchmark workflow trigger with perf test tag"
+else
+    echo "No changes to commit, working tree clean. Proceeding with existing commit..."
+fi
 
 # 2. Remove tag from local and remote
 echo "Removing existing tag from local and remote..."

@@ -1,8 +1,10 @@
 package com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter
 
+import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
+import com.matchalab.subscription_killer_api.datasets.EmailSample
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
-import com.matchalab.subscription_killer_api.subscription.config.SampleMessageConfig
+import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
@@ -10,14 +12,11 @@ import org.springframework.stereotype.Component
 private val logger = KotlinLogging.logger {}
 
 @Component
-@Import(SampleMessageConfig::class)
 class MockGmailClientAdapter(
-    private val sampleMessages: List<GmailMessage>
+    private val emailDatasetProvider: EmailDatasetProvider,
 ) : GmailClientAdapter {
 
-    val idToSampleMessages =
-        sampleMessages.sortedBy { it.internalDate }
-            .associateBy { it.id }
+    private val idToSampleMessages: Map<String, GmailMessage> = emailDatasetProvider.getSampleMessageSet().associateBy { it.id }
 
     override suspend fun listMessageIds(query: String): List<String> {
         return idToSampleMessages.values.map { it.id }

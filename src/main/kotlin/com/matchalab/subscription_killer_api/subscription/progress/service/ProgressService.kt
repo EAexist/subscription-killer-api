@@ -29,6 +29,7 @@ class ProgressService(
 
     private val emitters = ConcurrentHashMap<UUID, SseEmitter>()
     private val progresses = ConcurrentHashMap<UUID, ConcurrentHashMap<String, AnalysisProgress>>()
+    private val lastSentStatuses = ConcurrentHashMap<UUID, AnalysisProgressStatus>()
 
     fun isOnProgress(appUserId: UUID): Boolean {
         return progresses.containsKey(appUserId)
@@ -41,6 +42,7 @@ class ProgressService(
 
             val cleanup = {
                 emitters.remove(appUserId)
+                lastSentStatuses.remove(appUserId)
             }
             onCompletion { cleanup() }
             onTimeout { cleanup() }
@@ -54,6 +56,7 @@ class ProgressService(
                     .data(AppUserAnalysisProgressUpdate(AnalysisProgressStatus.COMPLETED))
             )
             emitter.complete()
+            return emitter
         }
 
         progresses[appUserId]?.values?.let { progresses ->
@@ -79,6 +82,7 @@ class ProgressService(
                 emitter.send(
                     SseEmitter.event().name("progress-update").data(update)
                 )
+                lastSentStatuses[appUserId] = update.status
                 serviceProviderUpdates.forEach {
                     emitter.send(
                         SseEmitter.event().name("progress-update").data(it)
@@ -100,22 +104,33 @@ class ProgressService(
             if (status === AnalysisProgressStatus.COMPLETED) AnalysisProgressStatus.COMPLETED else progresses[appUserId]?.values?.minBy { it.status.sortOrder }?.status
         val progressUpdate: AppUserAnalysisProgressUpdate? = totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
 
+        logger.debug { "update: $progressUpdate"}
+
         progressUpdate?.let { update ->
-            emitters[appUserId]?.let { emitter ->
-                try {
-                    emitter.send(
-                        SseEmitter.event().name("progress-update")
-                            .data(update)
-                    )
-                    if (totalStatus === AnalysisProgressStatus.COMPLETED) {
-                        emitter.complete()
+            val lastSentStatus = lastSentStatuses[appUserId]
+            
+            // Only send if status has changed
+            if (lastSentStatus != update.status) {
+                emitters[appUserId]?.let { emitter ->
+                    try {
+                        emitter.send(
+                            SseEmitter.event().name("progress-update")
+                                .data(update)
+                        )
+                        logger.info { "emitter has sent the progress update: ${progressUpdate}"}
+                        lastSentStatuses[appUserId] = update.status
+                        
+                        if (totalStatus === AnalysisProgressStatus.COMPLETED) {
+                            emitter.complete()
+                        }
+                    } catch (e: Exception) {
+                        emitter.completeWithError(e)
                     }
-                } catch (e: Exception) {
-                    emitter.completeWithError(e)
                 }
-            }
-            if (totalStatus === AnalysisProgressStatus.COMPLETED) {
-                progresses.remove(appUserId)
+                if (totalStatus === AnalysisProgressStatus.COMPLETED) {
+                    progresses.remove(appUserId)
+                    lastSentStatuses.remove(appUserId)
+                }
             }
         }
     }
@@ -134,12 +149,15 @@ class ProgressService(
 
         val update = ServiceProviderAnalysisProgressUpdate(serviceProviderResponseDto, status)
 
+        logger.debug { "update: $update"}
+
         emitters[appUserId]?.let { emitter ->
             try {
                 emitter.send(
                     SseEmitter.event().name("progress-update")
                         .data(update)
                 )
+                logger.info { "emitter has sent the progress update: ${update}"}
             } catch (e: Exception) {
                 emitter.completeWithError(e)
             }
@@ -147,10 +165,12 @@ class ProgressService(
     }
 
     fun initializeProgress(appUserId: UUID) {
-        val appUser = appUserService.findByIdOrNotFound(appUserId)
+        val googleAccountSubjects = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
         progresses[appUserId] =
-            ConcurrentHashMap(appUser.googleAccounts.map { it.subject }
+            ConcurrentHashMap(googleAccountSubjects
                 .associateWith { AnalysisProgress() })
+
+        setProgress(appUserId, googleAccountSubjects[0], AnalysisProgressStatus.STARTED)
     }
 }
