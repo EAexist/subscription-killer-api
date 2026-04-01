@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.service
 
+import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
@@ -9,12 +10,20 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.time.Instant
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
 @Service
-class AppUserService(private val appUserRepository: AppUserRepository) {
+class AppUserService(
+    private val appUserRepository: AppUserRepository,
+    private val guestAppUserProperties: GuestAppUserProperties
+) {
+
+    fun existsByName(name: String): Boolean {
+        return appUserRepository.existsByName(name)
+    }
 
     fun findByIdOrNull(appUserId: UUID): AppUser? {
         return appUserRepository.findByIdOrNull(appUserId)
@@ -23,7 +32,7 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
     fun findByIdOrNotFound(appUserId: UUID): AppUser {
         return findByIdOrNull(appUserId) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND,
-            "User profile not found"
+            "AppUser appUserId=$appUserId not found"
         )
     }
 
@@ -39,8 +48,20 @@ class AppUserService(private val appUserRepository: AppUserRepository) {
         return appUserRepository.findByGoogleAccounts_Subject(googleSub)
     }
 
+    fun getGuestAppUser(): AppUser {
+        return findByIdOrNotFound(guestAppUserProperties.id)
+    }
+
+    fun findMinAnalyzedAtByUserId(appUserId: UUID): Instant? {
+        return appUserRepository.findMinAnalyzedAtByUserId(appUserId)
+    }
+
     fun save(appUser: AppUser): AppUser {
         return appUserRepository.save(appUser)
+    }
+
+    fun findGoogleAccountsWithFullSubscriptions(appUserId: UUID): List<GoogleAccount> {
+        return appUserRepository.findGoogleAccountsWithFullSubscriptions(appUserId)
     }
 
     fun register(user: OidcUser): AppUser {

@@ -1,0 +1,16 @@
+spring:
+  flyway:
+    clean-disabled: false
+    clean-on-validation-error: false
+management:
+  otlp:
+    tracing:
+      endpoint: "http://localhost:8080/api/public/otel/v1/traces"
+      headers:
+        Authorization: "Basic test-langfuse-token"
+  export:
+        delay: 500ms
+app:
+  benchmark:
+    mock-gmail-api:
+      base-url: "http://gmail-mock-server:8080"

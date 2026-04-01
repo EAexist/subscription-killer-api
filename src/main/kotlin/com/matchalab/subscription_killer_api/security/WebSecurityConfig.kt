@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.cors.CorsConfigurationSource
 
-@Profile("google-auth")
+@Profile("!benchmark && !benchmark-dev")
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(CorsProperties::class)
@@ -43,7 +43,7 @@ open class WebSecurityConfig(
             authorizeHttpRequests {
                 authorize(HttpMethod.OPTIONS, "/**", permitAll)
                 authorize(HttpMethod.GET, "/ping", permitAll)
-                authorize(HttpMethod.GET, "/ouath2/**", permitAll)
+                authorize(HttpMethod.GET, "/oauth2/**", permitAll)
                 authorize(HttpMethod.GET, "/login/**", permitAll)
                 authorize(HttpMethod.GET, "/api/v1/guest/**", permitAll)
                 authorize(anyRequest, authenticated)

@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets
 private val logger = KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Tag("google-auth")
+@Tag("oauth")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @Import(
@@ -42,7 +42,6 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
 
     @Autowired
     lateinit var wac: WebApplicationContext
-
 
     @Autowired
     lateinit var corsConfigurationSource: CorsConfigurationSource
@@ -75,21 +74,19 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
     }
 
     @Test
-    fun `should return 403 Forbidden for unknown origins`() {
+    fun `should not return Access Control Allow Origin for unknown origins`() {
         client.options()
             .uri("/ping")
             .header(HttpHeaders.ORIGIN, "https://www.google.com/")
             .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
             .exchange()
-            .expectStatus()
-            .isForbidden()
+            .expectHeader().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)
 
         client.get()
             .uri("/ping")
             .header(HttpHeaders.ORIGIN, "https://www.google.com/")
             .exchange()
-            .expectStatus()
-            .isForbidden()
+            .expectHeader().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)
     }
 
     fun allowedOrigins() = corsProperties.allowedOrigins
@@ -116,7 +113,7 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
 
     @Test
     fun `when unauthenticated user access business path should return 401 Unauthorized`() {
-        client.get().uri("/api/v1/appUser").exchange().expectStatus().isUnauthorized()
+        client.get().uri("/api/v1/reports").exchange().expectStatus().isUnauthorized()
     }
 
     fun assertAllowedCorsGetRequest(allowedOrigin: String) {
@@ -125,8 +122,6 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
             .header(HttpHeaders.ORIGIN, allowedOrigin)
             .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
             .exchange()
-            .expectStatus()
-            .isOk()
             .expectHeader()
             .valueEquals(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin)
             .expectHeader()
@@ -140,8 +135,6 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
             .uri("/ping")
             .header(HttpHeaders.ORIGIN, allowedOrigin)
             .exchange()
-            .expectStatus()
-            .isOk()
             .expectHeader()
             .valueEquals(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin)
     }

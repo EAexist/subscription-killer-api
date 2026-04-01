@@ -2,10 +2,10 @@ package com.matchalab.subscription_killer_api.subscription.service
 
 import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import com.matchalab.subscription_killer_api.repository.ServiceProviderRepository
-import com.matchalab.subscription_killer_api.repository.SubscriptionRepository
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
+import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
@@ -20,28 +20,21 @@ private val logger = KotlinLogging.logger {}
 @Service
 class ServiceProviderService(
     private val serviceProviderRepository: ServiceProviderRepository,
-    private val subscriptionRepository: SubscriptionRepository,
     private val emailSourceRepository: EmailSourceRepository,
-    private val emailDetectionRuleService: EmailDetectionRuleService,
 ) {
-    interface ServiceProviderProjection {
-        val id: UUID
-        val displayName: String
-        val canAnalyzeSubscription: Boolean
-    }
-
-    val maxNumberOfEmailDetectionRuleAnalysis: Long = 40
-
 
     fun findByIdOrNotFound(id: UUID): ServiceProvider {
         return serviceProviderRepository.findByIdOrNull(id) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND,
-            "User profile not found"
+            "ServiceProvider not found"
         )
     }
 
-    fun findByIdWithSubscriptions(id: UUID): ServiceProvider? {
-        return serviceProviderRepository.findByIdWithSubscriptions(id)
+    fun findByIdWithSubscriptions(id: UUID): ServiceProvider {
+        return serviceProviderRepository.findByIdWithSubscriptions(id)  ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "ServiceProvider not found"
+        )
     }
 
     fun findAllWithEmailSources(): List<ServiceProvider> {
@@ -69,6 +62,9 @@ class ServiceProviderService(
     fun findByActiveEmailAddressesInWithEmailSources(addresses: List<String>): List<ServiceProvider> {
         return serviceProviderRepository.findByActiveEmailAddressesInWithEmailSources(addresses)
     }
+    fun getReferenceById(serviceProviderId: UUID): ServiceProvider {
+        return serviceProviderRepository.getReferenceById(serviceProviderId)
+    }
 
     fun findDtoById(id: UUID): ServiceProviderResponseDto? {
         return serviceProviderRepository.findWithEmailSourceById(id)?.let {
@@ -78,7 +74,7 @@ class ServiceProviderService(
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
                 subscriptionPageUrl = it.subscriptionPageUrl,
-                canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
+                canAnalyzeSubscription = it.isSubscriptionEventRuleAvailable()
             )
         }
     }
@@ -91,14 +87,15 @@ class ServiceProviderService(
                 logoDevSuffix = it.logoDevSuffix,
                 websiteUrl = it.websiteUrl,
                 subscriptionPageUrl = it.subscriptionPageUrl,
-                canAnalyzeSubscription = it.isEmailDetectionRuleAvailable()
+                canAnalyzeSubscription = it.isSubscriptionEventRuleAvailable()
             )
         }
     }
 
+
     fun addEmailSourcesFromMessages(messages: List<GmailMessage>): List<ServiceProvider> {
 
-        logger.debug { "[addEmailSourcesFromMessages] messages.size: ${messages.size}" }
+//        logger.debug { "[addEmailSourcesFromMessages] messages.size: ${messages.size}" }
 
         data class GmailSenderDto(
             val name: String?,
@@ -112,9 +109,9 @@ class ServiceProviderService(
         val existingAddresses = emailSourceRepository.findExistingAddresses(addressesInMessages)
         val newSenders = namedSenders.filter { !existingAddresses.contains(it.email) }
 
-        logger.debug { "🔊 | [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
-        logger.debug { "🔊 | [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
-        logger.debug { "🔊 | [addEmailSourcesFromMessages] newSenders: $newSenders" }
+//        logger.debug { "🔊 | [addEmailSourcesFromMessages] addressesInMessages: $addressesInMessages" }
+//        logger.debug { "🔊 | [addEmailSourcesFromMessages] existingAddresses: $existingAddresses" }
+//        logger.debug { "🔊 | [addEmailSourcesFromMessages] newSenders: $newSenders" }
 
 
         val aliasNameToNewEmails = newSenders.groupBy(
@@ -127,7 +124,7 @@ class ServiceProviderService(
             //@TODO Optimize
             val emailOwningServiceProviders = serviceProviderRepository.findByAliasNameWithEmailSources(aliasName)
             emailOwningServiceProviders?.let { serviceProvider ->
-                serviceProvider.addAllEmailSources(emails.map { EmailSource(null, it) })
+                serviceProvider.addAllEmailSources(emails.map { EmailSource(null, it, serviceProvider = serviceProvider) })
                 updatedProviders.add(serviceProvider)
             }
         }
@@ -137,52 +134,4 @@ class ServiceProviderService(
         return saveAll(updatedProviders)
     }
 
-    fun updateEmailDetectionRules(
-        provider: ServiceProvider,
-        addressToMessages: Map<String, List<GmailMessage>>
-    ): ServiceProvider {
-
-        logger.debug { "\uD83D\uDE80 | [updateEmailDetectionRules]" }
-
-        val isEmailDetectionRuleAnalysisAvailable =
-            subscriptionRepository.countByServiceProviderId(provider.requiredId) < maxNumberOfEmailDetectionRuleAnalysis
-
-        if ((!provider.isEmailDetectionRuleComplete()) && isEmailDetectionRuleAnalysisAvailable) {
-            provider.emailSources.forEach { emailSource ->
-                val messages: List<GmailMessage> =
-                    addressToMessages[emailSource.targetAddress]?.filter { it.id !in emailSource.analyzedMessageIds }
-                        ?: emptyList()
-                if (messages.isNotEmpty()) {
-                    emailSource.analyzedMessageIds.addAll(messages.map { it.id })
-                    val newEmailDetectionRules = emailDetectionRuleService.generateRules(emailSource, messages)
-                    emailSource.addEmailDetectionRules(
-                        newEmailDetectionRules
-                    )
-                }
-            }
-        }
-
-        //@TODO @COMPLETED If Rule is Complete, flag unused emailSources as disabled
-        if (provider.isEmailDetectionRuleComplete()) {
-            provider.emailSources.forEach {
-                if (it.eventRules.isEmpty()) {
-                    it.isActive = false
-                }
-            }
-        }
-
-        return save(provider)
-    }
-
-//    fun findByIdOrNull(id: UUID): ServiceProvider? {
-//        return serviceProviderRepository.findByIdOrNull(id)
-//    }
-//
-//    fun findAll(): List<ServiceProvider> {
-//        return serviceProviderRepository.findAll()
-//    }
-//
-//    fun fetchWithEmailSources(providers: List<ServiceProvider>): List<ServiceProvider> {
-//        return serviceProviderRepository.fetchWithEmailSources(providers)
-//    }
 }

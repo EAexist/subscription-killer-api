@@ -3,6 +3,7 @@ package com.matchalab.subscription_killer_api.repository
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.util.UUID
 
 interface GoogleAccountRepository : JpaRepository<GoogleAccount, String> {
 
@@ -24,4 +25,12 @@ interface GoogleAccountRepository : JpaRepository<GoogleAccount, String> {
     """
     )
     fun findByIdWithSubscriptionsAndProviders(subject: String): GoogleAccount?
+
+    @Query("""
+        SELECT CASE WHEN COUNT(ga) > 0 THEN true ELSE false END 
+        FROM GoogleAccount ga 
+        WHERE ga.appUser.id = :appUserId 
+        AND ga.analyzedAt IS NOT NULL
+    """)
+    fun existsAnalyzedSubscriptionByAppUserId(appUserId: UUID): Boolean
 }

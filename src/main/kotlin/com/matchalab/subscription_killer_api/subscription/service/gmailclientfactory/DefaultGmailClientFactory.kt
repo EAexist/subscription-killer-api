@@ -1,0 +1,3 @@
+package com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory
+
+interface DefaultGmailClientFactory : GmailClientFactory

@@ -5,5 +5,5 @@ enum class SubscriptionEventType {
     ANNUAL_PAYMENT,
     SUBSCRIPTION_START,
     SUBSCRIPTION_CANCEL,
-    UNKNOWN
+    NOT_A_SUBSCRIPTION_EMAIL
 }

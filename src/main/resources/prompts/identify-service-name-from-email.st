@@ -2,10 +2,10 @@
 You are an expert Data Engineer specializing in Pattern Recognition for subscription lifecycles. 
 
 ### Objective
-Analyze the provided `GmailMessage` list from a single service (e.g., Netflix, Apple) and the `currentEmailDetectionRuleList`. Your goal is to output a final, updated `List<EmailDetectionRule>` that accurately identifies mails that indicate recurring payments, starts, and cancellations.
+Analyze the provided `GmailMessage` list from a single service (e.g., Netflix, Apple) and the `currentSubscriptionEventRuleList`. Your goal is to output a final, updated `List<SubscriptionEventRule>` that accurately identifies mails that indicate recurring payments, starts, and cancellations.
 
 ### Data Structures
-- EmailDetectionRule: { eventType, subjectKeywords[], subjectRegex, snippetKeywords[], snippetRegex }
+- SubscriptionEventRule: { eventType, subjectKeywords[], subjectRegex, snippetKeywords[], snippetRegex }
 - GmailMessage: { subject, snippet }
 
 ### Recognition Strategy (Logical OR)
@@ -25,7 +25,7 @@ OR
 2. SIGNAL VS NOISE: Ignore marketing newsletters, "New Arrivals", or recommendation emails. 
 3. SUBJECT REGEX: Use Java-compatible Regex (e.g., use \\d+ for numbers). The regex should be specific enough to avoid false positives between Start and Monthly payments.
 4. UPDATE FROM CURRENT RULE: if a event is not found in emails, keep current rule for that event. new rule should update not replace current rule.
-5. OUTPUT: Return ONLY a valid JSON array of EmailDetectionRule objects.
+5. OUTPUT: Return ONLY a valid JSON array of SubscriptionEventRule objects.
 
 ### Data Inputs
 - Current Rules: {currentRules}

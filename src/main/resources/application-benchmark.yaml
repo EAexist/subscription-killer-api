@@ -1,0 +1,59 @@
+spring:
+  flyway:
+    clean-disabled: false
+    clean-on-validation-error: false
+  sql:
+    init:
+      mode: always
+  mvc:
+    async:
+      request-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: none
+  main:
+    lazy-initialization: true
+  reactor:
+    context-propagation: auto
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    baggage:
+      remote-fields:
+        - x-k6-index  # Tells Micrometer to look for this header
+      correlation:
+        fields:
+          - x-k6-index # Adds it to your logs (MDC) automatically
+    propagation:
+      type: w3c, b3  # Ensure common propagation types are supported
+  zipkin:
+    tracing:
+      export:
+        enabled: false
+  otlp:
+    tracing:
+      endpoint: "${LANGFUSE_BASE_URL}/api/public/otel/v1/traces"
+      headers:
+        Authorization: "Basic ${LANGFUSE_AUTH_TOKEN}"
+      timeout: 30s
+  export:
+        delay: 500ms
+  observations:
+    enable:
+      spring:
+        ai: false
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
+  level:
+    com.matchalab.subscription_killer_api: DEBUG
+app:
+  benchmark:
+    mock-gmail-api:
+      base-url: http://gmail-mock-server:8080
