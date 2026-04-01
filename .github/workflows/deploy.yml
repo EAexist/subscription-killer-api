@@ -9,7 +9,9 @@ env:
 
 on:
   push:
-    branches: [ "staging", "main" ]
+    branches: [ "main" ]
+  release:
+    types: [published]
 
 permissions:
   id-token: write # This is required for OIDC authentication
@@ -19,7 +21,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    environment: ${{ github.event_name == 'release' && 'production' || 'staging' }}
 
     steps:
       - name: Checkout
