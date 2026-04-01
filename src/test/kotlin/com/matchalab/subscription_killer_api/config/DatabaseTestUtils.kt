@@ -5,7 +5,6 @@ import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestConfiguration
 import java.util.*
 

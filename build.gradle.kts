@@ -114,7 +114,6 @@ plugins {
     kotlin("kapt") version "1.9.25"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("maven-publish")
-    id("java-test-fixtures")
 }
 
 group = "com.matchalab"
@@ -237,13 +236,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
 
-    /* Test Fixture */
-    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
-    testFixturesImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
-    testImplementation(testFixtures(project(":")))
-//    testFixturesImplementation(project(":subscription-killer-api"))
-
     /* Flyway */
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
     implementation("org.flywaydb:flyway-core:11.17.0")
@@ -296,6 +288,7 @@ tasks.withType<Test> {
 
 tasks.register<Zip>("buildLambdaWebAdapterZip") {
     dependsOn("generateGitProperties")
+    dependsOn("bootJar")
 
     into("lib") {
         from(tasks.jar)
