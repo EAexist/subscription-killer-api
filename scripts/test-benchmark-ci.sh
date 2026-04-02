@@ -2,7 +2,21 @@
 
 set -e
 
-TAG_NAME="v0.1.0-perf.1+test"
+# Find the highest existing perf tag and increment it
+echo "Finding existing performance tags..."
+EXISTING_TAGS=$(git ls-remote --tags origin | grep "v0\.1\.0-perf\..*\+test" | sed 's|.*/||' | sort -V)
+
+if [ -n "$EXISTING_TAGS" ]; then
+    LATEST_TAG=$(echo "$EXISTING_TAGS" | tail -n1)
+    # Extract the number after "v0.1.0-perf." and before "+test"
+    CURRENT_NUM=$(echo "$LATEST_TAG" | sed 's/v0\.1\.0-perf\.\(.*\)+test/\1/')
+    NEXT_NUM=$((CURRENT_NUM + 1))
+    TAG_NAME="v0.1.0-perf.$NEXT_NUM+test"
+    echo "Found latest tag: $LATEST_TAG, creating next tag: $TAG_NAME"
+else
+    TAG_NAME="v0.1.0-perf.1+test"
+    echo "No existing performance tags found, starting with: $TAG_NAME"
+fi
 
 echo "Testing benchmark workflow with tag: $TAG_NAME"
 
@@ -25,12 +39,7 @@ else
     echo "No changes to commit, working tree clean. Proceeding with existing commit..."
 fi
 
-# 2. Remove tag from local and remote
-echo "Removing existing tag from local and remote..."
-git tag -d $TAG_NAME 2>/dev/null || echo "Tag doesn't exist locally"
-git push origin :refs/tags/$TAG_NAME 2>/dev/null || echo "Tag doesn't exist remotely"
-
-# 3. Re-tag the current commit and push both code and tag
+# 2. Tag the current commit and push both code and tag
 echo "Tagging current commit and pushing..."
 git tag $TAG_NAME
 git push origin $CURRENT_BRANCH
