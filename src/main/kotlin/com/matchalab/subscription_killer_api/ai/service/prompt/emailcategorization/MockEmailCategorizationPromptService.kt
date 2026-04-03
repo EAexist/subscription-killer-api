@@ -52,10 +52,10 @@ class MockEmailCategorizationPromptService(
         }
 
         val response = mapOf(
-            "M" to monthlyMsgIds,
-            "A" to annualMsgIds,
-            "S" to subsStartMsgIds,
-            "C" to subsCancelMsgIds,
+            "M" to monthlyMsgIndexes,
+            "A" to annualMsgIndexes,
+            "S" to subsStartMsgIndexes,
+            "C" to subsCancelMsgIndexes,
         )
 
         val resultJson = convertResultToJson(response)

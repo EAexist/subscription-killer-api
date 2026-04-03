@@ -30,7 +30,7 @@ class MockEmailTemplateExtractionPromptService(
         val result: List<ExtractEmailTemplatesResponseItem> = messages.withIndex().map { (index, message) ->
             val template: EmailTemplate = emailDatasetProvider.getTemplate(message.id)!!
             ExtractEmailTemplatesResponseItem(
-                m =  index,
+                m = index,
                 j = template.subjectAnchors,
                 p = template.snippetAnchors
             )
