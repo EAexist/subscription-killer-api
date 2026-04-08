@@ -3,11 +3,12 @@ set -e
 
 # Configuration
 HEALTH_URL="http://localhost:8080/actuator/health"
+BENCHMARK_START_URL="http://localhost:8080/api/benchmark/start"
 BENCHMARK_URL="http://localhost:8080/api/benchmark/analyze"
 MAX_WAIT_TIME=300
 CHECK_INTERVAL=5
 FLUSH_WAIT_TIME=10  # Wait time for observations to flush to Langfuse
-BENCHMARK_RUNS=200  # Number of benchmark runs to perform
+BENCHMARK_RUNS=2  # Number of benchmark runs to perform (default)
 NO_CLEANUP=true # Whether to skip cleanup and keep containers running
 
 source "$(dirname "${BASH_SOURCE[0]}")/bootRun.sh"
@@ -65,6 +66,7 @@ trap cleanup EXIT INT TERM
 
 main() {
     # Parse arguments
+    BENCHMARK_RUNS_ARG=""
     for arg in "$@"; do
         case "$arg" in
             --no-cleanup)
@@ -72,13 +74,33 @@ main() {
                 echo -e "${YELLOW}[INFO] No cleanup mode enabled - containers will stay running${NC}"
                 ;;
             --help|-h)
-                echo "Usage: $0 [--no-cleanup] [--help]"
+                echo "Usage: $0 [BENCHMARK_RUNS] [--no-cleanup] [--help]"
+                echo "  BENCHMARK_RUNS: Number of benchmark runs to perform (default: 2)"
                 echo "  --no-cleanup: Keep containers running after benchmark for debugging"
                 echo "  --help: Show this help message"
                 exit 0
                 ;;
+            -*)
+                log_error "Unknown option: $arg"
+                echo "Usage: $0 [BENCHMARK_RUNS] [--no-cleanup] [--help]"
+                exit 1
+                ;;
+            *)
+                if [ -z "$BENCHMARK_RUNS_ARG" ]; then
+                    BENCHMARK_RUNS_ARG="$arg"
+                else
+                    log_error "Too many arguments"
+                    echo "Usage: $0 [BENCHMARK_RUNS] [--no-cleanup] [--help]"
+                    exit 1
+                fi
+                ;;
         esac
     done
+    
+    # Override default if BENCHMARK_RUNS argument was provided
+    if [ -n "$BENCHMARK_RUNS_ARG" ]; then
+        BENCHMARK_RUNS="$BENCHMARK_RUNS_ARG"
+    fi
 
     LOG_FILE=$(mktemp)
     STATUS_FILE=$(mktemp)
@@ -112,25 +134,50 @@ main() {
     done
     log_success "App Ready!"
 
-    # Step 3: Benchmark
-    log_info "Step 3: Running Benchmark ($BENCHMARK_RUNS requests with different UUIDs)..."
+    # Step 3: Initialize Benchmark and Get Traceparent
+    log_info "Step 3: Initializing benchmark and getting traceparent..."
+    
+    # Generate a unique runId for this benchmark run
+    RUN_ID="test-run-$(date +%s)-$$"
+    log_info "Generated runId: $RUN_ID"
+    
+    # Initialize benchmark and get traceparent (once per test run)
+    local start_response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "${BENCHMARK_START_URL}?runId=${RUN_ID}")
+    local start_http_code=$(echo "$start_response" | tail -n1 | cut -d: -f2)
+    local start_body=$(echo "$start_response" | sed '$d')
+    
+    if [[ "$start_http_code" != "200" ]]; then
+        log_error "Failed to initialize benchmark (HTTP $start_http_code)"
+        echo "$start_body"
+        exit 1
+    fi
+    
+    # Extract traceparent from response
+    local traceparent=$(echo "$start_body" | jq -r '.traceparent' 2>/dev/null)
+    if [[ -z "$traceparent" || "$traceparent" == "null" ]]; then
+        log_error "Failed to extract traceparent from benchmark start response"
+        echo "$start_body"
+        exit 1
+    fi
+    
+    log_success "Benchmark initialized with runId: $RUN_ID, traceparent: $traceparent"
+    
+    # Step 4: Run Benchmark Requests
+    log_info "Step 4: Running Benchmark ($BENCHMARK_RUNS requests with different UUIDs)..."
     
     # Function to run benchmark with a specific UUID
     run_benchmark() {
         local uuid=$1
         local attempt=$2
-        local trace_id=$(openssl rand -hex 16)
-        local span_id=$(openssl rand -hex 8)
-        local traceparent="00-${trace_id}-${span_id}-01"
 
-        log_info "Running benchmark attempt $attempt with UUID: $uuid"
+        log_info "Running benchmark attempt $attempt with UUID: $uuid (traceparent: $traceparent)"
         
-        # Perform request and capture code/body
+        # Perform request and capture code/body with distributed tracing header
         local response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BENCHMARK_URL" \
              -H "Content-Type: application/json" \
              -H "X-Benchmark-User-Id: $uuid" \
-             -H "X-K6-Index: $attempt")
-#             -H "traceparent: $traceparent") # This forces a new root trace
+             -H "X-Benchmark-Index: $attempt" \
+             -H "traceparent: $traceparent")
         
         # Process results
         HTTP_CODE=$(echo "$response" | tail -n1 | cut -d: -f2)
@@ -175,7 +222,7 @@ main() {
         fi
     done
     
-    # Step 4: Final Results
+    # Step 5: Final Results
     if $overall_success; then
         log_success "All $BENCHMARK_RUNS benchmark attempts completed successfully"
         exit 0

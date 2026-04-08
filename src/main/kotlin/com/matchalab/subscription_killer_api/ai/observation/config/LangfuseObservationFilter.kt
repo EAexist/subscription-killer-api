@@ -16,15 +16,6 @@ class LangfuseObservationFilter : ObservationFilter {
 
     override fun map(context: Observation.Context): Observation.Context {
 
-        if (context is ServerRequestObservationContext) {
-            val k6Index = context.carrier.getHeader("X-K6-Index")
-            if (k6Index != null) {
-                // Use 'tags' to make it a first-class filter in Langfuse UI
-                context.addHighCardinalityKeyValue(KeyValue.of("langfuse.trace.tags", "request_$k6Index"))
-                context.addHighCardinalityKeyValue(KeyValue.of("langfuse.trace.metadata.k6_index", k6Index))
-            }
-        }
-
         if (context is ChatModelObservationContext) {
             moveLowCardinalityTag(context, "app.ai.task_name", "langfuse.observation.metadata.task_name")
             moveHighCardinalityTag(context, "app.ai.data_count", "langfuse.observation.metadata.data_count")

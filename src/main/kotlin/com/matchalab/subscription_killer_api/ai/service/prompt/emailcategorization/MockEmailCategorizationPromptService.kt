@@ -38,7 +38,7 @@ class MockEmailCategorizationPromptService(
         val annualMsgIds = mutableListOf<String>()
 
         aggregatedMessages.withIndex().forEach { (index, message) ->
-            val eventType = emailDatasetProvider.getSubscriptionEventType(message.id)
+            val eventType = emailDatasetProvider.getSubscriptionEventTypeByTemplateId(message.templateId!!)
 //            logger.debug { "eventType: ${eventType} senderEmail: ${message.senderEmail} subject: ${message.subject}" }
             when (eventType) {
                 SubscriptionEventType.SUBSCRIPTION_START -> { subsStartMsgIndexes.add(index.toString()); subsStartMsgIds.add(message.id) }

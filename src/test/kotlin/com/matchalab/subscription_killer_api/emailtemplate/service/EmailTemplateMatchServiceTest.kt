@@ -44,14 +44,14 @@ class EmailTemplateMatchServiceTest {
         
         // When & Then
         selectedSamples.forEach { emailSample ->
-            val gmailMessage = emailSample.message.toGmailMessage()
+            val gmailMessage = emailSample.message
             val emailTemplate = emailSample.template
 
             val subjectMatches = emailTemplateMatchService.matches( gmailMessage.subject, emailTemplate.subjectAnchors )
 
             assertTrue(subjectMatches){
                 """
-                FAILED Match for EmailSample ID: ${emailSample.message.id}
+                FAILED Match for EmailSample ID: ${gmailMessage.id}
                 --------------------------------------------------
                 Subject Match: $subjectMatches
                 Actual Subject: '${gmailMessage.subject}'
@@ -63,7 +63,7 @@ class EmailTemplateMatchServiceTest {
             val snippetMatches = emailTemplateMatchService.matches( gmailMessage.snippet, emailTemplate.snippetAnchors )
             assertTrue(snippetMatches){
                 """
-                FAILED Match for EmailSample ID: ${emailSample.message.id}
+                FAILED Match for EmailSample ID: ${gmailMessage.id}
                 --------------------------------------------------
                 Snippet Match: $snippetMatches
                 Actual Snippet: '${gmailMessage.snippet}'
@@ -74,7 +74,7 @@ class EmailTemplateMatchServiceTest {
 
             val matches = emailTemplateMatchService.matchMessage(emailTemplate, gmailMessage)
             assertTrue(matches,
-                "EmailSample ID ${emailSample.message.id} should match its template using EmailTemplateMatchService matchMessage method")
+                "EmailSample ID ${gmailMessage.id} should match its template using EmailTemplateMatchService matchMessage method")
         }
     }
 

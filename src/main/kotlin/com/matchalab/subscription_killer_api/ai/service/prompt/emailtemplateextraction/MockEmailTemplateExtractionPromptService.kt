@@ -28,7 +28,7 @@ class MockEmailTemplateExtractionPromptService(
         emailTemplateExtractionPromptServiceImpl.run(messages)
 
         val result: List<ExtractEmailTemplatesResponseItem> = messages.withIndex().map { (index, message) ->
-            val template: EmailTemplate = emailDatasetProvider.getTemplate(message.id)!!
+            val template: EmailTemplate = emailDatasetProvider.getTemplate(message.templateId!!)!!
             ExtractEmailTemplatesResponseItem(
                 m = index,
                 j = template.subjectAnchors,
@@ -48,7 +48,7 @@ class MockEmailTemplateExtractionPromptService(
             outputString = resultJson
         )
 
-        val response = messages.map { EmailTemplateExtractionResult(it.id, emailDatasetProvider.getTemplate(it.id)?: EmailTemplate(listOf(it.subject), listOf(it.snippet)) )}
+        val response = messages.map { EmailTemplateExtractionResult(it.id, emailDatasetProvider.getTemplate(it.templateId!!)!! )}
 
         return response
     }

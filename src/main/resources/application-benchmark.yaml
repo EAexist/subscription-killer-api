@@ -26,10 +26,14 @@ management:
       probability: 1.0
     baggage:
       remote-fields:
-        - x-k6-index  # Tells Micrometer to look for this header
+        - x-benchmark-index  # Tells Micrometer to look for this header
+        - benchmark.request.id
+      tag-fields:
+        - benchmark.request.id
       correlation:
         fields:
-          - x-k6-index # Adds it to your logs (MDC) automatically
+          - benchmark.request.id
+          - x-benchmark-index # Adds it to your logs (MDC) automatically
     propagation:
       type: w3c, b3  # Ensure common propagation types are supported
   zipkin:
