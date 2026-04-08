@@ -2,6 +2,7 @@ package com.matchalab.subscription_killer_api.datasets
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
+import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 
 /**
@@ -9,7 +10,7 @@ import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
  */
 data class EmailSample(
     @JsonProperty("message")
-    val message: GmailApiMessage,
+    val message: GmailMessage,
     @JsonProperty("subscriptionEventType")
     val subscriptionEventType: SubscriptionEventType,
     @JsonProperty("subjectAnchors")

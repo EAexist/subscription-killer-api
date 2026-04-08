@@ -221,8 +221,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-commons")
+    implementation("io.opentelemetry:opentelemetry-extension-kotlin")
     // Source: https://mvnrepository.com/artifact/io.micrometer/micrometer-observation-test
     testImplementation("io.micrometer:micrometer-observation-test")
+
 
 //    implementation("io.zipkin.reporter2:zipkin-reporter-brave")
 //    runtimeOnly("io.micrometer:micrometer-registry-prometheus")

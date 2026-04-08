@@ -49,9 +49,9 @@ class SubscriptionAnalysisService(
     val after: Instant = DateTimeUtils.minusMonthsFromInstant(Instant.now(), mailProperties.analysisMonths)
 
     suspend fun analyze(appUserId: UUID) {
-        observationRegistry.observeSuspend(
-            "analyze",
-        ) {
+//        observationRegistry.observeSuspend(
+//            "analyze",
+//        ) {
 
             val googleAccountSubjects: List<String> = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
@@ -154,7 +154,7 @@ class SubscriptionAnalysisService(
                     AnalysisProgressStatus.COMPLETED
                 )
             }
-        }
+//        }
 
     }
 

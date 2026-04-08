@@ -37,6 +37,14 @@ internal data class Template(
     val subscriptionEventType: SubscriptionEventType,
 )
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class CompanyEmailSource(
+    val email: String,
+    val name: String,
+)
+
+
 /**
  * Component responsible for loading and providing email sample dataset
  */
@@ -54,8 +62,9 @@ class EmailDatasetProvider(
 
     private var currentOffset = 0
     private val batchSize = 50
-    private lateinit var companyEmailMap: Map<String, String>
+    private lateinit var companyEmailMap: Map<String, CompanyEmailSource>
     private lateinit var idToEmailSamples: Map<String, EmailSample>
+    private lateinit var idToEmailTemplates: Map<String, Template>
     private lateinit var sampleMessageSet: List<GmailMessage>
 
     /**
@@ -83,17 +92,21 @@ class EmailDatasetProvider(
     fun getSampleCount(): Int = idToEmailSamples.size
 
     fun getSubscriptionEventType(id: String): SubscriptionEventType? {
-//        logger.debug{ "id: $id sample: ${idToEmailSamples[id]} type: ${idToEmailSamples[id]?.subscriptionEventType}"}
         return idToEmailSamples[id]?.subscriptionEventType
     }
 
     fun getTemplate(id: String): EmailTemplate? {
-        return idToEmailSamples[id]?.template
+        return idToEmailTemplates[id]?.let { EmailTemplate(it.subject.extractAnchors(), it.snippet.extractAnchors()) }
     }
+
+    fun getSubscriptionEventTypeByTemplateId(id: String): SubscriptionEventType? {
+        return idToEmailTemplates[id]?.subscriptionEventType
+    }
+
 
     fun createEmailParamsFromDataset(): String {
         return idToEmailSamples.values.mapIndexed { index, emailSample ->
-            emailSample.message.toGmailMessage().toPromptParamString(index)
+            emailSample.message.toPromptParamString(index)
         }.joinToString("\n")
     }
 
@@ -101,13 +114,14 @@ class EmailDatasetProvider(
     @PostConstruct
     fun init() {
         this.companyEmailMap = loadCompanies()
+        this.idToEmailTemplates = loadTemplates()
         this.idToEmailSamples = loadDataset()
-        this.sampleMessageSet = idToEmailSamples.values.filter { it.message.payload.headers[0].value in companyEmailMap.values.toList().slice(0..4)}.shuffled().map {it.message.toGmailMessage()}
+        this.sampleMessageSet = idToEmailSamples.values.filter { it.message.senderEmail in companyEmailMap.values.toList().slice(0..4).map{c -> c.email}}.shuffled().map {it.message}
 
         logger.debug{ "EmailDatasetProvider Initialized. sample: ${idToEmailSamples.keys.first()}: ${idToEmailSamples.values.first()}"}
     }
 
-    private fun loadCompanies(): Map<String, String> {
+    private fun loadCompanies(): Map<String, CompanyEmailSource> {
 
         val resource = resourcePatternResolver.getResource(COMPANIES_DATA_PATH)
 
@@ -122,10 +136,12 @@ class EmailDatasetProvider(
 
         return rawCompanies.mapNotNull { company ->
             val id = company["id"] as? String
+            val names = @Suppress("UNCHECKED_CAST") (company["aliasNames"] as? Map<String, String>)
+            val name = names?.let{it["KO"] ?: it["EN"]}!!
             val emails = company["emailAddresses"] as? List<*>
             val firstEmail = emails?.firstOrNull() as? String
 
-            if (id != null && firstEmail != null) id to firstEmail else null
+            if (id != null && firstEmail != null) id to CompanyEmailSource(firstEmail, name) else null
         }.toMap()
     }
 
@@ -150,13 +166,13 @@ class EmailDatasetProvider(
     private fun loadDataset(): Map<String, EmailSample> {
         return try {
             val emails = loadEmails()
-            val templates = loadTemplates()
+            val templates = this.idToEmailTemplates
 
             val dataset = emails.mapNotNull { sample ->
                 val template = templates[sample.templateId]
                 template?.let {
                     sample.id to EmailSample(
-                        convertSampleToGmailApiMessage(sample),
+                        convertSampleToGmailMessage(sample),
                         sample.subscriptionEventType,
                         it.subject.extractAnchors(),
                         it.snippet.extractAnchors()
@@ -194,21 +210,18 @@ class EmailDatasetProvider(
         }
     }
 
-    private fun convertSampleToGmailApiMessage(sample: Sample): GmailApiMessage {
-        val companyEmail = companyEmailMap[sample.companyId]
+    private fun convertSampleToGmailMessage(sample: Sample): GmailMessage {
+        val company = companyEmailMap[sample.companyId]
             ?: throw Exception("Company ID '${sample.companyId}' not found")
 
-        return GmailApiMessage(
+        return GmailMessage(
             id = sample.id,
+            senderEmail = company.email,
+            senderName = company.name,
+            internalDate = Instant.now(),
+            subject = sample.subject,
             snippet = sample.snippet,
-            internalDate = Instant.now().toEpochMilli(),
-            payload = Payload(
-                headers = listOf(
-                    Header(name = "From", value = companyEmail),
-                    Header(name = "Subject", value = sample.subject)
-                )
-            )
+            templateId = sample.templateId
         )
     }
-
 }

@@ -14,4 +14,5 @@ data class GmailMessage(
     val senderEmail: String,
     val subject: String,
     val snippet: String,
+    val templateId: String? = null,
 ) {}

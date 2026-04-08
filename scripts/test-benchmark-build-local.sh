@@ -64,11 +64,15 @@ if [ -z "$GIT_TAG" ]; then
   echo "⚠️  No tag at HEAD. Falling back to: $GIT_TAG"
 fi
 
+# Get commit hash for Docker tag (like GitHub workflow)
+COMMIT_HASH=$(git rev-parse HEAD)
+echo "✓ Using commit hash as Docker tag: $COMMIT_HASH"
+
 # 1. Capture the exact ID from the build output
 docker buildx build \
   --load . \
-  --tag "subscription-killer-api:$GIT_TAG" \
-  --build-arg IMAGE_REVISION=$(git rev-parse HEAD) \
+  --tag "subscription-killer-api:$COMMIT_HASH" \
+  --build-arg IMAGE_REVISION=$COMMIT_HASH \
   --build-arg IMAGE_REF_NAME="${GIT_TAG}" \
   --build-arg IMAGE_CREATED=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --secret id=hf_token,env=HF_TOKEN \
@@ -76,21 +80,17 @@ docker buildx build \
   --progress=plain
 
 if [ $? -eq 0 ]; then
-  NEW_IMAGE_ID=$(docker images -q "subscription-killer-api:$GIT_TAG")
+  NEW_IMAGE_ID=$(docker images -q "subscription-killer-api:$COMMIT_HASH")
   echo "Successfully built: $NEW_IMAGE_ID"
 else
   echo "Build failed. Check the logs above."
   exit 1
 fi
 
-SHORT_ID=$(echo "${FULL_ID#sha256:}" | cut -c1-12)
+echo "Cleaning up old versions, keeping current image: $NEW_IMAGE_ID..."
 
-echo "Cleaning up old versions, keeping $SHORT_ID..."
-
-# 2. Get all IDs with that label
-# 3. Filter out the ID we just created
-# 4. Use uniq to avoid passing the same ID twice to rmi
-OLD_IMAGE_IDS=$(docker images -q --filter "label=org.opencontainers.image.title=subscription-killer-api" | grep -v "$SHORT_ID" | sort | uniq)
+# Get all IDs with that label, but exclude the one we just created
+OLD_IMAGE_IDS=$(docker images -q --filter "label=org.opencontainers.image.title=subscription-killer-api" | grep -v "$NEW_IMAGE_ID" | sort | uniq)
 
 if [ -n "$OLD_IMAGE_IDS" ]; then
     echo "Removing: $OLD_IMAGE_IDS"

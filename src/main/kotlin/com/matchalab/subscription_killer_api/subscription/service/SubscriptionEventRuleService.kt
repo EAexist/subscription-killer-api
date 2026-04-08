@@ -31,7 +31,7 @@ class SubscriptionEventRuleService(
 
     }
 
-    @Observed(name = "updateSubscriptionEventRules")
+//    @Observed(name = "updateSubscriptionEventRules")
     fun updateSubscriptionEventRules(
         emailSourceIdToMessages: Map<UUID, List<GmailMessage>>
     ) {
