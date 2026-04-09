@@ -7,6 +7,7 @@ data class EmailCategorizationResponse(
     val subsCancelMsgIds: List<String>,
     val monthlyMsgIds: List<String>,
     val annualMsgIds: List<String>,
+    val nonSubsMsgIds: List<String>,
 )
 
 fun EmailCategorizationResponse.toMessages(messages: List<GmailMessage>): List<GmailMessage> {
@@ -16,6 +17,7 @@ fun EmailCategorizationResponse.toMessages(messages: List<GmailMessage>): List<G
         this.subsCancelMsgIds,
         this.monthlyMsgIds,
         this.annualMsgIds,
+        this.nonSubsMsgIds,
     ).flatten().mapNotNull { idToMessage[it] }
 
 }

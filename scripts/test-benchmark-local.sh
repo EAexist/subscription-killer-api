@@ -38,7 +38,7 @@ cleanup() {
         trap - EXIT INT TERM  # Remove traps
         while true; do
             sleep 60
-        done
+        donek
         return
     fi
     
@@ -66,7 +66,6 @@ trap cleanup EXIT INT TERM
 
 main() {
     # Parse arguments
-    BENCHMARK_RUNS_ARG=""
     for arg in "$@"; do
         case "$arg" in
             --no-cleanup)
@@ -96,7 +95,7 @@ main() {
                 ;;
         esac
     done
-    
+
     # Override default if BENCHMARK_RUNS argument was provided
     if [ -n "$BENCHMARK_RUNS_ARG" ]; then
         BENCHMARK_RUNS="$BENCHMARK_RUNS_ARG"
@@ -136,22 +135,22 @@ main() {
 
     # Step 3: Initialize Benchmark and Get Traceparent
     log_info "Step 3: Initializing benchmark and getting traceparent..."
-    
+
     # Generate a unique runId for this benchmark run
     RUN_ID="test-run-$(date +%s)-$$"
     log_info "Generated runId: $RUN_ID"
-    
+
     # Initialize benchmark and get traceparent (once per test run)
     local start_response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "${BENCHMARK_START_URL}?runId=${RUN_ID}")
     local start_http_code=$(echo "$start_response" | tail -n1 | cut -d: -f2)
     local start_body=$(echo "$start_response" | sed '$d')
-    
+
     if [[ "$start_http_code" != "200" ]]; then
         log_error "Failed to initialize benchmark (HTTP $start_http_code)"
         echo "$start_body"
         exit 1
     fi
-    
+
     # Extract traceparent from response
     local traceparent=$(echo "$start_body" | jq -r '.traceparent' 2>/dev/null)
     if [[ -z "$traceparent" || "$traceparent" == "null" ]]; then
@@ -159,9 +158,9 @@ main() {
         echo "$start_body"
         exit 1
     fi
-    
+
     log_success "Benchmark initialized with runId: $RUN_ID, traceparent: $traceparent"
-    
+
     # Step 4: Run Benchmark Requests
     log_info "Step 4: Running Benchmark ($BENCHMARK_RUNS requests with different UUIDs)..."
     
