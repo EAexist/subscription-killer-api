@@ -80,9 +80,9 @@ class SubscriptionAnalysisService(
                 messages.forEach { message ->
                     val emailSource = emailSourceService.getEmailSource(message) ?: throw IllegalStateException("No active EmailSource found for sender: ${message.senderEmail}")
                     val event = emailSourceService.matchMessageToEvent(emailSource, message)
-//                    logger.debug {
-//                        "🔊 | emailSource: ${emailSource.id} message: ${message.subject}. event: $event"
-//                    }
+                    logger.debug {
+                        "🔊 | emailSource: ${emailSource.id} message: ${message.subject}. event: $event"
+                    }
                     if (event != null) {
                         subscriptionService.addEvent(
                             subject,

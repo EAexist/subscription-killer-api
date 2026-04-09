@@ -30,13 +30,23 @@ class EmailCategorizationPromptServiceImpl(
             getPrompt(),
             getParams(messages),
             aggregatedMessages.size
-            ).let { response ->
-                EmailCategorizationResponse(
-                    subsStartMsgIds = response["S"].orEmpty().map { aggregatedMessages[it].first.id },
-                    subsCancelMsgIds = response["C"].orEmpty().map { aggregatedMessages[it].first.id },
-                    monthlyMsgIds = response["M"].orEmpty().map { aggregatedMessages[it].first.id },
-                    annualMsgIds = response["A"].orEmpty().map { aggregatedMessages[it].first.id },
-                )
+        ).let { response ->
+            val selectedIndices = setOf(
+                *response["S"].orEmpty().toTypedArray(),
+                *response["C"].orEmpty().toTypedArray(),
+                *response["M"].orEmpty().toTypedArray(),
+                *response["A"].orEmpty().toTypedArray()
+            )
+
+            fun mapIndicesToIds(indices: List<Int>) = indices.map { aggregatedMessages[it].first.id }
+
+            EmailCategorizationResponse(
+                subsStartMsgIds = mapIndicesToIds(response["S"].orEmpty()),
+                subsCancelMsgIds = mapIndicesToIds(response["C"].orEmpty()),
+                monthlyMsgIds = mapIndicesToIds(response["M"].orEmpty()),
+                annualMsgIds = mapIndicesToIds(response["A"].orEmpty()),
+                nonSubsMsgIds = mapIndicesToIds(aggregatedMessages.indices.filter { it !in selectedIndices }),
+            )
             }
     }
 

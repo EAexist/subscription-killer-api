@@ -88,7 +88,8 @@ class SubscriptionEventRuleService(
                     subsStartMsgIds = emailCategorizationResponse.subsStartMsgIds.filter { it in sourceMessageIds },
                     subsCancelMsgIds = emailCategorizationResponse.subsCancelMsgIds.filter { it in sourceMessageIds },
                     monthlyMsgIds = emailCategorizationResponse.monthlyMsgIds.filter { it in sourceMessageIds },
-                    annualMsgIds = emailCategorizationResponse.annualMsgIds.filter { it in sourceMessageIds }
+                    annualMsgIds = emailCategorizationResponse.annualMsgIds.filter { it in sourceMessageIds },
+                    nonSubsMsgIds = emailCategorizationResponse.nonSubsMsgIds.filter { it in sourceMessageIds }
                 )
 
                 val sourceSubscriptionEventRuleGenerationDtos =

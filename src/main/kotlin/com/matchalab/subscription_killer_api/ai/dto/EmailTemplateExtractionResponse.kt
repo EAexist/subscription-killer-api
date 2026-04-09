@@ -37,6 +37,12 @@ fun List<EmailTemplateExtractionResult>.toSubscriptionEventRuleGenerationDto(
                 SubscriptionEventType.ANNUAL_PAYMENT
             )
         }
+        emailCategorizationResponse.nonSubsMsgIds.forEach {
+            put(
+                it,
+                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL
+            )
+        }
     }
     return this
         .map { result ->
