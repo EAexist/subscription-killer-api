@@ -21,7 +21,7 @@ class EmailCategorizationPromptServiceImpl(
 
     override fun run(messages: List<GmailMessage>): EmailCategorizationResponse {
 
-        val aggregatedMessages: List<Pair<GmailMessage, List<Instant>>> = filterRedundantTemplates(messages)
+        val aggregatedMessages: List<GmailMessage> = filterRedundantTemplates(messages)
 
         logger.debug { "[run] ✨ Condensed messages: ${messages.size} -> ${aggregatedMessages.size}" }
         logger.debug { "[run] ✨ Calling chatClient for ${aggregatedMessages.size} messages" }
@@ -34,43 +34,24 @@ class EmailCategorizationPromptServiceImpl(
             val selectedIndices = setOf(
                 *response["S"].orEmpty().toTypedArray(),
                 *response["C"].orEmpty().toTypedArray(),
-                *response["M"].orEmpty().toTypedArray(),
-                *response["A"].orEmpty().toTypedArray()
             )
 
-            fun mapIndicesToIds(indices: List<Int>) = indices.map { aggregatedMessages[it].first.id }
+            fun mapIndicesToIds(indices: List<Int>) = indices.map { aggregatedMessages[it].id }
 
             EmailCategorizationResponse(
-                subsStartMsgIds = mapIndicesToIds(response["S"].orEmpty()),
+                subsStartOrPaymentMsgIds = mapIndicesToIds(response["S"].orEmpty()),
                 subsCancelMsgIds = mapIndicesToIds(response["C"].orEmpty()),
-                monthlyMsgIds = mapIndicesToIds(response["M"].orEmpty()),
-                annualMsgIds = mapIndicesToIds(response["A"].orEmpty()),
                 nonSubsMsgIds = mapIndicesToIds(aggregatedMessages.indices.filter { it !in selectedIndices }),
             )
             }
     }
 
     fun getParams(messages: List<GmailMessage>): Map<String, String> {
-        val aggregatedMessages: List<Pair<GmailMessage, List<Instant>>> = filterRedundantTemplates(messages)
+        val aggregatedMessages: List<GmailMessage> = filterRedundantTemplates(messages)
         return mapOf("emails" to aggregatedMessages.withIndex().joinToString("\n") { (index, it) ->
-            val internalDates = it.second
-
-            val dateString = if (internalDates.size >= 2) {
-                "|${
-                    internalDates
-                        .take(2)
-                        .map { it.atZone(ZoneId.of("UTC")).toLocalDate() }
-                        .distinct()
-                        .joinToString(",") { it.format(DateTimeFormatter.ofPattern("yyMMdd")) }
-                }"
-            } else ""
-
-            "${
-                it.first.toPromptParamString(
+                it.toPromptParamString(
                     index
                 )
-            }${dateString}"
-
         })
     }
 
@@ -78,12 +59,8 @@ class EmailCategorizationPromptServiceImpl(
 
     fun getDataCount(messages: List<GmailMessage>) : Int = filterRedundantTemplates(messages).size
 
-    fun filterRedundantTemplates(messages: List<GmailMessage>): List<Pair<GmailMessage, List<Instant>>> = messages
+    fun filterRedundantTemplates(messages: List<GmailMessage>): List<GmailMessage> = messages
         .groupBy { it.subject to it.snippet }
-        .map { (_, group) ->
-            Pair(
-                group.first(),
-                group.map { it.internalDate }.sorted(),
-            )
+        .map { (_, group) -> group.first()
         }
 }

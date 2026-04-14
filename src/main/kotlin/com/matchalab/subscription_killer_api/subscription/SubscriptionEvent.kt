@@ -5,6 +5,7 @@ import java.time.Instant
 class SubscriptionEvent(
     var internalDate: Instant? = null,
     var type: SubscriptionEventType,
+    var isMonthlyRecurring: Boolean = false,
 ) {
 }
 //@Entity

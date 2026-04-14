@@ -78,7 +78,7 @@ class SubscriptionAnalysisService(
 //                    "🔊 | [googleSubjectToMessages] subject: $subject, messages size: ${messages.size}"
 //                }
                 messages.forEach { message ->
-                    val emailSource = emailSourceService.getEmailSource(message) ?: throw IllegalStateException("No active EmailSource found for sender: ${message.senderEmail}")
+                    val emailSource = emailSourceService.getEmailSource(message) ?: throw IllegalStateException("No active EmailSource found for sender: ${message.senderName}, ${message.senderEmail}, ${message.subject}")
                     val event = emailSourceService.matchMessageToEvent(emailSource, message)
                     logger.debug {
                         "🔊 | emailSource: ${emailSource.id} message: ${message.subject}. event: $event"

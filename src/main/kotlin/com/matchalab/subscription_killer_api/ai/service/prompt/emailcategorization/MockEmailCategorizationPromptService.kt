@@ -25,35 +25,27 @@ class MockEmailCategorizationPromptService(
 
         emailCategorizationPromptServiceImpl.run(messages)
 
-        val aggregatedMessages: List<GmailMessage> = emailCategorizationPromptServiceImpl.filterRedundantTemplates(messages).map{ it.first }
+        val aggregatedMessages: List<GmailMessage> = emailCategorizationPromptServiceImpl.filterRedundantTemplates(messages)
 
-        val subsStartMsgIndexes = mutableListOf<String>()
+        val subsStartOrPaymentMsgIndexes = mutableListOf<String>()
         val subsCancelMsgIndexes = mutableListOf<String>()
-        val monthlyMsgIndexes = mutableListOf<String>()
-        val annualMsgIndexes = mutableListOf<String>()
 
-        val subsStartMsgIds = mutableListOf<String>()
+        val subsStartOrPaymentMsgIds = mutableListOf<String>()
         val subsCancelMsgIds = mutableListOf<String>()
-        val monthlyMsgIds = mutableListOf<String>()
-        val annualMsgIds = mutableListOf<String>()
         val nonSubsMsgIds = mutableListOf<String>()
 
         aggregatedMessages.withIndex().forEach { (index, message) ->
             val eventType = emailDatasetProvider.getSubscriptionEventTypeByTemplateId(message.templateId!!)
 //            logger.debug { "eventType: ${eventType} senderEmail: ${message.senderEmail} subject: ${message.subject}" }
             when (eventType) {
-                SubscriptionEventType.SUBSCRIPTION_START -> { subsStartMsgIndexes.add(index.toString()); subsStartMsgIds.add(message.id) }
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT -> { subsStartOrPaymentMsgIndexes.add(index.toString()); subsStartOrPaymentMsgIds.add(message.id) }
                 SubscriptionEventType.SUBSCRIPTION_CANCEL -> { subsCancelMsgIndexes.add(index.toString()); subsCancelMsgIds.add(message.id) }
-                SubscriptionEventType.MONTHLY_PAYMENT -> { monthlyMsgIndexes.add(index.toString()); monthlyMsgIds.add(message.id) }
-                SubscriptionEventType.ANNUAL_PAYMENT -> { annualMsgIndexes.add(index.toString()); annualMsgIds.add(message.id) }
                 SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL, null -> { nonSubsMsgIds.add(message.id) }
             }
         }
 
         val response = mapOf(
-            "M" to monthlyMsgIndexes,
-            "A" to annualMsgIndexes,
-            "S" to subsStartMsgIndexes,
+            "S" to subsStartOrPaymentMsgIndexes,
             "C" to subsCancelMsgIndexes,
         )
 
@@ -65,16 +57,14 @@ class MockEmailCategorizationPromptService(
             taskName = "categorize_emails",
             prompt = emailCategorizationPromptServiceImpl.getPrompt(),
             params = emailCategorizationPromptServiceImpl.getParams(messages),
-            outputFormattingString = "{\"M\":[],\"A\":[],\"S\":[],\"C\":[]}",
+            outputFormattingString = "{\"S\":[],\"C\":[]}",
             dataCount = emailCategorizationPromptServiceImpl.getDataCount(messages),
             outputString = resultJson
         )
 
         return EmailCategorizationResponse(
-            subsStartMsgIds = subsStartMsgIds,
+            subsStartOrPaymentMsgIds = subsStartOrPaymentMsgIds,
             subsCancelMsgIds = subsCancelMsgIds,
-            monthlyMsgIds = monthlyMsgIds,
-            annualMsgIds = annualMsgIds,
             nonSubsMsgIds = nonSubsMsgIds,
         )
     }

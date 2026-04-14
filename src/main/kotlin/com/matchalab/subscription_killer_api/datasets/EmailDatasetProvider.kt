@@ -116,7 +116,7 @@ class EmailDatasetProvider(
         this.companyEmailMap = loadCompanies()
         this.idToEmailTemplates = loadTemplates()
         this.idToEmailSamples = loadDataset()
-        this.sampleMessageSet = idToEmailSamples.values.filter { it.message.senderEmail in companyEmailMap.values.toList().slice(0..4).map{c -> c.email}}.shuffled().map {it.message}
+        this.sampleMessageSet = idToEmailSamples.values.filter { it.message.senderEmail in companyEmailMap.values.toList().filter{ c -> c.name != "Gemini Advanced"}.slice(0..4).map{c -> c.email}}.shuffled().map {it.message}
 
         logger.debug{ "EmailDatasetProvider Initialized. sample: ${idToEmailSamples.keys.first()}: ${idToEmailSamples.values.first()}"}
     }

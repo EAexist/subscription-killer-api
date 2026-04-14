@@ -80,8 +80,8 @@ app:
     max-snippet-size: 100
   min-request-interval-hours: 72
   prompts:
-    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v5.st
-    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v5.st
+    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v6.st
+    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v6.st
   guest-app-user:
     id: 30f9a265-4f7d-3b1a-8e2b-7c4d5e6f8a9b
     name: GUEST_APP_USER_NAME

@@ -3,20 +3,16 @@ package com.matchalab.subscription_killer_api.ai.dto
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 
 data class EmailCategorizationResponse(
-    val subsStartMsgIds: List<String>,
+    val subsStartOrPaymentMsgIds: List<String>,
     val subsCancelMsgIds: List<String>,
-    val monthlyMsgIds: List<String>,
-    val annualMsgIds: List<String>,
     val nonSubsMsgIds: List<String>,
 )
 
 fun EmailCategorizationResponse.toMessages(messages: List<GmailMessage>): List<GmailMessage> {
     val idToMessage = messages.associateBy { it.id }
     return listOf(
-        this.subsStartMsgIds,
+        this.subsStartOrPaymentMsgIds,
         this.subsCancelMsgIds,
-        this.monthlyMsgIds,
-        this.annualMsgIds,
         this.nonSubsMsgIds,
     ).flatten().mapNotNull { idToMessage[it] }
 

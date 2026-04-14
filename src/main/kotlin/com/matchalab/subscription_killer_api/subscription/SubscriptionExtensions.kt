@@ -82,7 +82,7 @@ fun Subscription.isCanceled(): Boolean {
 fun Subscription.getLatestSubscriptionStartDate(
 ): Instant? {
     val startEvents = subscriptionEvents
-        .filter { it.type == SubscriptionEventType.SUBSCRIPTION_START }
+        .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && !it.isMonthlyRecurring  }
 
     return startEvents.mapNotNull { it.internalDate }.maxOfOrNull { it }
 }
@@ -98,7 +98,7 @@ fun Subscription.getLatestSubscriptionCancelDate(
 fun Subscription.getLatestMonthlySubscriptionDate(
 ): Instant? {
     val cancelEvents = subscriptionEvents
-        .filter { it.type == SubscriptionEventType.MONTHLY_PAYMENT }
+        .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && it.isMonthlyRecurring }
 
     return cancelEvents.mapNotNull { it.internalDate }.maxOfOrNull { it }
 }
@@ -106,7 +106,7 @@ fun Subscription.getLatestMonthlySubscriptionDate(
 fun Subscription.getFirstOfConsecutiveMonthlySubscriptionDate(
 ): Instant? {
     val monthlyPaymentEvents = subscriptionEvents
-        .filter { it.type == SubscriptionEventType.MONTHLY_PAYMENT }
+        .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && it.isMonthlyRecurring }
         .map {it.internalDate}
         .sortedByDescending { it }
 

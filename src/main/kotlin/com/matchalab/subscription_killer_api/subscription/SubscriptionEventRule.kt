@@ -15,6 +15,8 @@ data class SubscriptionEventRule(
     val eventType: SubscriptionEventType,
 
     val template: EmailTemplate,
+
+    var isMonthlyRecurring: Boolean = false,
 ) {
     companion object {
         fun createActive(generationDto: SubscriptionEventRuleGenerationDto, updatedAt: Instant): SubscriptionEventRule {

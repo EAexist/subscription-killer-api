@@ -4,8 +4,6 @@ Decide ONE label per email.
 Do NOT explain your decision, reason, or output extra text.
 
 Valid Keys:
-M = MONTHLY_PAYMENT
-A = ANNUAL_PAYMENT
 S = SUBSCRIPTION_START
 C = SUBSCRIPTION_CANCEL
 

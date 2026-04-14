@@ -35,10 +35,10 @@ class EmailSource(
 
     ) {
 
-    fun hasPaymentStartRule() = eventRules.any { it.eventType == SubscriptionEventType.SUBSCRIPTION_START && it.isActive }
+    fun hasPaymentStartRule() = eventRules.any { it.eventType == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT && it.isActive && !it.isMonthlyRecurring }
     fun hasPaymentCancelRule() = eventRules.any { it.eventType == SubscriptionEventType.SUBSCRIPTION_CANCEL && it.isActive }
-    fun hasMonthlyPaymentRule() = eventRules.any { it.eventType == SubscriptionEventType.MONTHLY_PAYMENT && it.isActive }
-    fun hasAnnualPaymentRule() = eventRules.any { it.eventType == SubscriptionEventType.ANNUAL_PAYMENT && it.isActive }
+    fun hasMonthlyPaymentRule() = eventRules.any { it.eventType == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT && it.isActive && it.isMonthlyRecurring }
+//    fun hasAnnualPaymentRule() = eventRules.any { it.eventType == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT && it.isActive }
 
     fun addSubscriptionEventRules(
         newRules: List<SubscriptionEventRuleGenerationDto>,
