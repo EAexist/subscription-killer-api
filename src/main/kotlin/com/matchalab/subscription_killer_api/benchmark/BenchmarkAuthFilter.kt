@@ -1,7 +1,7 @@
 package com.matchalab.subscription_killer_api.benchmark
 
+import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
 import com.matchalab.subscription_killer_api.domain.AppUser
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.service.AppUserService
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,8 +42,9 @@ class BenchmarkAuthFilter(private val appUserService: AppUserService) : OncePerR
                 AppUser(
                     name = "Benchmark User",
                 )
-            appUser.addGoogleAccount(
-                GoogleAccount(
+            appUserService.addGoogleAccount(
+                appUser,
+                AddGoogleAccountCommand(
                     appUserId.toString(),
                     "Benchmark User",
                     "${appUserId.toString().take(8)}@example.com",
@@ -93,9 +94,9 @@ class BenchmarkAuthFilter(private val appUserService: AppUserService) : OncePerR
             )
 
             SecurityContextHolder.getContext().authentication = auth
-            logger.debug {"DEBUG: BenchmarkAuthFilter - Set authentication: ${auth.principal}"}
+            logger.debug { "DEBUG: BenchmarkAuthFilter - Set authentication: ${auth.principal}" }
         } else {
-            logger.debug {"DEBUG: BenchmarkAuthFilter - No X-Benchmark-User-Id header found"}
+            logger.debug { "DEBUG: BenchmarkAuthFilter - No X-Benchmark-User-Id header found" }
         }
 
         filterChain.doFilter(request, response)

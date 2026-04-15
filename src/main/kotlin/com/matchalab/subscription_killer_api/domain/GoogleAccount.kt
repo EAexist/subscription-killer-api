@@ -22,6 +22,7 @@ class GoogleAccount(
     var scope: String? = null,
 
     var analyzedAt: Instant? = null,
+    var lastEmailSyncedAt: Instant,
 
     @OneToMany(mappedBy = "googleAccount", cascade = [CascadeType.ALL], orphanRemoval = true)
     var subscriptions: MutableList<Subscription> = mutableListOf(),
@@ -29,6 +30,7 @@ class GoogleAccount(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id", nullable = false)
     var appUser: AppUser? = null
+
 ) {
 //    constructor(
 //        payload: GoogleIdToken.Payload

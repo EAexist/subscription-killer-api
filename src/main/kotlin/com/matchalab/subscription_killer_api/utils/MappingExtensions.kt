@@ -1,10 +1,12 @@
 package com.matchalab.subscription_killer_api.utils
 
 import com.google.api.services.gmail.model.Message
+import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
 import com.matchalab.subscription_killer_api.datasets.GmailApiMessage
 import com.matchalab.subscription_killer_api.datasets.Header
 import com.matchalab.subscription_killer_api.datasets.Payload
+import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
@@ -14,6 +16,14 @@ import com.matchalab.subscription_killer_api.subscription.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
+
+
+fun AppUser.toResponseDto(): AppUserResponseDto {
+    return AppUserResponseDto(
+        name = this.name,
+        googleAccounts = this.googleAccounts.map { it.toResponseDto() }
+    )
+}
 
 fun GoogleAccount.toResponseDto(): GoogleAccountResponseDto {
     return GoogleAccountResponseDto(
@@ -76,9 +86,11 @@ fun GmailApiMessage.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
         id = this.id,
         senderName = name,
         senderEmail = email,
-        subject = subjectHeaderValue.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it },
+        subject = subjectHeaderValue.cleanEmailText()
+            .let { if (doHidePrices) it.hidePrices() else it },
         internalDate = internalDate,
-        snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }.take(maxSnippetSize)
+        snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }
+            .take(maxSnippetSize)
     )
 }
 

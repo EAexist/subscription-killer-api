@@ -1,9 +1,12 @@
 package com.matchalab.subscription_killer_api.service
 
 import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
+import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
+import com.matchalab.subscription_killer_api.subscription.config.MailProperties
+import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -18,7 +21,8 @@ private val logger = KotlinLogging.logger {}
 @Service
 class AppUserService(
     private val appUserRepository: AppUserRepository,
-    private val guestAppUserProperties: GuestAppUserProperties
+    private val guestAppUserProperties: GuestAppUserProperties,
+    private val mailProperties: MailProperties
 ) {
 
     fun existsByName(name: String): Boolean {
@@ -40,8 +44,12 @@ class AppUserService(
         return appUserRepository.findGoogleAccountSubjectsByAppUserId(appUserId)
     }
 
-    fun findByIdWithAccounts(appUserId: UUID): AppUser? {
-        return appUserRepository.findByIdWithAccounts(appUserId)
+    fun findByIdWithGoogleAccounts(appUserId: UUID): AppUser {
+        return appUserRepository.findByIdWithGoogleAccounts(appUserId)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "AppUser appUserId=$appUserId not found"
+            )
     }
 
     fun findByGoogleAccounts_Subject(googleSub: String): AppUser? {
@@ -52,8 +60,8 @@ class AppUserService(
         return findByIdOrNotFound(guestAppUserProperties.id)
     }
 
-    fun findMinAnalyzedAtByUserId(appUserId: UUID): Instant? {
-        return appUserRepository.findMinAnalyzedAtByUserId(appUserId)
+    fun findLastEmailSyncedAtByUserId(appUserId: UUID): Instant? {
+        return appUserRepository.findLastEmailSyncedAtByUserId(appUserId)
     }
 
     fun save(appUser: AppUser): AppUser {
@@ -68,49 +76,36 @@ class AppUserService(
         val appUser = AppUser(
             name = user.givenName
         )
-        appUser.addGoogleAccount(GoogleAccount(subject = user.name, name = user.givenName, email = user.email))
+        addGoogleAccount(
+            appUser,
+            AddGoogleAccountCommand(
+                user.name, user.givenName, user.email
+            )
+        )
 
         return appUserRepository.save(
             appUser
         )
     }
 
-//    fun getAppUser(): AppUser {
-//        val count = appUserRepository.count()
-//        logger.debug { "\uD83D\uDE80 | Total users in DB: $count" }
-//        val appUserId = getAppUserId()
-//        return appUserRepository.findById(appUserId)
-//            .orElseThrow { EntityNotFoundException("User not found with id $appUserId") }
-//    }
-
-//    fun getAppUser(appUserId: UUID): AppUser {
-//        return appUserRepository.findById(appUserId)
-//            .orElseThrow { EntityNotFoundException("User not found with id $appUserId") }
-//    }
-//    @Transactional
-//    fun findByGoogleAccountSubjectOrRegister(
-//        payload: GoogleIdToken.Payload
-//    ): LoginOrRegisterResult {
-//        val existingAppUser: AppUser? =
-//            appUserRepository.findByGoogleAccounts_Subject(payload.subject)
-//
-//        return existingAppUser?.let { appUser -> LoginOrRegisterResult.LoggedIn(appUser) }
-//            ?: run {
-//                val newUser = AppUser(name = payload["name"] as String)
-//                val newGoogleAccount = GoogleAccount(payload)
-//
-//                newUser.addGoogleAccount(newGoogleAccount)
-//                val savedUser = appUserRepository.save(newUser)
-//
-//                LoginOrRegisterResult.Registered(savedUser)
-//            }
-//
-//        // return appUserRepository.findByGoogleAccounts_Subject(payload.subject).orElseGet {
-//        //     val newUser = AppUser(name = payload.get("name") as String)
-//        //     val newGoogleAccount = GoogleAccount(payload)
-//        //     newUser.addGoogleAccount(newGoogleAccount)
-//        //     val savedUser = appUserRepository.save(newUser)
-//        //     return@orElseGet savedUser
-//        // }
-//    }
+    fun addGoogleAccount(
+        appUser: AppUser,
+        command: AddGoogleAccountCommand,
+    ) {
+        appUser.addGoogleAccount(
+            GoogleAccount(
+                subject = command.subject,
+                name = command.name,
+                email = command.email,
+                refreshToken = command.refreshToken,
+                accessToken = command.accessToken,
+                expiresAt = command.expiresAt,
+                scope = command.scope,
+                lastEmailSyncedAt = DateTimeUtils.minusMonthsFromInstant(
+                    Instant.now(),
+                    mailProperties.analysisMonths
+                )
+            )
+        )
+    }
 }

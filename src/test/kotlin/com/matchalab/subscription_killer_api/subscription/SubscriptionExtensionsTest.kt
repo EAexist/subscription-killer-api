@@ -1,7 +1,8 @@
 package com.matchalab.subscription_killer_api.subscription
 
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -24,7 +25,10 @@ class SubscriptionExtensionsTest {
             SubscriptionEvent(twoDaysAgo, SubscriptionEventType.SUBSCRIPTION_CANCEL),
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_CANCEL),
             SubscriptionEvent(yesterday, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(3, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_CANCEL)
+            SubscriptionEvent(
+                now.minus(3, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_CANCEL
+            )
         )
 
         // When
@@ -45,8 +49,16 @@ class SubscriptionExtensionsTest {
         val now = Instant.now()
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(1, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(2, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true)
+            SubscriptionEvent(
+                now.minus(1, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                now.minus(2, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            )
         )
 
         // When
@@ -72,8 +84,16 @@ class SubscriptionExtensionsTest {
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
             SubscriptionEvent(yesterday, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(twoDaysAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(trhreeDaysAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, false)
+            SubscriptionEvent(
+                twoDaysAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                trhreeDaysAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                false
+            )
         )
 
         // When
@@ -94,8 +114,15 @@ class SubscriptionExtensionsTest {
         val now = Instant.now()
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(1, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(2, ChronoUnit.DAYS), SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL)
+            SubscriptionEvent(
+                now.minus(1, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                now.minus(2, ChronoUnit.DAYS),
+                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL
+            )
         )
 
         // When
@@ -121,7 +148,10 @@ class SubscriptionExtensionsTest {
             SubscriptionEvent(twoDaysAgo, SubscriptionEventType.SUBSCRIPTION_CANCEL),
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_CANCEL),
             SubscriptionEvent(yesterday, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(3, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_CANCEL)
+            SubscriptionEvent(
+                now.minus(3, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_CANCEL
+            )
         )
 
         // When
@@ -142,8 +172,16 @@ class SubscriptionExtensionsTest {
         val now = Instant.now()
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(1, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(2, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true)
+            SubscriptionEvent(
+                now.minus(1, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                now.minus(2, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            )
         )
 
         // When
@@ -166,10 +204,18 @@ class SubscriptionExtensionsTest {
         val twoDaysAgo = now.minus(2, ChronoUnit.DAYS)
 
         subscription.subscriptionEvents = mutableListOf(
-            SubscriptionEvent(twoDaysAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
+            SubscriptionEvent(
+                twoDaysAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
             SubscriptionEvent(yesterday, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(3, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true)
+            SubscriptionEvent(
+                now.minus(3, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            )
         )
 
         // When
@@ -190,8 +236,15 @@ class SubscriptionExtensionsTest {
         val now = Instant.now()
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, false),
-            SubscriptionEvent(now.minus(1, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, false),
-            SubscriptionEvent(now.minus(2, ChronoUnit.DAYS), SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL)
+            SubscriptionEvent(
+                now.minus(1, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                false
+            ),
+            SubscriptionEvent(
+                now.minus(2, ChronoUnit.DAYS),
+                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL
+            )
         )
 
         // When
@@ -213,15 +266,36 @@ class SubscriptionExtensionsTest {
         val oneMonthAgo = now.minus(30, ChronoUnit.DAYS)
         val twoMonthsAgo = now.minus(60, ChronoUnit.DAYS)
         val threeMonthsAgo = now.minus(90, ChronoUnit.DAYS)
-        val fourMonthsAgo = now.minus(136, ChronoUnit.DAYS) // This should break the consecutive chain
+        val fourMonthsAgo =
+            now.minus(136, ChronoUnit.DAYS) // This should break the consecutive chain
 
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(oneMonthAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(twoMonthsAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(threeMonthsAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(fourMonthsAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true), // Too old, should break chain
-            SubscriptionEvent(now.minus(10, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true)
+            SubscriptionEvent(
+                oneMonthAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                twoMonthsAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                threeMonthsAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                fourMonthsAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ), // Too old, should break chain
+            SubscriptionEvent(
+                now.minus(10, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            )
         )
 
         // When
@@ -242,8 +316,15 @@ class SubscriptionExtensionsTest {
         val now = Instant.now()
         subscription.subscriptionEvents = mutableListOf(
             SubscriptionEvent(now, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, false),
-            SubscriptionEvent(now.minus(1, ChronoUnit.DAYS), SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL),
-            SubscriptionEvent(now.minus(2, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, false),
+            SubscriptionEvent(
+                now.minus(1, ChronoUnit.DAYS),
+                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL
+            ),
+            SubscriptionEvent(
+                now.minus(2, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                false
+            ),
         )
 
         // When
@@ -265,8 +346,16 @@ class SubscriptionExtensionsTest {
         val fourMonthsAgo = now.minus(120, ChronoUnit.DAYS) // Too old
 
         subscription.subscriptionEvents = mutableListOf(
-            SubscriptionEvent(fourMonthsAgo, SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true),
-            SubscriptionEvent(now.minus(150, ChronoUnit.DAYS), SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT, true)
+            SubscriptionEvent(
+                fourMonthsAgo,
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            ),
+            SubscriptionEvent(
+                now.minus(150, ChronoUnit.DAYS),
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT,
+                true
+            )
         )
 
         // When
@@ -290,6 +379,7 @@ class SubscriptionExtensionsTest {
             "",
             "",
             "",
+            lastEmailSyncedAt = Instant.now()
         )
     }
 }

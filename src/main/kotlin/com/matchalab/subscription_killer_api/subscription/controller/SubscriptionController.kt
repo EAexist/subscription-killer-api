@@ -1,7 +1,6 @@
 package com.matchalab.subscription_killer_api.subscription.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
-import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
@@ -27,7 +26,7 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 @ConfigurationProperties(prefix = "app")
-data class AppProperties(val minRequestIntervalHours: Long)
+data class AppProperties(val minRequestIntervalSeconds: Long)
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -49,16 +48,12 @@ class SubscriptionController(
         } ?: ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/updates/eligibility")
-    fun getUpdateEligibility(@AuthenticatedUser appUserId: UUID): ReportUpdateEligibilityDto {
-        return reportService.getUpdateEligibility(appUserId)
-    }
-
     @PostMapping("/updates")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): ResponseEntity<Any> {
 
-        val reportUpdateEligibility: ReportUpdateEligibilityDto = reportService.getUpdateEligibility(appUserId)
+        val reportUpdateEligibility: ReportUpdateEligibilityDto =
+            reportService.getUpdateEligibility(appUserId)
 
         if (!reportUpdateEligibility.canUpdate) {
 
@@ -69,7 +64,7 @@ class SubscriptionController(
 
             val problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.TOO_MANY_REQUESTS,
-                "Minimum interval between analyses is ${appProperties.minRequestIntervalHours} hours."
+                "Retry after ${secondsUntilNextAllowed.toString()} seconds."
             ).apply {
                 title = "Too Frequent Requests"
             }
@@ -97,5 +92,10 @@ class SubscriptionController(
                 .contentType(MediaType.APPLICATION_JSON).build<Void>()
         }
         return ResponseEntity.ok(progressService.createEmitter(appUserId))
+    }
+
+    @GetMapping("/updates/eligibility")
+    fun getUpdateEligibility(@AuthenticatedUser appUserId: UUID): ReportUpdateEligibilityDto {
+        return reportService.getUpdateEligibility(appUserId)
     }
 }

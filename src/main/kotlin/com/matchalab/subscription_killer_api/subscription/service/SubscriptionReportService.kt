@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
-import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.service.GoogleAccountService
 import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
@@ -22,24 +21,25 @@ class SubscriptionReportService(
     private val appUserService: AppUserService,
     private val googleAccountService: GoogleAccountService,
     private val appProperties: AppProperties,
-    private val guestAppUserProperties: GuestAppUserProperties,
 ) {
 
     fun getUpdateEligibility(appUserId: UUID): ReportUpdateEligibilityDto {
 
-        val analyzedAt: Instant = appUserService.findMinAnalyzedAtByUserId(appUserId) ?: return ReportUpdateEligibilityDto(true)
+        val lastEmailSyncedAt: Instant = appUserService.findLastEmailSyncedAtByUserId(appUserId)
+            ?: return ReportUpdateEligibilityDto(true)
 
-        val availableSince: Instant = if (false) analyzedAt else
-            analyzedAt.plus(appProperties.minRequestIntervalHours, ChronoUnit.HOURS)
+        val availableSince: Instant =
+            lastEmailSyncedAt.plus(appProperties.minRequestIntervalSeconds, ChronoUnit.SECONDS)
         val canUpdate: Boolean = availableSince.isBefore(Instant.now())
 
-        return ReportUpdateEligibilityDto(canUpdate, analyzedAt, availableSince)
+        return ReportUpdateEligibilityDto(canUpdate, lastEmailSyncedAt, availableSince)
 
     }
 
     fun getReport(appUserId: UUID): SubscriptionReportResponseDto? {
 
-        val hasAnalyzedSubscription = googleAccountService.existsAnalyzedSubscriptionByAppUserId(appUserId)
+        val hasAnalyzedSubscription =
+            googleAccountService.existsAnalyzedSubscriptionByAppUserId(appUserId)
 
         if (!hasAnalyzedSubscription) {
             return null

@@ -10,7 +10,7 @@ import java.util.*
 interface AppUserRepository : JpaRepository<AppUser, UUID> {
 
     fun existsByName(name: String): Boolean
-    
+
     @Query(
         """
         SELECT DISTINCT u 
@@ -25,19 +25,21 @@ interface AppUserRepository : JpaRepository<AppUser, UUID> {
     fun findGoogleAccountSubjectsByAppUserId(appUserId: UUID): List<String>
 
     @Query("SELECT u FROM AppUser u LEFT JOIN FETCH u.googleAccounts WHERE u.id = :id")
-    fun findByIdWithAccounts(id: UUID): AppUser?
+    fun findByIdWithGoogleAccounts(id: UUID): AppUser?
 
     @Query("SELECT COUNT(u) > 0 FROM AppUser u JOIN u.googleAccounts ga WHERE ga.subject = :subject")
     fun existsByGoogleAccounts_Subject(subject: String): Boolean
 
-    @Query("SELECT MIN(ga.analyzedAt) FROM AppUser u JOIN u.googleAccounts ga WHERE u.id = :id")
-    fun findMinAnalyzedAtByUserId(id: UUID): Instant?
+    @Query("SELECT MAX(ga.lastEmailSyncedAt) FROM AppUser u JOIN u.googleAccounts ga WHERE u.id = :id")
+    fun findLastEmailSyncedAtByUserId(id: UUID): Instant?
 
-    @Query("""
+    @Query(
+        """
         SELECT DISTINCT ga FROM GoogleAccount ga 
         LEFT JOIN FETCH ga.subscriptions s 
         LEFT JOIN FETCH s.serviceProvider 
         WHERE ga.appUser.id = :id
-    """)
-    fun findGoogleAccountsWithFullSubscriptions(id: UUID):List<GoogleAccount>
+    """
+    )
+    fun findGoogleAccountsWithFullSubscriptions(id: UUID): List<GoogleAccount>
 }
