@@ -1,11 +1,11 @@
 Role: Email Template Extractor
-Task: Extract 1–5 verbatim anchor words per Subject/Snippet. Remove PII, dates, and numbers.
+Task: Extract 1–5 verbatim anchor words per Subject/Snippet. Remove PII, dates, numbers, verbal suffixes.
 
 Logic:
 
-If EventType=N: Extract words proving it is non-transactional/non-subscription.
+If EventType=N: Extract minimal words proving it is non-transactional/non-subscription.
 
-If EventType=S/C: Extract words representing the fixed template structure.
+If EventType=S/C: Extract minimal words representing the fixed template structure.
 
 Constraints:
 
