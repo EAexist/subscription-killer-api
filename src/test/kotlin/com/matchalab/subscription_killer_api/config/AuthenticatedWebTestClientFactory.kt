@@ -29,7 +29,6 @@ class AuthenticatedClientFactory(
     private val appUserRepository: AppUserRepository,
     private val sessionRepository: SessionRepository<out Session>,
     private val webTestClient: WebTestClient,
-    private val guestAppUserProperties: GuestAppUserProperties,
     private val databaseTestUtils: DatabaseTestUtils,
 ) {
     private val localhost = "https://localhost:3000"
@@ -40,7 +39,8 @@ class AuthenticatedClientFactory(
 
         val sampleAppUserId = databaseTestUtils.setUser()
 
-        val principal: OidcUser = CustomOidcUser(sampleAppUserId, listOf(SimpleGrantedAuthority("ROLE_USER")))
+        val principal: OidcUser =
+            CustomOidcUser(sampleAppUserId, listOf(SimpleGrantedAuthority("ROLE_USER")))
         val auth = OAuth2AuthenticationToken(
             principal, principal.authorities, "google"
         )

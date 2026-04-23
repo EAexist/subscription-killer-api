@@ -5,13 +5,13 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.matchalab.subscription_killer_api.ai.toPromptParamString
 import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
+import com.matchalab.subscription_killer_api.emailtemplate.extractAnchors
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
-import com.matchalab.subscription_killer_api.emailtemplate.extractAnchors
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jetbrains.annotations.VisibleForTesting
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 import org.springframework.core.io.support.ResourcePatternResolver
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -50,6 +50,7 @@ internal data class CompanyEmailSource(
  */
 @Component
 @Lazy(false)
+@Profile("!ai")
 class EmailDatasetProvider(
     private val objectMapper: ObjectMapper,
     private val resourcePatternResolver: ResourcePatternResolver
@@ -71,6 +72,7 @@ class EmailDatasetProvider(
      * Returns the loaded email samples
      */
     fun getEmailSamples(): List<EmailSample> = idToEmailSamples.values.toList()
+
     /**
      * Returns the loaded email samples
      */
@@ -86,6 +88,24 @@ class EmailDatasetProvider(
 
         return slice.map { it }
     }
+
+    /**
+     * Returns the loaded email samples
+     */
+    fun getSampleMessagesWithSubscriptionEventType(): List<Pair<GmailMessage, SubscriptionEventType>> {
+        val fromIndex = currentOffset % sampleMessageSet.size
+        val toIndex = (fromIndex + batchSize).coerceAtMost(sampleMessageSet.size)
+
+        val slice = sampleMessageSet.slice(fromIndex until toIndex)
+
+        // Update offset for the next call
+        currentOffset = toIndex
+        if (currentOffset >= sampleMessageSet.size) currentOffset = 0
+
+        return slice.map { it to idToEmailSamples[it.id]!!.subscriptionEventType }
+    }
+
+
     /**
      * Returns the number of loaded samples
      */
@@ -96,7 +116,12 @@ class EmailDatasetProvider(
     }
 
     fun getTemplate(id: String): EmailTemplate? {
-        return idToEmailTemplates[id]?.let { EmailTemplate(it.subject.extractAnchors(), it.snippet.extractAnchors()) }
+        return idToEmailTemplates[id]?.let {
+            EmailTemplate(
+                it.subject.extractAnchors(),
+                it.snippet.extractAnchors()
+            )
+        }
     }
 
     fun getSubscriptionEventTypeByTemplateId(id: String): SubscriptionEventType? {
@@ -116,9 +141,12 @@ class EmailDatasetProvider(
         this.companyEmailMap = loadCompanies()
         this.idToEmailTemplates = loadTemplates()
         this.idToEmailSamples = loadDataset()
-        this.sampleMessageSet = idToEmailSamples.values.filter { it.message.senderEmail in companyEmailMap.values.toList().filter{ c -> c.name != "Gemini Advanced"}.slice(0..4).map{c -> c.email}}.shuffled().map {it.message}
+        this.sampleMessageSet = idToEmailSamples.values.filter {
+            it.message.senderEmail in companyEmailMap.values.toList()
+                .filter { c -> c.name != "Gemini Advanced" }.slice(0..4).map { c -> c.email }
+        }.shuffled().map { it.message }
 
-        logger.debug{ "EmailDatasetProvider Initialized. sample: ${idToEmailSamples.keys.first()}: ${idToEmailSamples.values.first()}"}
+        logger.debug { "EmailDatasetProvider Initialized. sample: ${idToEmailSamples.keys.first()}: ${idToEmailSamples.values.first()}" }
     }
 
     private fun loadCompanies(): Map<String, CompanyEmailSource> {
@@ -137,11 +165,14 @@ class EmailDatasetProvider(
         return rawCompanies.mapNotNull { company ->
             val id = company["id"] as? String
             val names = @Suppress("UNCHECKED_CAST") (company["aliasNames"] as? Map<String, String>)
-            val name = names?.let{it["KO"] ?: it["EN"]}!!
+            val name = names?.let { it["KO"] ?: it["EN"] }!!
             val emails = company["emailAddresses"] as? List<*>
             val firstEmail = emails?.firstOrNull() as? String
 
-            if (id != null && firstEmail != null) id to CompanyEmailSource(firstEmail, name) else null
+            if (id != null && firstEmail != null) id to CompanyEmailSource(
+                firstEmail,
+                name
+            ) else null
         }.toMap()
     }
 

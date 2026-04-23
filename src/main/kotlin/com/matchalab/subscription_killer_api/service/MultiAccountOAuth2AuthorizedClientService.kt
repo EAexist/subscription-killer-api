@@ -68,7 +68,8 @@ class MultiAccountOAuth2AuthorizedClientService(
                     email = email,
                     refreshToken = client.refreshToken?.tokenValue,
                     accessToken = client.accessToken.tokenValue,
-                    expiresAt = client.accessToken.expiresAt
+                    expiresAt = client.accessToken.expiresAt,
+                    scope = client.accessToken.scopes.joinToString(",")
                 )
             )
             appUserService.save(appUser)
@@ -107,7 +108,8 @@ class MultiAccountOAuth2AuthorizedClientService(
                 OAuth2AccessToken.TokenType.BEARER,
                 googleAccount.accessToken,
                 null,
-                googleAccount.expiresAt
+                googleAccount.expiresAt,
+                googleAccount.scope?.split(",")?.toSet() ?: emptySet()
             ),
             googleAccount.refreshToken?.let {
                 OAuth2RefreshToken(it, null)

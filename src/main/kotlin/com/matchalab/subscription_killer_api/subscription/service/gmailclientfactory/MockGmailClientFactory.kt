@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class MockGmailClientFactory(
-    val emailDatasetProvider: EmailDatasetProvider
+    private val emailDatasetProvider: EmailDatasetProvider
 ) : DefaultGmailClientFactory {
     override fun createAdapter(subject: String): GmailClientAdapter {
         return MockGmailClientAdapter(emailDatasetProvider)

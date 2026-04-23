@@ -8,10 +8,12 @@ import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
 
+@Profile("!ai")
 @Service
 @Primary
 class MockEmailCategorizationPromptService(
@@ -25,7 +27,8 @@ class MockEmailCategorizationPromptService(
 
         emailCategorizationPromptServiceImpl.run(messages)
 
-        val aggregatedMessages: List<GmailMessage> = emailCategorizationPromptServiceImpl.filterRedundantTemplates(messages)
+        val aggregatedMessages: List<GmailMessage> =
+            emailCategorizationPromptServiceImpl.filterRedundantTemplates(messages)
 
         val subsStartOrPaymentMsgIndexes = mutableListOf<String>()
         val subsCancelMsgIndexes = mutableListOf<String>()
@@ -35,12 +38,23 @@ class MockEmailCategorizationPromptService(
         val nonSubsMsgIds = mutableListOf<String>()
 
         aggregatedMessages.withIndex().forEach { (index, message) ->
-            val eventType = emailDatasetProvider.getSubscriptionEventTypeByTemplateId(message.templateId!!)
+            val eventType =
+                emailDatasetProvider.getSubscriptionEventTypeByTemplateId(message.templateId!!)
 //            logger.debug { "eventType: ${eventType} senderEmail: ${message.senderEmail} subject: ${message.subject}" }
             when (eventType) {
-                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT -> { subsStartOrPaymentMsgIndexes.add(index.toString()); subsStartOrPaymentMsgIds.add(message.id) }
-                SubscriptionEventType.SUBSCRIPTION_CANCEL -> { subsCancelMsgIndexes.add(index.toString()); subsCancelMsgIds.add(message.id) }
-                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL, null -> { nonSubsMsgIds.add(message.id) }
+                SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT -> {
+                    subsStartOrPaymentMsgIndexes.add(index.toString()); subsStartOrPaymentMsgIds.add(
+                        message.id
+                    )
+                }
+
+                SubscriptionEventType.SUBSCRIPTION_CANCEL -> {
+                    subsCancelMsgIndexes.add(index.toString()); subsCancelMsgIds.add(message.id)
+                }
+
+                SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL, null -> {
+                    nonSubsMsgIds.add(message.id)
+                }
             }
         }
 
@@ -51,7 +65,7 @@ class MockEmailCategorizationPromptService(
 
         val resultJson = convertResultToJson(response)
 
-        logger.debug { "Subscription messages: ${response.values.flatten().size}/${aggregatedMessages.size}"}
+        logger.debug { "Subscription messages: ${response.values.flatten().size}/${aggregatedMessages.size}" }
 
         mockChatResponseService.generateMockChatContext(
             taskName = "categorize_emails",

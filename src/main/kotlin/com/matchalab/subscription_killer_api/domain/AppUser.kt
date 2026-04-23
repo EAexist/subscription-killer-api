@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.domain
 
 import jakarta.persistence.*
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -11,11 +12,13 @@ class AppUser(
 
     @Enumerated(EnumType.STRING)
     var userRole: UserRoleType = UserRoleType.USER,
-    
+
     @OneToMany(mappedBy = "appUser", cascade = [CascadeType.ALL], orphanRemoval = true)
     var googleAccounts: MutableList<GoogleAccount> = mutableListOf(),
 
-) {
+    var reportUpdatedAt: Instant? = null,
+
+    ) {
     fun addGoogleAccount(googleAccount: GoogleAccount) {
         this.googleAccounts.add(googleAccount)
         googleAccount.appUser = this

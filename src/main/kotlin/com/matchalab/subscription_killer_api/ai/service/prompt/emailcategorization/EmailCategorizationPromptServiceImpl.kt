@@ -7,9 +7,6 @@ import com.matchalab.subscription_killer_api.ai.toPromptParamString
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 private val logger = KotlinLogging.logger {}
 
@@ -43,24 +40,27 @@ class EmailCategorizationPromptServiceImpl(
                 subsCancelMsgIds = mapIndicesToIds(response["C"].orEmpty()),
                 nonSubsMsgIds = mapIndicesToIds(aggregatedMessages.indices.filter { it !in selectedIndices }),
             )
-            }
+        }
     }
 
     fun getParams(messages: List<GmailMessage>): Map<String, String> {
         val aggregatedMessages: List<GmailMessage> = filterRedundantTemplates(messages)
         return mapOf("emails" to aggregatedMessages.withIndex().joinToString("\n") { (index, it) ->
-                it.toPromptParamString(
-                    index
-                )
+            it.toPromptParamString(
+                index
+            )
         })
     }
 
-    fun getPrompt() : String = promptTemplateProperties.filterAndCategorizeEmails.getContentAsString(Charsets.UTF_8).trimIndent()
+    fun getPrompt(): String =
+        promptTemplateProperties.filterAndCategorizeEmails.getContentAsString(Charsets.UTF_8)
+            .trimIndent()
 
-    fun getDataCount(messages: List<GmailMessage>) : Int = filterRedundantTemplates(messages).size
+    fun getDataCount(messages: List<GmailMessage>): Int = filterRedundantTemplates(messages).size
 
     fun filterRedundantTemplates(messages: List<GmailMessage>): List<GmailMessage> = messages
         .groupBy { it.subject to it.snippet }
-        .map { (_, group) -> group.first()
+        .map { (_, group) ->
+            group.first()
         }
 }

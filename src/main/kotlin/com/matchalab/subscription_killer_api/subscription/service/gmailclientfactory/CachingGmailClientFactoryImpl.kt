@@ -7,12 +7,14 @@ import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapterImpl
 import io.micrometer.observation.ObservationRegistry
+import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
 @Profile("oauth && gmail")
+@Primary
 @Service
 class CachingGmailClientFactoryImpl(
     googleAccountRepository: GoogleAccountRepository,

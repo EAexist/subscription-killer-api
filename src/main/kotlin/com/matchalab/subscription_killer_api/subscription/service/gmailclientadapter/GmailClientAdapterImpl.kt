@@ -71,7 +71,10 @@ open class GmailClientAdapterImpl(
         return messageIds
     }
 
-    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
+    override suspend fun getMessages(
+        messageIds: List<String>,
+        plan: MessageFetchPlan
+    ): List<GmailMessage> {
 
         logger.debug { "🔊  [getMessages] Start fetching ${messageIds.size} messages" }
 
@@ -101,6 +104,34 @@ open class GmailClientAdapterImpl(
             }
         }
             .mapNotNull { it.toGmailMessage(mailProperties.maxSnippetSize) }
+    }
+
+    override suspend fun getFirstMessageId(addresses: List<String>, q: String): String? {
+        var pageToken: String? = null
+        var oldestId: String? = null
+
+        do {
+            val listResponse = try {
+                gmailClient.users().messages().list(userId)
+                    .setQ(q)
+                    .setPageToken(pageToken)
+                    .setMaxResults(500L)
+                    .setFields("nextPageToken,messages(id)") // Optimization: Only fetch IDs
+                    .execute()
+            } catch (e: Exception) {
+                null
+            } ?: break
+
+            val messages = listResponse.messages ?: emptyList()
+            if (messages.isNotEmpty()) {
+                // The last item in the list on the current page
+                oldestId = messages.last().id
+            }
+
+            pageToken = listResponse.nextPageToken
+        } while (pageToken != null)
+
+        return oldestId
     }
 
     override suspend fun getFirstMessageId(addresses: List<String>): String? {

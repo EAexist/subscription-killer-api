@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Read environment variables from .env.dataset file
+# Read environment variables from .env.dev.dataset file
 ENV_FILE=".env.dataset"
 
 if [ ! -f "$ENV_FILE" ]; then
@@ -8,7 +8,7 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Export variables from .env.dataset
+# Export variables from .env.dev.dataset
 set -a
 source "$ENV_FILE"
 set +a

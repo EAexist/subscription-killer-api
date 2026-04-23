@@ -6,7 +6,7 @@ spring:
           google:
             client-id: ${APP_GOOGLE_CLIENT_ID}
             client-secret: ${APP_GOOGLE_CLIENT_SECRET}
-            redirect-uri: ${FRONTEND_URL}/api/login/oauth2/code/google
+            redirect-uri: https://localhost:8443/login/oauth2/code/google
             client-authentication-method: client_secret_basic
             scope:
               - openid

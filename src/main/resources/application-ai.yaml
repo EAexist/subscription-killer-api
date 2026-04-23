@@ -10,9 +10,7 @@ spring:
         api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
         chat:
           options:
-            #            model: gemini-2.5-flash
-            #            thinking-budget: 0
-            model: gemini-3-flash-preview
+            model: gemini-3.1-flash-lite-preview
             thinking-level: LOW
             temperature: 0.1
     chat:

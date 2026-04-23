@@ -51,18 +51,20 @@ class ProgressService(
 
         if (!progresses.containsKey(appUserId)) {
 
+            logger.debug { "AppUser $appUserId is not in progress." }
+
             emitter.send(
-                SseEmitter.event().name("progress-update")
+                SseEmitter.event()
                     .data(AppUserAnalysisProgressUpdate(AnalysisProgressStatus.COMPLETED))
             )
             emitter.complete()
-            return emitter
         }
 
         progresses[appUserId]?.values?.let { progresses ->
             try {
                 val update: AppUserAnalysisProgressUpdate =
-                    progresses.map { it.status }.minBy { it.sortOrder }.let { AppUserAnalysisProgressUpdate(it) }
+                    progresses.map { it.status }.minBy { it.sortOrder }
+                        .let { AppUserAnalysisProgressUpdate(it) }
 
                 val serviceProviderIds = progresses.flatMap { it.serviceProviders.keys }
 
@@ -80,12 +82,12 @@ class ProgressService(
                     }
 
                 emitter.send(
-                    SseEmitter.event().name("progress-update").data(update)
+                    SseEmitter.event().data(update)
                 )
                 lastSentStatuses[appUserId] = update.status
                 serviceProviderUpdates.forEach {
                     emitter.send(
-                        SseEmitter.event().name("progress-update").data(it)
+                        SseEmitter.event().data(it)
                     )
                 }
             } catch (e: Exception) {
@@ -102,34 +104,31 @@ class ProgressService(
 
         val totalStatus: AnalysisProgressStatus? =
             if (status === AnalysisProgressStatus.COMPLETED) AnalysisProgressStatus.COMPLETED else progresses[appUserId]?.values?.minBy { it.status.sortOrder }?.status
-        val progressUpdate: AppUserAnalysisProgressUpdate? = totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
-
-        logger.debug { "update: $progressUpdate"}
+        val progressUpdate: AppUserAnalysisProgressUpdate? =
+            totalStatus?.let { AppUserAnalysisProgressUpdate(it) }
 
         progressUpdate?.let { update ->
             val lastSentStatus = lastSentStatuses[appUserId]
-            
+
             // Only send if status has changed
             if (lastSentStatus != update.status) {
                 emitters[appUserId]?.let { emitter ->
                     try {
                         emitter.send(
-                            SseEmitter.event().name("progress-update")
+                            SseEmitter.event()
                                 .data(update)
                         )
-                        logger.info { "emitter has sent the progress update: ${progressUpdate}"}
+                        logger.debug { "emitter has sent the progress update: ${progressUpdate}" }
                         lastSentStatuses[appUserId] = update.status
-                        
+
                         if (totalStatus === AnalysisProgressStatus.COMPLETED) {
+                            progresses.remove(appUserId)
+                            lastSentStatuses.remove(appUserId)
                             emitter.complete()
                         }
                     } catch (e: Exception) {
                         emitter.completeWithError(e)
                     }
-                }
-                if (totalStatus === AnalysisProgressStatus.COMPLETED) {
-                    progresses.remove(appUserId)
-                    lastSentStatuses.remove(appUserId)
                 }
             }
         }
@@ -142,22 +141,25 @@ class ProgressService(
         status: ServiceProviderAnalysisProgressStatus
     ) {
 
-        progresses[appUserId]?.get(googleAccountSubject)?.serviceProviders?.set(serviceProviderId, status)
+        progresses[appUserId]?.get(googleAccountSubject)?.serviceProviders?.set(
+            serviceProviderId,
+            status
+        )
 
         val serviceProviderResponseDto: ServiceProviderResponseDto =
             serviceProviderService.findDtoById(serviceProviderId) ?: throw EntityNotFoundException()
 
         val update = ServiceProviderAnalysisProgressUpdate(serviceProviderResponseDto, status)
 
-        logger.debug { "update: $update"}
+        logger.debug { "update: $update" }
 
         emitters[appUserId]?.let { emitter ->
             try {
                 emitter.send(
-                    SseEmitter.event().name("progress-update")
+                    SseEmitter.event()
                         .data(update)
                 )
-                logger.info { "emitter has sent the progress update: ${update}"}
+                logger.debug { "emitter has sent the progress update: $update" }
             } catch (e: Exception) {
                 emitter.completeWithError(e)
             }
@@ -168,8 +170,9 @@ class ProgressService(
         val googleAccountSubjects = appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
         progresses[appUserId] =
-            ConcurrentHashMap(googleAccountSubjects
-                .associateWith { AnalysisProgress() })
+            ConcurrentHashMap(
+                googleAccountSubjects
+                    .associateWith { AnalysisProgress() })
 
         setProgress(appUserId, googleAccountSubjects[0], AnalysisProgressStatus.STARTED)
     }

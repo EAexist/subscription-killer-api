@@ -21,8 +21,7 @@ class GoogleAccount(
     var expiresAt: Instant? = null,
     var scope: String? = null,
 
-    var analyzedAt: Instant? = null,
-    var lastEmailSyncedAt: Instant,
+    var lastEmailSyncedAt: Instant? = null,
 
     @OneToMany(mappedBy = "googleAccount", cascade = [CascadeType.ALL], orphanRemoval = true)
     var subscriptions: MutableList<Subscription> = mutableListOf(),

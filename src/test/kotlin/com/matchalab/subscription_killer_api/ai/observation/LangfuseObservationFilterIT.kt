@@ -10,7 +10,6 @@ import io.micrometer.observation.tck.TestObservationRegistry
 import io.micrometer.observation.tck.TestObservationRegistryAssert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -67,14 +66,16 @@ class LangfuseObservationFilterIT {
     @ParameterizedTest
     @MethodSource("aiServiceTestProvider")
     fun `should map all observation keys from app to langfuse and OTEL conventions`(testData: AiServiceTest) {
-        val messages = emailDatasetProvider.getSampleMessageSet()
-        
+        val messagesWithSubscriptionEventType =
+            emailDatasetProvider.getSampleMessagesWithSubscriptionEventType()
+
         when (testData.serviceName) {
             "emailCategorization" -> {
-                emailCategorizationPromptService.run(messages)
+                emailCategorizationPromptService.run(messagesWithSubscriptionEventType.map { it.first })
             }
+
             "emailTemplateExtraction" -> {
-                emailTemplateExtractionPromptService.run(messages)
+                emailTemplateExtractionPromptService.run(messagesWithSubscriptionEventType)
             }
         }
 

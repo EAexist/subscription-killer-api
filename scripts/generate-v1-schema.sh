@@ -10,8 +10,8 @@ docker compose up -d && \
 {
     # Load SSL environment variables safely
     set -a
-    # shellcheck source=.env.ssl
-    source .env.ssl
+    # shellcheck source=.env.dev
+    source .env.dev
     set +a
     
     ./gradlew bootRun -x test --args='--spring.profiles.active=dev,oauth,local-ssl,schema-generation'

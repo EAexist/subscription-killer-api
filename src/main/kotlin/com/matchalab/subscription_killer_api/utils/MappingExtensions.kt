@@ -10,9 +10,7 @@ import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
-import com.matchalab.subscription_killer_api.subscription.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -27,15 +25,10 @@ fun AppUser.toResponseDto(): AppUserResponseDto {
 
 fun GoogleAccount.toResponseDto(): GoogleAccountResponseDto {
     return GoogleAccountResponseDto(
+        subject = this.subject!!,
         email = this.email,
         name = this.name,
-    )
-}
-
-fun GoogleAccount.toReportDto(): AccountReportDto {
-    return AccountReportDto(
-        subscriptions = this.subscriptions.map { it -> it.toResponseDto() },
-        googleAccount = this.toResponseDto(),
+        canDelete = false
     )
 }
 

@@ -29,11 +29,7 @@ log_error() {
 
 # SSL and Google account environment setup
 setup_env() {
-    set -a; source .env; set +a
-}
-
-setup_ssl_env() {
-    set -a; source .env.ssl; set +a
+    set -a; source .env.dev; set +a
 }
 
 setup_google_env() {

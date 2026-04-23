@@ -112,7 +112,7 @@ def generate_sql_from_json(json_file_path: str, output_file_path: str):
 
 if __name__ == "__main__":
     # File paths
-    json_file = "src/main/resources/static/service-providers.json"
+    json_file = "build/generated/dataset/data/reference/companies.json"
     output_file = "src/main/resources/db/migration/V2__init_data_generated.sql"
     
     generate_sql_from_json(json_file, output_file)

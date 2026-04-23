@@ -5,12 +5,14 @@ import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.service.GoogleAccountService
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
+import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.ServiceProviderAnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory.ProxyGmailClientFactory
+import com.matchalab.subscription_killer_api.utils.DateTimeUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.kotlin.asContextElement
 import io.micrometer.observation.ObservationRegistry
@@ -25,9 +27,6 @@ import java.util.*
 
 
 private val logger = KotlinLogging.logger {}
-
-typealias GeneralProgressCallback = (AnalysisProgressStatus) -> Unit
-typealias ServiceProviderProgressCallback = (UUID, ServiceProviderAnalysisProgressStatus) -> Unit
 
 @Service
 class SubscriptionAnalysisService(
@@ -47,6 +46,8 @@ class SubscriptionAnalysisService(
 //            "analyze",
 //        ) {
 
+        val lastEmailSyncedAt = Instant.now()
+
         val googleAccountSubjects: List<String> =
             appUserService.findGoogleAccountSubjectsByAppUserId(appUserId)
 
@@ -64,8 +65,9 @@ class SubscriptionAnalysisService(
         serviceProviderService.addEmailSourcesFromMessages(allMessages)
 
         /* @TODO Postpone the matchedMessage Processing to after AI calls */
-        val emailSourceIdToUnmatchedMessages = mutableMapOf<UUID, MutableList<GmailMessage>>()
-        val googleAccountToServiceProviders = mutableMapOf<String, MutableSet<ServiceProvider>>()
+        val googleSubjectToUnmatchedMessageAndEmailSourceId =
+            mutableMapOf<String, MutableList<Pair<GmailMessage, UUID>>>()
+        val googleAccountToServiceProviderIds = mutableMapOf<String, MutableSet<UUID>>()
 
         // 3. Process & Match
         googleSubjectToMessages.forEach { (subject, messages) ->
@@ -74,72 +76,83 @@ class SubscriptionAnalysisService(
 //                }
             messages.forEach { message ->
                 val emailSource = emailSourceService.getEmailSource(message)
-                    ?: throw IllegalStateException("No active EmailSource found for sender: ${message.senderName}, ${message.senderEmail}, ${message.subject}")
+                    ?: return@forEach // getEmailSource can return null (e.g. email address = google-payments@google.com, but sender isn't any service provider registered in our service.
+
+                googleAccountToServiceProviderIds.getOrPut(subject) { mutableSetOf() }
+                    .add(emailSource.serviceProvider.id!!)
+
                 val event = emailSourceService.matchMessageToEvent(emailSource, message)
-                logger.debug {
-                    "🔊 | emailSource: ${emailSource.id} message: ${message.subject}. event: $event"
-                }
+//                logger.debug {
+//                    "🔊 | emailSource: ${emailSource.id} message: ${message.subject}. event: $event"
+//                }
                 if (event != null) {
-                    subscriptionService.addEvent(
-                        subject,
-                        emailSource.serviceProvider.id!!,
-                        event,
-                        message.internalDate
-                    )
+                    if (event != SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL) {
+                        subscriptionService.addEvent(
+                            subject,
+                            emailSource.serviceProvider.id!!,
+                            event,
+                            message.internalDate
+                        )
+                    }
                 } else {
-                    emailSourceIdToUnmatchedMessages.getOrPut(emailSource.id!!) { mutableListOf() }
-                        .add(message)
+                    googleSubjectToUnmatchedMessageAndEmailSourceId.getOrPut(subject) { mutableListOf() }
+                        .add(
+                            Pair(
+                                message,
+                                emailSource.id!!
+                            )
+                        )
                 }
             }
         }
 
-        val unMatchedMessageSize = emailSourceIdToUnmatchedMessages.values.sumOf { it.size }
+        val unMatchedMessageSize =
+            googleSubjectToUnmatchedMessageAndEmailSourceId.values.sumOf { it.size }
+
+        val emailSourceIdToUnmatchedMessages: Map<UUID, List<GmailMessage>> =
+            googleSubjectToUnmatchedMessageAndEmailSourceId.values.flatten().groupBy { it.second }
+                .mapValues { it.value.map { it.first }.toMutableList() }
 
         logger.debug {
             "🔊 | [Cache Hit] New Templates: ${unMatchedMessageSize}/${allMessages.size}"
         }
 
-        for (serviceProviders in googleAccountToServiceProviders.values) {
-            for (serviceProvider in serviceProviders) {
-                progressService.setServiceProviderProgress(
-                    appUserId,
-                    googleAccountSubjects.first(),
-                    serviceProvider.id!!,
-                    ServiceProviderAnalysisProgressStatus.STARTED
-                )
-            }
-        }
-
         coroutineScope {
-            val emailRulesDeferred = async(Dispatchers.IO) {
+            val emailRulesDeferred = async {
                 subscriptionEventRuleService.updateSubscriptionEventRules(
                     emailSourceIdToUnmatchedMessages
                 )
             }
 
             val googleAccountToProvidersList =
-                googleAccountToServiceProviders.map { (subject, providers) ->
+                googleAccountToServiceProviderIds.map { (subject, providers) ->
                     val googleAccount = googleAccountService.findById(subject)
                     googleAccount to providers.toList()
                 }.toMap()
 
-            val newSubscriptions = subscriptionService.update(googleAccountToProvidersList)
+            subscriptionService.update(googleAccountToProvidersList)
 
             val registeredSinceDeferred =
-                newSubscriptions.groupBy { it.googleAccount }.map { (ga, subscriptions) ->
+                googleAccountSubjects.map { subject ->
                     async(Dispatchers.IO + observationRegistry.asContextElement()) {
-                        subscriptionService.updateRegisteredSince(
-                            ga.subject!!,
-                            subscriptions.map { it.serviceProvider.id!! })
+                        subscriptionService.updateRegisteredSince(subject)
                     }
                 }
 
+            for (serviceProviderIds in googleAccountToServiceProviderIds.values) {
+                for (serviceProviderId in serviceProviderIds) {
+                    progressService.setServiceProviderProgress(
+                        appUserId,
+                        googleAccountSubjects.first(),
+                        serviceProviderId,
+                        ServiceProviderAnalysisProgressStatus.STARTED
+                    )
+                }
+            }
 
             emailRulesDeferred.await()
-            registeredSinceDeferred.awaitAll()
 
             for (googleAccount in googleAccountToProvidersList.keys) {
-                googleAccount.analyzedAt = Instant.now()
                 progressService.setProgress(
                     appUserId,
                     googleAccount.subject!!,
@@ -147,14 +160,39 @@ class SubscriptionAnalysisService(
                 )
             }
 
+
+            val idToEmailSource = emailSourceService.findAllById(
+                googleSubjectToUnmatchedMessageAndEmailSourceId.values.flatten().map { it.second })
+                .associateBy { it.id }
+
+            googleSubjectToUnmatchedMessageAndEmailSourceId.forEach { (subject, pairs) ->
+                pairs.forEach { (message, emailSourceId) ->
+                    val emailSource = idToEmailSource[emailSourceId]!!
+                    val event = emailSourceService.matchMessageToEvent(emailSource, message)
+                    if ((event != null) && (event != SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL)) {
+                        subscriptionService.addEvent(
+                            subject,
+                            emailSource.serviceProvider.id!!,
+                            event,
+                            message.internalDate
+                        )
+                    }
+                }
+            }
+            
+            for (googleAccount in googleAccountToProvidersList.keys) {
+                googleAccount.lastEmailSyncedAt = lastEmailSyncedAt
+                googleAccountService.save(googleAccount)
+            }
+
+            registeredSinceDeferred.awaitAll()
+
             progressService.setProgress(
                 appUserId,
                 googleAccountSubjects.first(),
                 AnalysisProgressStatus.COMPLETED
             )
         }
-//        }
-
     }
 
     @Observed(name = "fetch_gmail_messages")
@@ -166,9 +204,13 @@ class SubscriptionAnalysisService(
 //            "fetch_gmail_messages",
 //            "google_account.subject" to googleAccountSubject
 //        ) {
-        val lastEmailSyncedAt = googleAccountService.getAnalyzeAfter(googleAccountSubject)
+        val lastEmailSyncedAt = googleAccountService.getLastEmailSyncedAt(googleAccountSubject)
         val now = Instant.now()
-        val duration = java.time.Duration.between(lastEmailSyncedAt, now)
+        val start = lastEmailSyncedAt ?: DateTimeUtils.minusMonthsFromInstant(
+            now,
+            mailProperties.analysisMonths
+        )
+        val duration = java.time.Duration.between(start, now)
         val days = duration.toDays()
         val hours = duration.toHours() % 24
         val minutes = duration.toMinutes() % 60
@@ -177,7 +219,7 @@ class SubscriptionAnalysisService(
         // List Gmail Messages
         val gmailClientAdapter: GmailClientAdapter =
             clientFactory.createAdapter(googleAccountSubject)
-        val afterPart = "after:${lastEmailSyncedAt.epochSecond}"
+        val afterPart = "after:${start.epochSecond}"
 
         val allServiceProviders: List<ServiceProvider> =
             serviceProviderService.findAllWithEmailSourcesAndAliases()

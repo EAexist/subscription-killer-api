@@ -13,6 +13,7 @@ import com.google.auth.oauth2.AccessToken
 import com.google.auth.oauth2.UserCredentials
 import com.matchalab.subscription_killer_api.config.GoogleClientProperties
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.subscription_killer_api.exception.GoogleOAuthReAuthRequiredException
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
 import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.utils.observe
@@ -95,17 +96,32 @@ abstract class AbstractGmailClientFactoryImpl(
                 "refresh_token"
             )
                 .setClientAuthentication(
-                    ClientParametersAuthentication(googleClientProperties.clientId, googleClientProperties.clientSecret)
+                    ClientParametersAuthentication(
+                        googleClientProperties.clientId,
+                        googleClientProperties.clientSecret
+                    )
                 )
         tokenRequest.set("refresh_token", refreshToken)
 
         return try {
             tokenRequest.execute()
         } catch (e: TokenResponseException) {
-            // This is the "Gold Mine" of debugging info
-            logger.error { "❌ Google OAuth Error: ${e.details?.error}" }
-            logger.error { "❌ Error Description: ${e.details?.errorDescription}" }
-            logger.error { "❌ Full Details: ${e.details}" }
+            logger.error { "❌ Google OAuth Error: ${e.details}" }
+
+            // Check for token expiry/invalid grant errors
+            if (
+                (e.details.error == "invalid_grant" ||
+                        e.details.errorDescription?.contains(
+                            "expired",
+                            ignoreCase = true
+                        ) == true ||
+                        e.details.errorDescription?.contains("invalid", ignoreCase = true) == true)
+            ) {
+                throw GoogleOAuthReAuthRequiredException(
+                    "Google OAuth refresh token expired: ${e.details}"
+                )
+            }
+
             throw e
         }
     }

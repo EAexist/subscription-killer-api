@@ -2,11 +2,8 @@
 
 import groovy.json.JsonSlurper
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.boot.gradle.tasks.run.BootRun
 import java.net.HttpURLConnection
 import java.net.URI
-import java.util.*
 
 abstract class DownloadTestDataTask : DefaultTask() {
     @get:Input
@@ -35,7 +32,7 @@ abstract class DownloadTestDataTask : DefaultTask() {
 
     @TaskAction
     fun download() {
-        if (!(enabledByProperty.getOrElse(false)?: false)) {
+        if (!(enabledByProperty.getOrElse(false) ?: false)) {
             logger.lifecycle("⏭️ Skipping download (Property 'syncDataset' not found).")
             return
         }
@@ -417,23 +414,23 @@ tasks.register<JavaExec>("benchmark") {
     classpath = sourceSets["main"].runtimeClasspath + sourceSets["test"].runtimeClasspath
     args("--spring.profiles.active=benchmark")
 }
-
-val env = Properties().apply {
-    val envFile = project.file(".env")
-    if (envFile.exists()) {
-        envFile.inputStream().use { load(it) }
-    }
-
-    // Clean up quotes
-    stringPropertyNames().forEach { name ->
-        val value = getProperty(name)
-        if (value != null) {
-            // Removes leading/trailing double or single quotes
-            val cleanValue = value.trim().removeSurrounding("\"").removeSurrounding("'")
-            setProperty(name, cleanValue)
-        }
-    }
-}
+//
+//val env = Properties().apply {
+//    val envFile = project.file(".env.dev")
+//    if (envFile.exists()) {
+//        envFile.inputStream().use { load(it) }
+//    }
+//
+//    // Clean up quotes
+//    stringPropertyNames().forEach { name ->
+//        val value = getProperty(name)
+//        if (value != null) {
+//            // Removes leading/trailing double or single quotes
+//            val cleanValue = value.trim().removeSurrounding("\"").removeSurrounding("'")
+//            setProperty(name, cleanValue)
+//        }
+//    }
+//}
 
 val syncDatasetProvider = providers.gradleProperty("syncDataset")
 
@@ -464,6 +461,10 @@ tasks.processResources {
 
 tasks.test {
     maxHeapSize = "1024m"
+}
+
+kapt {
+    useBuildCache = true
 }
 
 

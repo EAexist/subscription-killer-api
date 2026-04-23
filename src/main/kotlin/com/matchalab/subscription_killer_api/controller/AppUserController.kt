@@ -3,7 +3,6 @@ package com.matchalab.subscription_killer_api.controller
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
 import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.service.AppUserService
-import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,10 +20,7 @@ class AppUserController(private val appUserService: AppUserService) {
     fun getAppUser(
         @AuthenticatedUser appUserId: UUID
     ): ResponseEntity<AppUserResponseDto> {
-        val appUser = appUserService.findByIdWithGoogleAccounts(appUserId)
-
-        val response = appUser.toResponseDto()
-
-        return ResponseEntity.ok(response)
+        val appUserResponseDto = appUserService.getAppUser(appUserId)
+        return ResponseEntity.ok(appUserResponseDto)
     }
 }

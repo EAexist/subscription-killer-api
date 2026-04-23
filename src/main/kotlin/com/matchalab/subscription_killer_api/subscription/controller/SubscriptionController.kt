@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.subscription.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
+import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
 import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionReportResponseDto
 import com.matchalab.subscription_killer_api.subscription.progress.service.ProgressService
@@ -32,10 +33,10 @@ data class AppProperties(val minRequestIntervalSeconds: Long)
 @RequestMapping("/api/v1/reports")
 class SubscriptionController(
     private val analysisService: SubscriptionAnalysisService,
+    private val appUserService: AppUserService,
     private val progressService: ProgressService,
     private val reportService: SubscriptionReportService,
     private val observationRegistry: ObservationRegistry,
-    private val appProperties: AppProperties,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
@@ -52,10 +53,11 @@ class SubscriptionController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun analyze(@AuthenticatedUser appUserId: UUID): ResponseEntity<Any> {
 
-        val reportUpdateEligibility: ReportUpdateEligibilityDto =
-            reportService.getUpdateEligibility(appUserId)
+        val newReportGeneratedAt = appUserService.claimReportQuota(appUserId)
 
-        if (!reportUpdateEligibility.canUpdate) {
+        if (newReportGeneratedAt == null) {
+            val reportUpdateEligibility: ReportUpdateEligibilityDto =
+                appUserService.getReportUpdateEligibility(appUserId)
 
             val secondsUntilNextAllowed: Long = Duration.between(
                 Instant.now(),
@@ -92,10 +94,5 @@ class SubscriptionController(
                 .contentType(MediaType.APPLICATION_JSON).build<Void>()
         }
         return ResponseEntity.ok(progressService.createEmitter(appUserId))
-    }
-
-    @GetMapping("/updates/eligibility")
-    fun getUpdateEligibility(@AuthenticatedUser appUserId: UUID): ReportUpdateEligibilityDto {
-        return reportService.getUpdateEligibility(appUserId)
     }
 }

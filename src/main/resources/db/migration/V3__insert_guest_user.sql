@@ -17,8 +17,7 @@ INSERT INTO google_account (
 SELECT new_accounts.subject, new_accounts.name, new_accounts.email, app_user.id
 FROM app_user, (
     VALUES
-        ('GUEST_APP_USER_SUBJECT_A', 'GUEST_APP_USER_NAME', 'guest_a@example.com'),
-        ('GUEST_APP_USER_SUBJECT_B', 'GUEST_APP_USER_NAME', 'guest_b@example.com')
+        ('GUEST_APP_USER_SUBJECT_A', 'GUEST_APP_USER_NAME', 'guest_a@example.com')
 ) AS new_accounts(subject, name, email)
 WHERE NOT EXISTS (
     SELECT 1 FROM google_account WHERE subject = new_accounts.subject

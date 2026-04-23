@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.controller
+package com.matchalab.subscription_killer_api.guest
 
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
 import com.matchalab.subscription_killer_api.service.AppUserService
@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-
 
 @RestController
 @RequestMapping("/api/v1/guest")

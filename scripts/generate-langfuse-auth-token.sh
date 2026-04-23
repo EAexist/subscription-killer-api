@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# 1. Load variables from .env file
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+# 1. Load variables from .env.dev.benchmark file
+if [ -f .env.dev.benchmark ]; then
+    export $(grep -v '^#' .env.dev.benchmark | xargs)
 else
-    echo "Error: .env file not found."
+    echo "Error: .env.benchmark file not found."
     exit 1
 fi
 
@@ -22,11 +22,11 @@ TOKEN=$(printf "%s:%s" "$LANGFUSE_PUBLIC_KEY" "$LANGFUSE_SECRET_KEY" | base64)
 echo "Generated Token: $TOKEN"
 export LANGFUSE_AUTH_TOKEN=$TOKEN
 
-# Optional: Append/Update the token in your .env file
-if grep -q "LANGFUSE_AUTH_TOKEN" .env; then
-    sed -i "s/^LANGFUSE_AUTH_TOKEN=.*/LANGFUSE_AUTH_TOKEN=$TOKEN/" .env
+# Optional: Append/Update the token in your .env.dev.benchmark file
+if grep -q "LANGFUSE_AUTH_TOKEN" .env.dev.benchmark; then
+    sed -i "s/^LANGFUSE_AUTH_TOKEN=.*/LANGFUSE_AUTH_TOKEN=$TOKEN/" .env.dev.benchmark
 else
-    echo "LANGFUSE_AUTH_TOKEN=$TOKEN" >> .env
+    echo "LANGFUSE_AUTH_TOKEN=$TOKEN" >> .env.dev.benchmark
 fi
 
-echo "Success: LANGFUSE_AUTH_TOKEN added to .env"
+echo "Success: LANGFUSE_AUTH_TOKEN added to .env.benchmark"

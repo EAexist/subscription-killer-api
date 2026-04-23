@@ -8,14 +8,17 @@ import com.matchalab.subscription_killer_api.ai.service.MockChatResponseService
 import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
 import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
 
-@Primary
+@Profile("!ai")
 @Service
+@Primary
 class MockEmailTemplateExtractionPromptService(
     private val emailTemplateExtractionPromptServiceImpl: EmailTemplateExtractionPromptServiceImpl,
     private val emailDatasetProvider: EmailDatasetProvider,
@@ -23,18 +26,22 @@ class MockEmailTemplateExtractionPromptService(
     private val objectMapper: ObjectMapper
 ) : EmailTemplateExtractionPromptService {
 
-    override fun run(messages: List<GmailMessage>): List<EmailTemplateExtractionResult> {
+    override fun run(messagesWithSubscriptionEventType: List<Pair<GmailMessage, SubscriptionEventType>>): List<EmailTemplateExtractionResult> {
 
-        emailTemplateExtractionPromptServiceImpl.run(messages)
+        val messages = messagesWithSubscriptionEventType.map { it.first }
 
-        val result: List<ExtractEmailTemplatesResponseItem> = messages.withIndex().map { (index, message) ->
-            val template: EmailTemplate = emailDatasetProvider.getTemplate(message.templateId!!)!!
-            ExtractEmailTemplatesResponseItem(
-                m = index,
-                j = template.subjectAnchors,
-                p = template.snippetAnchors
-            )
-        }
+        emailTemplateExtractionPromptServiceImpl.run(messagesWithSubscriptionEventType)
+
+        val result: List<ExtractEmailTemplatesResponseItem> =
+            messages.withIndex().map { (index, message) ->
+                val template: EmailTemplate =
+                    emailDatasetProvider.getTemplate(message.templateId!!)!!
+                ExtractEmailTemplatesResponseItem(
+                    m = index,
+                    j = template.subjectAnchors,
+                    p = template.snippetAnchors
+                )
+            }
         val extractResponse = ExtractEmailTemplatesResponse(result)
 
         val resultJson = convertResultToJson(extractResponse)
@@ -42,13 +49,20 @@ class MockEmailTemplateExtractionPromptService(
         mockChatResponseService.generateMockChatContext(
             taskName = "extract_email_templates",
             prompt = emailTemplateExtractionPromptServiceImpl.getPrompt(),
-            params = emailTemplateExtractionPromptServiceImpl.getParams(messages),
+            params = emailTemplateExtractionPromptServiceImpl.getParams(
+                messagesWithSubscriptionEventType
+            ),
             outputFormattingString = "{\"result\":[]}",
             dataCount = messages.size,
             outputString = resultJson
         )
 
-        val response = messages.map { EmailTemplateExtractionResult(it.id, emailDatasetProvider.getTemplate(it.templateId!!)!! )}
+        val response = messages.map {
+            EmailTemplateExtractionResult(
+                it.id,
+                emailDatasetProvider.getTemplate(it.templateId!!)!!
+            )
+        }
 
         return response
     }

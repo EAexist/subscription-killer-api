@@ -1,17 +1,20 @@
 package com.matchalab.subscription_killer_api.service
 
-import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
+import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.subscription_killer_api.guest.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.subscription.config.MailProperties
-import com.matchalab.subscription_killer_api.utils.DateTimeUtils
+import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
+import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
+import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 import java.util.*
@@ -22,8 +25,12 @@ private val logger = KotlinLogging.logger {}
 class AppUserService(
     private val appUserRepository: AppUserRepository,
     private val guestAppUserProperties: GuestAppUserProperties,
-    private val mailProperties: MailProperties
+    private val appProperties: AppProperties,
 ) {
+    fun getAppUser(appUserId: UUID): AppUserResponseDto {
+        val appUser = findByIdWithGoogleAccounts(appUserId)
+        return appUser.toResponseDto()
+    }
 
     fun existsByName(name: String): Boolean {
         return appUserRepository.existsByName(name)
@@ -57,11 +64,7 @@ class AppUserService(
     }
 
     fun getGuestAppUser(): AppUser {
-        return findByIdOrNotFound(guestAppUserProperties.id)
-    }
-
-    fun findLastEmailSyncedAtByUserId(appUserId: UUID): Instant? {
-        return appUserRepository.findLastEmailSyncedAtByUserId(appUserId)
+        return findByIdWithGoogleAccounts(guestAppUserProperties.id)
     }
 
     fun save(appUser: AppUser): AppUser {
@@ -101,11 +104,33 @@ class AppUserService(
                 accessToken = command.accessToken,
                 expiresAt = command.expiresAt,
                 scope = command.scope,
-                lastEmailSyncedAt = DateTimeUtils.minusMonthsFromInstant(
-                    Instant.now(),
-                    mailProperties.analysisMonths
-                )
             )
+        )
+        appUserRepository.save(appUser)
+    }
+
+    /* Reports */
+    @Transactional
+    fun claimReportQuota(appUserId: UUID): Instant? {
+        val now = Instant.now()
+        val threshold = now.minusSeconds(appProperties.minRequestIntervalSeconds)
+
+        val rowsAffected = appUserRepository.claimReportQuota(appUserId, now, threshold)
+        return if (rowsAffected > 0) now else null
+    }
+
+    fun getReportUpdateEligibility(appUserId: UUID): ReportUpdateEligibilityDto {
+
+        val reportUpdatedAt = appUserRepository.findLastReportGeneratedAtByUserId(appUserId)
+            ?: return ReportUpdateEligibilityDto(true)
+        val availableSince =
+            reportUpdatedAt.plusSeconds(appProperties.minRequestIntervalSeconds)
+        val canUpdate: Boolean = availableSince.isBefore(Instant.now())
+
+        return ReportUpdateEligibilityDto(
+            canUpdate = canUpdate,
+            reportUpdatedAt = reportUpdatedAt,
+            availableSince = availableSince
         )
     }
 }

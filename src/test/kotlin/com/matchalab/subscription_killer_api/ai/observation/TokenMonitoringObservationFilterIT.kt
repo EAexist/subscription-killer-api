@@ -1,6 +1,5 @@
 package com.matchalab.subscription_killer_api.ai.observation
 
-import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.prompt.emailcategorization.EmailCategorizationPromptService
 import com.matchalab.subscription_killer_api.ai.service.prompt.emailtemplateextraction.EmailTemplateExtractionPromptService
 import com.matchalab.subscription_killer_api.config.DatasetTestConfiguration
@@ -12,7 +11,6 @@ import io.micrometer.observation.tck.TestObservationRegistryAssert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,14 +64,16 @@ abstract class AbstractTokenMonitoringObservationFilterTest {
     @ParameterizedTest
     @MethodSource("aiServiceTestProvider")
     fun `given AI Services when run called should record observation`(testData: AiServiceTest) {
-        val messages = emailDatasetProvider.getSampleMessageSet()
-        
+        val messagesWithSubscriptionEventType =
+            emailDatasetProvider.getSampleMessagesWithSubscriptionEventType()
+
         when (testData.serviceName) {
             "emailCategorization" -> {
-                emailCategorizationPromptService.run(messages)
+                emailCategorizationPromptService.run(messagesWithSubscriptionEventType.map { it.first })
             }
+
             "emailTemplateExtraction" -> {
-                emailTemplateExtractionPromptService.run(messages)
+                emailTemplateExtractionPromptService.run(messagesWithSubscriptionEventType)
             }
         }
 

@@ -14,14 +14,38 @@ interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
         serviceProviderId: UUID
     ): Subscription?
 
+    @Query(
+        """
+        SELECT DISTINCT s FROM Subscription s 
+        JOIN FETCH s.serviceProvider sp 
+        JOIN FETCH sp.emailSources 
+        JOIN FETCH s.googleAccount 
+        WHERE s.id IN :ids
+    """
+    )
+    fun findAllWithDetailsByIds(@Param("ids") ids: Collection<UUID>): List<Subscription>
+
+    @Query(
+        """
+        SELECT DISTINCT s FROM Subscription s 
+        JOIN FETCH s.serviceProvider sp 
+        JOIN FETCH sp.emailSources 
+        JOIN FETCH s.googleAccount g
+        WHERE g.subject = :subject
+    """
+    )
+    fun findAllWithDetailsByGoogleAccountSubject(@Param("subject") subject: String): List<Subscription>
+
     fun findAllByGoogleAccountSubject(subject: String): List<Subscription>
 
-    @Query("""
+    @Query(
+        """
         SELECT s FROM Subscription s 
         JOIN FETCH s.googleAccount 
         JOIN FETCH s.serviceProvider 
         WHERE s.googleAccount IN :accounts
-    """)
+    """
+    )
     fun findAllByGoogleAccountIn(
         @Param("accounts") accounts: Collection<GoogleAccount>
     ): List<Subscription>
@@ -29,12 +53,14 @@ interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
     @Query("SELECT COUNT(s) FROM Subscription s WHERE s.serviceProvider.id = :serviceProviderId")
     fun countByServiceProviderId(serviceProviderId: UUID): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT s FROM Subscription s 
         JOIN FETCH s.googleAccount 
         JOIN FETCH s.serviceProvider 
         WHERE s.googleAccount.subject IN :subjects
-    """)
+    """
+    )
     fun findAllByGoogleAccountSubjectIn(
         @Param("subjects") subjects: Collection<String>
     ): List<Subscription>

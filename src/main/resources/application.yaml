@@ -8,11 +8,44 @@ spring:
       test:
         - "dev"
         - "oauth"
+        - "dev-db-local"
       benchmark:
         - "oauth"
       benchmark-dev:
         - "benchmark"
         - "dev"
+      local:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "local-ssl"
+        - "dev-db-local"
+        - "dev-fe-local"
+        - "ai"
+      db-remote-fe-local:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "local-ssl"
+        - "dev-db-remote"
+        - "dev-fe-local"
+        - "ai"
+      db-local-fe-remote:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "local-ssl"
+        - "dev-db-local"
+        - "dev-fe-remote"
+        - "ai"
+      db-remote-fe-remote:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "local-ssl"
+        - "dev-db-remote"
+        - "dev-fe-remote"
+        - "ai"
 ---
 spring:
   mvc:
@@ -55,6 +88,10 @@ management:
   observations:
     annotations:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
 #  zipkin:
 #    tracing:
 #      export:
@@ -64,7 +101,7 @@ logging:
     console: UTF-8
 app:
   oauth2:
-    redirect-uri: ${FRONTEND_URL}/report
+    redirect-uri: ${FRONTEND_URL}
   cors:
     allowed-methods:
       - GET
@@ -87,7 +124,6 @@ app:
     name: GUEST_APP_USER_NAME
     subjects:
       - GUEST_APP_USER_SUBJECT_A
-      - GUEST_APP_USER_SUBJECT_B
 ---
 
 spring:

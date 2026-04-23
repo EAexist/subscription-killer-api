@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Read git tag from .env.benchmark file if it exists, otherwise use default
+# Read git tag from .env.dev.benchmark file if it exists, otherwise use default
 ENV_FILE="$(dirname "$0")/../.env.benchmark"
 if [ -f "$ENV_FILE" ]; then
   source "$ENV_FILE"
@@ -10,7 +10,7 @@ else
   exit 1
 fi
 
-# Load environment variables from .env.dataset file if it exists
+# Load environment variables from .env.dev.dataset file if it exists
 PROJECT_ROOT="$(dirname "$(dirname "$0")")"
 DATASET_ENV_FILE="$PROJECT_ROOT/.env.dataset"
 BUILD_ARGS=""

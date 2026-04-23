@@ -13,7 +13,7 @@ NO_CLEANUP=true # Whether to skip cleanup and keep containers running
 
 source "$(dirname "${BASH_SOURCE[0]}")/bootRun.sh"
 
-# Load environment variables from .env.benchmark
+# Load environment variables from .env.dev.benchmark
 load_env_benchmark() {
     local env_file="$(dirname "${BASH_SOURCE[0]}")/../.env.benchmark"
     if [ -f "$env_file" ]; then
@@ -104,7 +104,7 @@ main() {
     LOG_FILE=$(mktemp)
     STATUS_FILE=$(mktemp)
 
-    # Load environment variables from .env.benchmark
+    # Load environment variables from .env.dev.benchmark
     load_env_benchmark
 
     log_info "Step 1: Starting bootRun..."

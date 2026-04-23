@@ -1,11 +1,11 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
+import com.matchalab.subscription_killer_api.emailtemplate.service.EmailTemplateMatchService
 import com.matchalab.subscription_killer_api.repository.EmailSourceRepository
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventRule
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
-import com.matchalab.subscription_killer_api.emailtemplate.service.EmailTemplateMatchService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
@@ -27,13 +27,18 @@ class EmailSourceService(
             "EmailSource not found"
         )
     }
+    
+    fun findAllById(ids: List<UUID>): List<EmailSource> {
+        return emailSourceRepository.findAllById(ids)
+    }
 
     @Transactional
     suspend fun getEmailSource(
         gmailMessage: GmailMessage,
     ): EmailSource? {
-        
-        val serviceProviders = serviceProviderService.findByActiveEmailAddressesInWithEmailSources(listOf(gmailMessage.senderEmail))
+
+        val serviceProviders =
+            serviceProviderService.findByActiveEmailAddressesInWithEmailSources(listOf(gmailMessage.senderEmail))
 
         val sources = serviceProviders
             .flatMap { it.emailSources }
@@ -46,7 +51,7 @@ class EmailSourceService(
                     gmailMessage.snippet.contains(discriminator, true)
         } ?: return null
 
-        return source
+        return emailSourceRepository.findByIdWithServiceProvider(source.id!!)
     }
 
     @Transactional
@@ -64,7 +69,10 @@ class EmailSourceService(
         return addedRules
     }
 
-    fun matchMessageToEvent(emailSource: EmailSource, message: GmailMessage): SubscriptionEventType? {
+    fun matchMessageToEvent(
+        emailSource: EmailSource,
+        message: GmailMessage
+    ): SubscriptionEventType? {
         return emailSource.eventRules
             .filter { it.isActive }
             .find { emailTemplateMatchService.matchMessage(it.template, message) }?.eventType

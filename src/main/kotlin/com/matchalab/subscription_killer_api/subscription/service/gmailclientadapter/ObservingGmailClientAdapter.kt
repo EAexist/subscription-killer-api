@@ -18,18 +18,31 @@ class ObservingGmailClientAdapter(
 //            "gmail_client_adapter list_message_ids",
 //            "query" to query
 //        ) {
-            // Optional: attach high-cardinality data like query as a KeyValue
-            return delegate.listMessageIds(query)
+        // Optional: attach high-cardinality data like query as a KeyValue
+        return delegate.listMessageIds(query)
 //        }
     }
 
-    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
+    override suspend fun getMessages(
+        messageIds: List<String>,
+        plan: MessageFetchPlan
+    ): List<GmailMessage> {
 
 //        return observationRegistry.observeSuspend(
 //            "gmail_client_adapter get_messages",
 //            "fields" to plan.fields
 //        ) {
-            return delegate.getMessages(messageIds, plan)
+        return delegate.getMessages(messageIds, plan)
+//        }
+    }
+
+    override suspend fun getFirstMessageId(addresses: List<String>, q: String): String? {
+
+//        return observationRegistry.observeSuspend(
+//            "gmail_client_adapter get_first_messageId",
+//            "addresses" to (addresses.firstOrNull() ?: "none")
+//        ) {
+        return delegate.getFirstMessageId(addresses, q)
 //        }
     }
 
@@ -39,7 +52,7 @@ class ObservingGmailClientAdapter(
 //            "gmail_client_adapter get_first_messageId",
 //            "addresses" to (addresses.firstOrNull() ?: "none")
 //        ) {
-            return delegate.getFirstMessageId(addresses)
+        return delegate.getFirstMessageId(addresses)
 //        }
     }
 }

@@ -1,33 +1,37 @@
-You are a email phrase template extractor.
-Extract one key phrase and create regex patterns of email templates for each email.
+Role: Email Template Extractor
+Task: Extract 1–5 verbatim anchor words per Subject/Snippet. Remove PII, dates, and numbers.
 
-- Use only exact characters and phrases found.
-- Pick 1 key phrase for "Subject" and "Snippet" each.
-- Replace PII, dates, non-essential 'filler' text with .*.
-- No .* at start or end
-- No exact endings (e.g., use 갱신, not 갱신되었습니다).
-- Group emails only if they share both 1.subject template and 2.snippet template. For groups, provide one common result and append first message ID. Result regex should match all group members.
+Logic:
+
+If EventType=N: Extract words proving it is non-transactional/non-subscription.
+
+If EventType=S/C: Extract words representing the fixed template structure.
+
+Constraints:
+
+Anchors must exist in the source text.
+
+Group identical Subject+Snippet templates; provide one result + first ID.
 
 Input format:
-ID|Subject|Snippet
+ID|Subject|Snippet|EventType
 
 Output Key:
 - m: first message id
-- j: subject regex
-- p: snippet regex
+- j: subject anchor list
+- p: snippet anchor list
 
 Constraint:
 - JSON only. No prose. Compact JSON without any whitespace.
 - Don't use any internal thought.
-
 
 Output format (exact keys):
 \{
   "result": [
     \{
       "m": 1,
-      "j": "subject-regex",
-      "p": "snippet-regex"
+      "j": ["subject anchor 1", "subject anchor 2"],
+      "p": ["snippet anchor 1", "snippet anchor 2"]
     \}
   ]
 \}

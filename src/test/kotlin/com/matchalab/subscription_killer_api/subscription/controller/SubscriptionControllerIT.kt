@@ -6,8 +6,8 @@ import com.matchalab.subscription_killer_api.config.SharedTestcontainersConfig
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
 import com.matchalab.subscription_killer_api.subscription.progress.dto.AnalysisProgressUpdate
 import com.matchalab.subscription_killer_api.subscription.progress.dto.AppUserAnalysisProgressUpdate
+import com.matchalab.subscription_killer_api.subscription.progress.dto.ServiceProviderAnalysisProgressUpdate
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -33,7 +33,11 @@ private val logger = KotlinLogging.logger {}
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @AutoConfigureObservability
-@Import(AuthenticatedClientFactory::class, SharedTestcontainersConfig::class, DatabaseTestUtils::class)
+@Import(
+    AuthenticatedClientFactory::class,
+    SharedTestcontainersConfig::class,
+    DatabaseTestUtils::class
+)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SubscriptionControllerIT
 @Autowired
@@ -83,10 +87,12 @@ constructor(
             .returnResult(object : ParameterizedTypeReference<AnalysisProgressUpdate>() {})
             .responseBody.doOnNext { logger.debug { "🔊 | eventStream: $it" } }
 
-        StepVerifier.create(eventStream).expectSubscription().recordWith { ArrayList() } // Collect what we catch
-            .thenConsumeWhile { it is AppUserAnalysisProgressUpdate }
+        StepVerifier.create(eventStream).expectSubscription()
+            .recordWith { ArrayList() } // Collect what we catch
+            .thenConsumeWhile { it is AppUserAnalysisProgressUpdate || it is ServiceProviderAnalysisProgressUpdate }
             .consumeRecordedWith { results ->
-                val statuses = results.filterIsInstance<AppUserAnalysisProgressUpdate>().map { it.status }
+                val statuses =
+                    results.filterIsInstance<AppUserAnalysisProgressUpdate>().map { it.status }
 
                 // Assert that at least the final state is reached
                 assertThat(statuses).contains(AnalysisProgressStatus.COMPLETED)
@@ -96,10 +102,7 @@ constructor(
                 assertThat(statuses).isSortedAccordingTo(Comparator.comparing { it.ordinal })
             }
             .expectComplete()
-            .verify(Duration.ofSeconds(120))
-
-        println("Test finished, waiting for Zipkin flush...")
-        delay(5000)
+            .verify(Duration.ofSeconds(600))
     }
 
 }

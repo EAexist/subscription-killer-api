@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.ai.dto
 
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 
 data class EmailCategorizationResponse(
     val subsStartOrPaymentMsgIds: List<String>,
@@ -15,5 +16,16 @@ fun EmailCategorizationResponse.toMessages(messages: List<GmailMessage>): List<G
         this.subsCancelMsgIds,
         this.nonSubsMsgIds,
     ).flatten().mapNotNull { idToMessage[it] }
+}
 
+fun EmailCategorizationResponse.toMessagesWithSubscriptionEventType(messages: List<GmailMessage>): List<Pair<GmailMessage, SubscriptionEventType>> {
+    val idToMessage = messages.associateBy { it.id }
+    return listOf(
+        this.subsStartOrPaymentMsgIds.mapNotNull { idToMessage[it] }
+            .map { it to SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT },
+        this.subsCancelMsgIds.mapNotNull { idToMessage[it] }
+            .map { it to SubscriptionEventType.SUBSCRIPTION_CANCEL },
+        this.nonSubsMsgIds.mapNotNull { idToMessage[it] }
+            .map { it to SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL },
+    ).flatten()
 }

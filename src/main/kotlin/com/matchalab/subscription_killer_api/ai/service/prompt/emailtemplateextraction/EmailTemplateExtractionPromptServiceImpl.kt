@@ -3,12 +3,11 @@ package com.matchalab.subscription_killer_api.ai.service.prompt.emailtemplateext
 import com.matchalab.subscription_killer_api.ai.dto.EmailTemplateExtractionResult
 import com.matchalab.subscription_killer_api.ai.service.ChatClientService
 import com.matchalab.subscription_killer_api.ai.service.config.PromptTemplateProperties
-import com.matchalab.subscription_killer_api.ai.toPromptParamString
 import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import kotlin.collections.mapOf
 
 private val logger = KotlinLogging.logger {}
 
@@ -16,35 +15,51 @@ private val logger = KotlinLogging.logger {}
 class EmailTemplateExtractionPromptServiceImpl(
     private val chatClientService: ChatClientService,
     private val promptTemplateProperties: PromptTemplateProperties,
-): EmailTemplateExtractionPromptService {
+) : EmailTemplateExtractionPromptService {
 
-    override fun run(messages: List<GmailMessage>): List<EmailTemplateExtractionResult> {
+    override fun run(messagesWithSubscriptionEventType: List<Pair<GmailMessage, SubscriptionEventType>>): List<EmailTemplateExtractionResult> {
+
+        val messages = messagesWithSubscriptionEventType.map { it.first }
         logger.debug { "[run] ✨  Calling chatClient for ${messages.size} messages" }
+
 
         return chatClientService.extractEmailTemplates(
             getPrompt(),
-            getParams(messages),
+            getParams(messagesWithSubscriptionEventType),
             messages.size
-        ).let { response -> response.result.map { result ->
-                    EmailTemplateExtractionResult(
-                        messages[result.m].id,
-                        EmailTemplate(
-                            result.j.map{it.trim()},
-                            result.p.map{it.trim()}
-                        )
+        ).let { response ->
+            response.result.map { result ->
+//                val jList = when (result.j) {
+//                    is String -> listOf(result.j.toString().trim())
+//                    is List<*> -> (result.j as List<*>).map { it.toString().trim() }
+//                    else -> emptyList()
+//                }
+                EmailTemplateExtractionResult(
+                    messages[result.m].id,
+                    EmailTemplate(
+                        result.j.map { it.trim() },
+                        result.p.map { it.trim() }
                     )
-                }
+                )
+            }
         }
     }
 
-    fun getParams(messages: List<GmailMessage>): Map<String, String> {
-        return mapOf("emails" to messages.withIndex().joinToString("\n") { (index, it) ->
-            it.toPromptParamString(
-                index
-            )
-        })
+    fun getParams(messagesWithSubscriptionEventType: List<Pair<GmailMessage, SubscriptionEventType>>): Map<String, String> {
+        return mapOf(
+            "emails" to messagesWithSubscriptionEventType.withIndex()
+                .joinToString("\n") { (index, it) ->
+                    val eventType = when (it.second) {
+                        SubscriptionEventType.NOT_A_SUBSCRIPTION_EMAIL -> "N"
+                        SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT -> "S"
+                        SubscriptionEventType.SUBSCRIPTION_CANCEL -> "C"
+                    }
+                    "${index}|${it.first.subject}|${it.first.snippet}|${eventType}"
+                })
     }
 
-    fun getPrompt() : String = promptTemplateProperties.generalizeStringPattern.getContentAsString(Charsets.UTF_8).trimIndent()
+    fun getPrompt(): String =
+        promptTemplateProperties.generalizeStringPattern.getContentAsString(Charsets.UTF_8)
+            .trimIndent()
 
 }

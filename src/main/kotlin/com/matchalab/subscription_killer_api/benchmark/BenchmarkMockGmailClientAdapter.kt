@@ -64,23 +64,29 @@ class BenchmarkMockGmailClientAdapter(
         val response = withContext(Dispatchers.IO) {
             httpClient.send(request, BodyHandlers.ofString())
         }
-        return objectMapper.readValue(response.body(), String::class.java).split(",").filter { it.isNotBlank() }
+        return objectMapper.readValue(response.body(), String::class.java).split(",")
+            .filter { it.isNotBlank() }
     }
 
-    override suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage> {
+    override suspend fun getMessages(
+        messageIds: List<String>,
+        plan: MessageFetchPlan
+    ): List<GmailMessage> {
         val uri = URI("${benchmarkProperties.baseUrl}/messages/batch-get")
 
         val requestBody = objectMapper.writeValueAsString(BatchGetRequest(messageIds))
 
 //        logger.debug { "getMessages:\nrequestBody=${requestBody}" }
 
-        val request = createPostRequest(uri, requestBody, mapOf("Content-Type" to "application/json"))
+        val request =
+            createPostRequest(uri, requestBody, mapOf("Content-Type" to "application/json"))
 
         val response = withContext(Dispatchers.IO) {
             httpClient.send(request, BodyHandlers.ofString())
         }
 
-        val messages : List<GmailMessage> = objectMapper.readValue(response.body(), BatchGetResponse::class.java).messages
+        val messages: List<GmailMessage> =
+            objectMapper.readValue(response.body(), BatchGetResponse::class.java).messages
 
         return messages
     }
@@ -90,12 +96,17 @@ class BenchmarkMockGmailClientAdapter(
 
         val requestBody = objectMapper.writeValueAsString(FirstMessageIdRequest(addresses))
 
-        val request = createPostRequest(uri, requestBody, mapOf("Content-Type" to "application/json"))
+        val request =
+            createPostRequest(uri, requestBody, mapOf("Content-Type" to "application/json"))
 
         val response = withContext(Dispatchers.IO) {
             httpClient.send(request, BodyHandlers.ofString())
         }
         return objectMapper.readValue(response.body(), String::class.java)
+    }
+
+    override suspend fun getFirstMessageId(addresses: List<String>, q: String): String? {
+        return getFirstMessageId(addresses)
     }
 
     private fun createGetRequest(uri: URI, headers: Map<String, String> = emptyMap()): HttpRequest {
@@ -104,7 +115,11 @@ class BenchmarkMockGmailClientAdapter(
         return builder.build()
     }
 
-    private fun createPostRequest(uri: URI, body: String, headers: Map<String, String> = emptyMap()): HttpRequest {
+    private fun createPostRequest(
+        uri: URI,
+        body: String,
+        headers: Map<String, String> = emptyMap()
+    ): HttpRequest {
         val builder = HttpRequest.newBuilder()
             .uri(uri)
             .POST(HttpRequest.BodyPublishers.ofString(body))

@@ -1,25 +1,16 @@
 package com.matchalab.subscription_killer_api.subscription
 
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
-import com.matchalab.subscription_killer_api.utils.toDto
 import java.time.Instant
+import java.time.YearMonth
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 data class SubscribedSinceDto(
     val subscribedSince: Instant?,
+    val nextPaymentDate: Instant? = null,
     val isNotSureIfSubscriptionIsOngoing: Boolean = false,
 )
-
-fun Subscription.toResponseDto(): SubscriptionResponseDto {
-    val subscribedSinceDto: SubscribedSinceDto = this.subscribedSince()
-    return SubscriptionResponseDto(
-        serviceProvider = this.serviceProvider.toDto(),
-        registeredSince = this.registeredSince,
-        hasSubscribedNewsletterOrAd = false,
-        subscribedSince = subscribedSinceDto.subscribedSince,
-        isNotSureIfSubscriptionIsOngoing = subscribedSinceDto.isNotSureIfSubscriptionIsOngoing,
-    )
-}
 
 fun Subscription.subscribedSince(): SubscribedSinceDto {
     val serviceProvider = this.serviceProvider
@@ -37,7 +28,7 @@ fun Subscription.subscribedSince(): SubscribedSinceDto {
     if (!(serviceProvider.isSubscriptionEventRuleComplete())) {
         // Only StartRule Exists
         latestStartDay = getLatestSubscriptionStartDate()
-        return SubscribedSinceDto(latestStartDay, true)
+        return SubscribedSinceDto(latestStartDay, latestStartDay?.getNextMonthlyPaymentDate(), true)
     }
 
     // One of StartRule+CancelRule or MonthlyPayment Rule Exists.
@@ -47,9 +38,12 @@ fun Subscription.subscribedSince(): SubscribedSinceDto {
         latestStartDay = getLatestSubscriptionStartDate()
         latestCancelDay = getLatestSubscriptionCancelDate()
 
-        if ((latestStartDay != null) && ((latestCancelDay == null) || (latestStartDay.isAfter(latestCancelDay)))) {
+        if ((latestStartDay != null) && ((latestCancelDay == null) || (latestStartDay.isAfter(
+                latestCancelDay
+            )))
+        ) {
             // Has Start Message. Has No Cancel Message After Start Message.
-            return SubscribedSinceDto(latestStartDay)
+            return SubscribedSinceDto(latestStartDay, latestStartDay.getNextMonthlyPaymentDate())
         }
         // No Start Message after Last Cancel Message.
         return SubscribedSinceDto(null)
@@ -59,7 +53,7 @@ fun Subscription.subscribedSince(): SubscribedSinceDto {
     val oldestConsecutive = getFirstOfConsecutiveMonthlySubscriptionDate()
     if (oldestConsecutive != null) {
         // Has Monthly Payment Message.
-        return SubscribedSinceDto(oldestConsecutive)
+        return SubscribedSinceDto(oldestConsecutive, oldestConsecutive.getNextMonthlyPaymentDate())
     }
     // No Monthly Payment Message.
     return SubscribedSinceDto(null)
@@ -69,7 +63,7 @@ fun Subscription.isCanceled(): Boolean {
     val cancelDate = getLatestSubscriptionCancelDate()
     val startDate = getLatestSubscriptionStartDate()
     val monthlyDate = getLatestMonthlySubscriptionDate()
-    
+
     return if (cancelDate != null) {
         val cancelAfterStart = startDate == null || cancelDate.isAfter(startDate)
         val cancelAfterMonthly = monthlyDate == null || cancelDate.isAfter(monthlyDate)
@@ -82,7 +76,7 @@ fun Subscription.isCanceled(): Boolean {
 fun Subscription.getLatestSubscriptionStartDate(
 ): Instant? {
     val startEvents = subscriptionEvents
-        .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && !it.isMonthlyRecurring  }
+        .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && !it.isMonthlyRecurring }
 
     return startEvents.mapNotNull { it.internalDate }.maxOfOrNull { it }
 }
@@ -107,14 +101,14 @@ fun Subscription.getFirstOfConsecutiveMonthlySubscriptionDate(
 ): Instant? {
     val monthlyPaymentEvents = subscriptionEvents
         .filter { (it.type == SubscriptionEventType.SUBSCRIPTION_START_OR_PAYMENT) && it.isMonthlyRecurring }
-        .map {it.internalDate}
+        .map { it.internalDate }
         .sortedByDescending { it }
 
     if (monthlyPaymentEvents.isEmpty()) {
         return null
     }
 
-    val latestDate = monthlyPaymentEvents.first()?: return null
+    val latestDate = monthlyPaymentEvents.first() ?: return null
 
     if (isBeforeLastMonth(latestDate)) {
         return null
@@ -138,4 +132,28 @@ fun Subscription.getFirstOfConsecutiveMonthlySubscriptionDate(
 fun Subscription.isBeforeLastMonth(date: Instant, referenceDate: Instant = Instant.now()): Boolean {
     val oneMonthAgo = referenceDate.minus(30, ChronoUnit.DAYS)
     return date.isBefore(oneMonthAgo)
+}
+
+fun Instant.getNextMonthlyPaymentDate(): Instant {
+    val now = Instant.now()
+    val zone = ZoneId.systemDefault()
+
+    val baseDay = this.atZone(zone).dayOfMonth
+    val nowZ = now.atZone(zone)
+
+    fun build(year: Int, month: Int): ZonedDateTime {
+        val ym = YearMonth.of(year, month)
+        val day = minOf(baseDay, ym.lengthOfMonth()) // handle Feb, etc.
+        return ym.atDay(day).atStartOfDay(zone)
+    }
+
+    val thisMonth = build(nowZ.year, nowZ.monthValue)
+    val next = if (thisMonth.toInstant().isAfter(now)) {
+        thisMonth
+    } else {
+        val nm = nowZ.plusMonths(1)
+        build(nm.year, nm.monthValue)
+    }
+
+    return next.toInstant()
 }

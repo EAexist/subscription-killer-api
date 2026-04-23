@@ -16,4 +16,7 @@ interface EmailSourceRepository : JpaRepository<EmailSource, UUID> {
     @Transactional
     @Query(value = "UPDATE email_source SET event_rules = '[]'::json", nativeQuery = true)
     fun clearAllEventRules(): Int
+
+    @Query("SELECT e FROM EmailSource e JOIN FETCH e.serviceProvider WHERE e.id = :id")
+    fun findByIdWithServiceProvider(id: UUID): EmailSource?
 }
