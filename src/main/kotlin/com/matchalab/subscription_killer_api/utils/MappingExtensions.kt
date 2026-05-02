@@ -3,47 +3,32 @@ package com.matchalab.subscription_killer_api.utils
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.core.dto.GoogleAccountResponseDto
+import com.matchalab.subscription_killer_api.datasets.GmailApiMessage
+import com.matchalab.subscription_killer_api.datasets.Header
+import com.matchalab.subscription_killer_api.datasets.Payload
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.subscription.Subscription
-import com.matchalab.subscription_killer_api.subscription.dto.AccountReportDto
 import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
-import com.matchalab.subscription_killer_api.subscription.service.GmailMessageSummaryDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
+
 fun AppUser.toResponseDto(): AppUserResponseDto {
     return AppUserResponseDto(
         name = this.name,
-        googleAccounts = this.googleAccounts.map(GoogleAccount::toResponseDto)
+        googleAccounts = this.googleAccounts.map { it.toResponseDto() }
     )
 }
 
 fun GoogleAccount.toResponseDto(): GoogleAccountResponseDto {
     return GoogleAccountResponseDto(
+        subject = this.subject!!,
         email = this.email,
         name = this.name,
-    )
-}
-
-fun GoogleAccount.toReportDto(): AccountReportDto {
-    return AccountReportDto(
-        subscriptions = this.subscriptions.map { it -> it.toResponseDto() },
-        googleAccount = this.toResponseDto(),
-    )
-}
-
-fun Subscription.toResponseDto(): SubscriptionResponseDto {
-    return SubscriptionResponseDto(
-        serviceProvider = this.serviceProvider.toDto(),
-        registeredSince = this.registeredSince,
-        hasSubscribedNewsletterOrAd = this.hasSubscribedNewsletterOrAd,
-        subscribedSince = this.subscribedSince,
-        isNotSureIfSubscriptionIsOngoing = this.isNotSureIfSubscriptionIsOngoing,
+        canDelete = false
     )
 }
 
@@ -54,20 +39,34 @@ fun ServiceProvider.toDto(): ServiceProviderResponseDto {
         this.logoDevSuffix,
         this.websiteUrl,
         this.subscriptionPageUrl,
-        this.isEmailDetectionRuleAvailable()
+        this.isSubscriptionEventRuleAvailable()
     )
 }
 
-fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
+fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage =
+    this.toGmailApiMessage().toGmailMessage(maxSnippetSize)
+
+
+fun Message.toGmailApiMessage(): GmailApiMessage {
+    val headers = this.payload?.headers?.map { Header(it.name, it.value) } ?: emptyList()
+    return GmailApiMessage(
+        id = this.id,
+        internalDate = this.internalDate,
+        snippet = this.snippet,
+        payload = Payload(headers = headers)
+    )
+}
+
+fun GmailApiMessage.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
 
     val doHidePrices = true
 
     val internalDate = this.internalDate.let { DateTimeUtils.epochMilliToInstant(it) }
-    val headers = this.payload?.headers
+    val headers = this.payload.headers
     val fromHeaderValue =
-        headers?.find { it.name.equals("From", ignoreCase = true) }?.value ?: ""
+        headers.find { it.name.equals("From", ignoreCase = true) }?.value ?: ""
     val subjectHeaderValue =
-        headers?.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
+        headers.find { it.name.equals("Subject", ignoreCase = true) }?.value ?: ""
 
     val regex = """^(.+)\s+<(.+)>$""".toRegex()
     val matchResult = regex.find(fromHeaderValue)
@@ -80,9 +79,11 @@ fun Message.toGmailMessage(maxSnippetSize: Int = 400): GmailMessage {
         id = this.id,
         senderName = name,
         senderEmail = email,
-        subject = subjectHeaderValue.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it },
+        subject = subjectHeaderValue.cleanEmailText()
+            .let { if (doHidePrices) it.hidePrices() else it },
         internalDate = internalDate,
-        snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }.take(maxSnippetSize)
+        snippet = this.snippet.cleanEmailText().let { if (doHidePrices) it.hidePrices() else it }
+            .take(maxSnippetSize)
     )
 }
 
@@ -95,13 +96,11 @@ private fun String.cleanEmailText(): String {
         .replace(Regex("[\\p{C}\\u034F\\u200B-\\u200D\\uFEFF]"), "")
         // 3. Collapse all whitespace (newlines, tabs, multiple spaces) into one single space
         .replace(Regex("\\s+"), " ")
+        .hideDates()
         .trim()
 }
 
-fun GmailMessage.toSummaryDto(): GmailMessageSummaryDto =
-    GmailMessageSummaryDto(this.id, this.subject, this.snippet)
-
-fun String.hidePrices(): String {
+private fun String.hidePrices(): String {
     // Matches the full number followed by the currency suffix
     val priceSuffixRegex = """\d[\d,.]*\s?(원|KRW|USD)""".toRegex(RegexOption.IGNORE_CASE)
     // Matches the currency symbol followed by the full number
@@ -112,7 +111,7 @@ fun String.hidePrices(): String {
         .replace(pricePrefixRegex, "[PRICE]")
 }
 
-fun String.hideDates(): String {
+private fun String.hideDates(): String {
     val dateAndOptionalTimeRegex =
         """(?i)\b(\d{4}-\d{2}-\d{2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(?:st|nd|rd|th)?,? \d{4})(\s+\d{1,2}:\d{2}(:\d{2})?)?\b""".toRegex(
             RegexOption.IGNORE_CASE

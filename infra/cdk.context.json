@@ -1,0 +1,4 @@
+{
+  "ssm:account=660410403413:parameterName=/stg/subscription-killer-api/FRONTEND_URL:region=ap-northeast-2": "https://sublog-git-staging-matchalab-project.vercel.app",
+  "ssm:account=660410403413:parameterName=/stg/subscription-killer-api/SERVICE_URL:region=ap-northeast-2": "https://hnsmwdroq2gbdrvkvhqpm5uhjy0asfrp.lambda-url.ap-northeast-2.on.aws"
+}

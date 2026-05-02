@@ -1,5 +1,6 @@
 package com.matchalab.subscription_killer_api.service
 
+import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
 import com.matchalab.subscription_killer_api.repository.GoogleAccountRepository
@@ -20,7 +21,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@Profile("google-auth")
+@Profile("oauth")
 @Service
 class MultiAccountOAuth2AuthorizedClientService(
     private val clientRegistrationRepository: ClientRegistrationRepository,
@@ -33,7 +34,8 @@ class MultiAccountOAuth2AuthorizedClientService(
         val customUser = principal.principal as CustomOidcUser
         val googleAccountSubject: String = customUser.getGoogleSubject()
 
-        val existingGoogleAccount: GoogleAccount? = googleAccountRepository.findByIdOrNull(googleAccountSubject)
+        val existingGoogleAccount: GoogleAccount? =
+            googleAccountRepository.findByIdOrNull(googleAccountSubject)
 
         if (existingGoogleAccount != null) {
             logger.debug { "\uD83D\uDD0A [saveAuthorizedClient] Updating existing GoogleAccount" }
@@ -56,18 +58,20 @@ class MultiAccountOAuth2AuthorizedClientService(
                 ?: throw (Exception("Principal attributes not found"))
             val name: String = attributes["name"] as String
             val email: String = attributes["email"] as String
-
-            val newGoogleAccount: GoogleAccount = GoogleAccount(
-                subject = googleAccountSubject,
-                name = name,
-                email = email,
-                refreshToken = client.refreshToken?.tokenValue,
-                accessToken = client.accessToken.tokenValue,
-                expiresAt = client.accessToken.expiresAt
-            )
             val currentUser = (principal.principal as CustomOidcUser)
             val appUser = appUserService.findByIdOrNotFound(currentUser.appUserId!!)
-            appUser.addGoogleAccount(newGoogleAccount)
+            appUserService.addGoogleAccount(
+                appUser,
+                AddGoogleAccountCommand(
+                    subject = googleAccountSubject,
+                    name = name,
+                    email = email,
+                    refreshToken = client.refreshToken?.tokenValue,
+                    accessToken = client.accessToken.tokenValue,
+                    expiresAt = client.accessToken.expiresAt,
+                    scope = client.accessToken.scopes.joinToString(",")
+                )
+            )
             appUserService.save(appUser)
         }
     }
@@ -77,14 +81,16 @@ class MultiAccountOAuth2AuthorizedClientService(
         principalName: String
     ): T? {
 
-        val clientRegistration = clientRegistrationRepository.findByRegistrationId(clientRegistrationId) ?: return null
+        val clientRegistration =
+            clientRegistrationRepository.findByRegistrationId(clientRegistrationId) ?: return null
         var googleAccount: GoogleAccount
 
         val (appUserIdString, googleAccountSubject) = principalName.split(":", limit = 2)
 
 
         if (googleAccountSubject.isNotEmpty()) {
-            googleAccount = googleAccountRepository.findByIdOrNull(googleAccountSubject) ?: return null
+            googleAccount =
+                googleAccountRepository.findByIdOrNull(googleAccountSubject) ?: return null
         } else {
             val appUserId =
                 UUID.fromString(appUserIdString)
@@ -94,7 +100,7 @@ class MultiAccountOAuth2AuthorizedClientService(
             googleAccount = appUser.googleAccounts.first()
         }
 
-
+        @Suppress("UNCHECKED_CAST")
         return OAuth2AuthorizedClient(
             clientRegistration,
             principalName,
@@ -102,7 +108,8 @@ class MultiAccountOAuth2AuthorizedClientService(
                 OAuth2AccessToken.TokenType.BEARER,
                 googleAccount.accessToken,
                 null,
-                googleAccount.expiresAt
+                googleAccount.expiresAt,
+                googleAccount.scope?.split(",")?.toSet() ?: emptySet()
             ),
             googleAccount.refreshToken?.let {
                 OAuth2RefreshToken(it, null)

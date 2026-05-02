@@ -4,6 +4,6 @@ import java.time.Instant
 
 data class ReportUpdateEligibilityDto(
     val canUpdate: Boolean,
-    val analyzedAt: Instant? = null,
+    val reportUpdatedAt: Instant? = null,
     val availableSince: Instant? = null,
 ) {}

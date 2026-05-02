@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/subscription_killer_db
+    username: guest
+    password: hello_guest

@@ -1,6 +1,7 @@
 package com.matchalab.subscription_killer_api.subscription.progress
 
 enum class AnalysisProgressStatus(val sortOrder: Int) {
+    ERROR(0),
     STARTED(10),
     EMAIL_FETCHED(20),
     EMAIL_ACCOUNT_ANALYSIS_COMPLETED(30),

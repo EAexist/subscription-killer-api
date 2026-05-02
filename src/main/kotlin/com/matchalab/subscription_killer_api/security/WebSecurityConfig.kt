@@ -1,9 +1,11 @@
 package com.matchalab.subscription_killer_api.security
 
+import com.matchalab.subscription_killer_api.security.config.AccountLinkingAuthorizedClientRepository
 import com.matchalab.subscription_killer_api.security.config.CorsProperties
 import com.matchalab.subscription_killer_api.security.config.CustomSuccessHandler
 import com.matchalab.subscription_killer_api.service.CustomOidcUserService
 import com.matchalab.subscription_killer_api.service.MultiAccountOAuth2AuthorizedClientService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,10 +16,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.cors.CorsConfigurationSource
 
-@Profile("google-auth")
+private val logger = KotlinLogging.logger {}
+
+@Profile("!benchmark && !benchmark-dev")
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(CorsProperties::class)
@@ -28,7 +33,8 @@ open class WebSecurityConfig(
 //    private val googleIdTokenAuthenticationEntryPoint: GoogleIdTokenAuthenticationEntryPoint,
     private val multiAccountOAuth2AuthorizedClientService: MultiAccountOAuth2AuthorizedClientService,
     private val customSuccessHandler: CustomSuccessHandler,
-    private val customOidcUserService: CustomOidcUserService
+    private val customOidcUserService: CustomOidcUserService,
+    private val accountLinkingAuthorizedClientRepository: AccountLinkingAuthorizedClientRepository
 ) {
 
     @Bean
@@ -42,18 +48,27 @@ open class WebSecurityConfig(
             csrf { disable() }
             authorizeHttpRequests {
                 authorize(HttpMethod.OPTIONS, "/**", permitAll)
+                authorize(HttpMethod.GET, "/actuator/health", permitAll)
                 authorize(HttpMethod.GET, "/ping", permitAll)
-                authorize(HttpMethod.GET, "/ouath2/**", permitAll)
+                authorize(HttpMethod.GET, "/oauth2/**", permitAll)
                 authorize(HttpMethod.GET, "/login/**", permitAll)
                 authorize(HttpMethod.GET, "/api/v1/guest/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2Login {
+                authorizedClientRepository = accountLinkingAuthorizedClientRepository
                 authorizedClientService = multiAccountOAuth2AuthorizedClientService
                 authenticationSuccessHandler = customSuccessHandler
                 userInfoEndpoint {
                     oidcUserService = customOidcUserService
                 }
+                authenticationFailureHandler =
+                    AuthenticationFailureHandler { _, response, exception ->
+                        logger.debug { "OAuth2 Error: ${exception.message}" }
+                        logger.debug { "${exception.printStackTrace()}" }
+
+                        response.sendRedirect("/login?error=${exception.message}")
+                    }
 //                authorizationEndpoint {
 //                    authorizationRequestResolver = customAuthorizationRequestResolver
 //                }
@@ -61,26 +76,8 @@ open class WebSecurityConfig(
             exceptionHandling {
                 authenticationEntryPoint = HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
             }
-//            exceptionHandling { authenticationEntryPoint = googleIdTokenAuthenticationEntryPoint }
-
-//            addFilterBefore<AuthorizationFilter>(googleTokenAuthFilter)
-//            addFilterBefore<GoogleTokenAuthFilter>(authRequestBodyValidationFilter)
-            // addFilterBefore<AuthorizationFilter>(authRequestBodyValidationFilter)
         }
 
         return http.build()
     }
-
-//    @Bean
-//    open fun authenticationManager(): AuthenticationManager {
-//        return authenticationConfiguration.authenticationManager
-//    }
-//
-//    @Bean
-//    open fun googleIdTokenAuthenticationProvider(
-//        tokenVerifierService: TokenVerifierService,
-//        appUserService: AppUserService
-//    ): AuthenticationProvider {
-//        return GoogleIdTokenAuthenticationProvider(tokenVerifierService, appUserService)
-//    }
 }

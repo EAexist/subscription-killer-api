@@ -43,25 +43,25 @@ class ServiceProvider(
 
     val activeEmailSources: List<EmailSource> get() = emailSources.filter { it.isActive }
     val emailSearchAddresses: List<String> get() = activeEmailSources.map { it.targetAddress }
-    val emailSearchAliasNames: Map<String, String>? get() = if (isEmailDetectionRuleComplete()) aliasNames else null
+    val emailSearchAliasNames: Map<String, String>? get() = if (isSubscriptionEventRuleComplete()) aliasNames else null
 
     fun isSubscriptionStartRulePresent(): Boolean {
-        return emailSources.any { it.paymentStartRule != null }
+        return emailSources.any { it.hasPaymentStartRule() }
     }
 
     fun isSubscriptionCancelRulePresent(): Boolean {
-        return emailSources.any { it.paymentCancelRule != null }
+        return emailSources.any { it.hasPaymentCancelRule() }
     }
 
     fun isMonthlyPaymentRulePresent(): Boolean {
-        return emailSources.any { it.monthlyPaymentRule != null }
+        return emailSources.any { it.hasMonthlyPaymentRule() }
     }
 
-    fun isEmailDetectionRuleAvailable(): Boolean {
+    fun isSubscriptionEventRuleAvailable(): Boolean {
         return isSubscriptionStartRulePresent() || isMonthlyPaymentRulePresent()
     }
 
-    fun isEmailDetectionRuleComplete(): Boolean {
+    fun isSubscriptionEventRuleComplete(): Boolean {
         return (isSubscriptionStartRulePresent() && isSubscriptionCancelRulePresent()) || isMonthlyPaymentRulePresent()
     }
 

@@ -1,10 +1,10 @@
 package com.matchalab.subscription_killer_api.config
 
 import com.matchalab.subscription_killer_api.security.CustomOidcUser
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.core.MethodParameter
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
-import org.springframework.security.core.Authentication
-import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
@@ -13,9 +13,9 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import java.util.*
 
 @Component
-class AuthenticatedUserIdResolver(
-    private val authenticationPrincipalResolver: AuthenticationPrincipalArgumentResolver
-) : HandlerMethodArgumentResolver {
+class AuthenticatedAppUserIdResolver : HandlerMethodArgumentResolver {
+
+    private val logger = KotlinLogging.logger {}
 
     override fun supportsParameter(parameter: MethodParameter): Boolean =
         //@TODO Use AppUSerId Custom Object Instead of UUID
@@ -28,13 +28,19 @@ class AuthenticatedUserIdResolver(
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
     ): UUID {
+//        logger.debug { "AuthenticatedAppUserIdResolver - Resolving argument" }
 
-        val principal = webRequest.userPrincipal as? Authentication
-            ?: throw AuthenticationCredentialsNotFoundException("User is not authenticated")
+        val authentication = SecurityContextHolder.getContext().authentication
+//        logger.debug { "AuthenticatedAppUserIdResolver - Authentication: $authentication" }
 
-        val appUserId = (principal.principal as? CustomOidcUser)?.appUserId
-            ?: throw AuthenticationCredentialsNotFoundException("Invalid principal")
+        if (authentication == null || !authentication.isAuthenticated) {
+//            logger.debug { "AuthenticatedAppUserIdResolver - No authentication found" }
+            throw AuthenticationCredentialsNotFoundException("User is not authenticated")
+        }
 
-        return appUserId
+        val appUserId = (authentication.principal as? CustomOidcUser)?.appUserId
+//        logger.debug { "AuthenticatedAppUserIdResolver - AppUserId: $appUserId" }
+
+        return appUserId ?: throw AuthenticationCredentialsNotFoundException("Invalid principal")
     }
 }

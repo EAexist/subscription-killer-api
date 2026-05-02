@@ -6,7 +6,7 @@ if [ ! -f build/distributions/myapp.zip ]; then
     exit 1
 fi
 
-BUCKET=${DEPLOY_BUCKET_NAME:-my-default-dev-bucket}
+BUCKET=$DEPLOY_BUCKET_NAME
 
 echo "Packaging using bucket: $BUCKET"
 

@@ -4,5 +4,5 @@ import java.time.Instant
 
 data class SubscriptionReportResponseDto(
     val accountReports: List<AccountReportDto>,
-    val analyzedAt: Instant?
+    val reportUpdateAvailableSince: Instant,
 ) {}

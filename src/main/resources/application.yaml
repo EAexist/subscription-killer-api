@@ -2,29 +2,73 @@ spring:
   profiles:
     group:
       prod:
-        - "google-auth"
+        - "oauth"
         - "gmail"
         - "ai"
+      test:
+        - "dev"
+        - "oauth"
+        - "dev-db-local"
+      benchmark:
+        - "oauth"
+      benchmark-dev:
+        - "benchmark"
+        - "dev"
+      schema-generation:
+        - "dev"
+        - "oauth"
+        - "dev-db-local"
+        - "dev-fe-local"
+      local:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "dev-db-local"
+        - "dev-fe-local"
+      db-remote-fe-local:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "dev-db-remote"
+        - "dev-fe-local"
+      db-local-fe-remote:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "dev-db-local"
+        - "dev-fe-remote"
+      db-remote-fe-remote:
+        - "dev"
+        - "oauth"
+        - "gmail"
+        - "dev-db-remote"
+        - "dev-fe-remote"
 ---
-
 spring:
+  mvc:
+    async:
+      request-timeout: 60000
   application:
     name: subscription-killer-api
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+
+      connection-timeout: 15000
+      validation-timeout: 5000
+
+      max-lifetime: 300000     # 5 min
+      idle-timeout: 60000      # 1 min
       keepalive-time: 30000
-      max-lifetime: 600000
+
       connection-test-query: SELECT 1
-      initialization-fail-timeout: 1
   jpa:
     hibernate:
       ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        temp:
-          use_jdbc_metadata_defaults: false
+    generate-ddl: false
+    open-in-view: false
   session:
     jdbc:
       initialize-schema: always
@@ -32,6 +76,9 @@ spring:
   ai:
     model:
       chat: none
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 server:
   forward-headers-strategy: framework
   servlet:
@@ -42,16 +89,23 @@ server:
         path: /
 
 management:
-  zipkin:
-    tracing:
-      export:
-        enabled: false
+  observations:
+    annotations:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+#  zipkin:
+#    tracing:
+#      export:
+#        enabled: false
 logging:
   charset:
     console: UTF-8
 app:
   oauth2:
-    redirect-uri: ${FRONTEND_URL}/report
+    redirect-uri: ${FRONTEND_URL}
   cors:
     allowed-methods:
       - GET
@@ -60,128 +114,20 @@ app:
       - DELETE
       - OPTIONS
     max-age: 3600
-  mail:
-    analysis-months: 13
-    max-snippet-size: 100
-  min-request-interval-hours: 72
-  prompts:
-    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v4.st
-    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v4.st
-  guest-app-user:
-    subject: GUEST_APP_USER_SUBJECT
-    name: GUEST_APP_USER_NAME
-    email: guest@example.com
-  sample-messages:
-    dir: private/messages
-    fallback: static/messages/sample_messages_netflix_sketchfab.json
----
-
-spring:
-  config:
-    activate:
-      on-profile: google-auth
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${APP_GOOGLE_CLIENT_ID}
-            client-secret: ${APP_GOOGLE_CLIENT_SECRET}
-            redirect-uri: ${FRONTEND_URL}/api/login/oauth2/code/google
-            client-authentication-method: client_secret_basic
-            scope:
-              - openid
-              - email
-              - profile
-              - https://www.googleapis.com/auth/gmail.readonly
-            authorization-grant-type: authorization_code
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
-app:
-  google:
-    client-id: ${APP_GOOGLE_CLIENT_ID}
-    client-secret: ${APP_GOOGLE_CLIENT_SECRET}
-    token-server-url: https://oauth2.googleapis.com/token
-    token-refresh-threshold-seconds: 300
----
-
-spring:
-  config:
-    activate:
-      on-profile: dev
-  reactor:
-    context-propagation: auto
-  jpa:
-    hibernate:
-      ddl-auto: update
-management:
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
-  info:
-    git:
-      enabled: true
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
-  level:
-    com.matchalab.subscription_killer_api: DEBUG
-    org:
-      springframework:
-        security: DEBUG
-        security.oauth2: DEBUG
-        security.oauth2.client: DEBUG
-        session: DEBUG
-      hibernate:
-        SQL: DEBUG
-app:
-  cors:
     allowed-origins:
       - ${FRONTEND_URL}
   mail:
-    analysis-months: 8
-  min-request-interval-hours: 0
----
-
-spring:
-  config:
-    activate:
-      on-profile: ai
-  ai:
-    model:
-      chat: google-genai
-    retry:
-      max-attempts: 1
-    google:
-      genai:
-        project-id: ${GOOGLE_CLOUD_PROJECT}
-        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
-        chat:
-          options:
-            model: gemini-3-flash-preview
-            temperature: 0.1
-            thinking-level: LOW
-    #            thinking-budget: 0
-    chat:
-      observations:
-        log-prompt: false
-        log-completion: false
----
-
-spring:
-  config:
-    activate:
-      on-profile: local-ssl
-server.port: 8443
-server.ssl.key-store: classpath:certs/keystore.p12
-server.ssl.key-store-password: password
-server.ssl.key-store-type: PKCS12
-server.ssl.key-alias: 1
+    analysis-months: 13
+    max-snippet-size: 100
+  min-request-interval-seconds: 600
+  prompts:
+    filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v6.st
+    generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v6.st
+  guest-app-user:
+    name: GUEST
+    emails:
+      - GUEST_EMAIL_FIRST@example.com
+      - GUEST_EMAIL_SECONDS@example.com
 ---
 
 spring:

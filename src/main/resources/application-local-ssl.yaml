@@ -1,9 +1,9 @@
-spring:
-  config:
-    activate:
-      on-profile: local-ssl
-server.port: 8443
-server.ssl.key-store: classpath:certs/keystore.p12
-server.ssl.key-store-password: password
-server.ssl.key-store-type: PKCS12
-server.ssl.key-alias: springboot
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:certs/sublog-mkcert-dev-local.p12
+    key-store-type: PKCS12
+    key-alias: sublog-mkcert-dev-local
+    key-store-password: ${SSL_PASSWORD:password}
+    key-password: ${SSL_PASSWORD:password}

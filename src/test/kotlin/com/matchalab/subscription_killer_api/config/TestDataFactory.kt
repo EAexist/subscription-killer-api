@@ -2,7 +2,7 @@ package com.matchalab.subscription_killer_api.config
 
 import com.google.api.services.gmail.model.Message
 import com.matchalab.subscription_killer_api.domain.LocaleType
-import com.matchalab.subscription_killer_api.subscription.EmailDetectionRule
+import com.matchalab.subscription_killer_api.subscription.SubscriptionEventRule
 import com.matchalab.subscription_killer_api.subscription.EmailSource
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
@@ -14,33 +14,6 @@ import java.util.*
 
 open class TestDataFactory(
 ) {
-
-    fun createServiceProvider(
-        displayName: String,
-        emailSources: MutableList<EmailSource>?,
-    ) =
-        ServiceProvider(
-            UUID.randomUUID(),
-            displayName,
-            "$displayName.com",
-            "www.$displayName.com",
-            "www.$displayName.com",
-            mutableMapOf(LocaleType.EN.name to displayName),
-            emailSources ?: mutableListOf<EmailSource>()
-        )
-
-    fun createEmailSource(
-        targetAddress: String,
-        eventRules: MutableList<EmailDetectionRule> = mutableListOf(),
-        analyzedMessageIds: MutableSet<String> = mutableSetOf()
-    ) =
-        EmailSource(null, targetAddress, eventRules, analyzedMessageIds = analyzedMessageIds)
-
-    fun loadSampleMessages(): List<GmailMessage> {
-        val jsonPath = "static/messages/sample_messages_netflix_sketchfab.json"
-        return readMessages(ClassPathResource(jsonPath).inputStream).map { it.toGmailMessage() }
-    }
-
     fun loadSampleRawMessages(): List<Message> {
         val dir = "private/messages"
         val fallback = "static/messages/sample_messages_netflix_sketchfab.json"

@@ -14,5 +14,7 @@ interface GmailClientAdapter {
 
     suspend fun getMessages(messageIds: List<String>, plan: MessageFetchPlan): List<GmailMessage>
 
+    suspend fun getFirstMessageId(addresses: List<String>, q: String): String?
+
     suspend fun getFirstMessageId(addresses: List<String>): String?
 }

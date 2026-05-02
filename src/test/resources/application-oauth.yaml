@@ -1,0 +1,25 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "test-id"
+            client-secret: "test-secret"
+            redirect-uri: https://test-origin.com/api/login/oauth2/code/google
+            client-authentication-method: client_secret_basic
+            scope:
+              - openid
+              - email
+              - profile
+              - https://www.googleapis.com/auth/gmail.readonly
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent%20select_account
+app:
+  google:
+    client-id: "test-client-id"
+    client-secret: "test-client-secret"
+    token-server-url: https://oauth2.googleapis.com/token
+    token-refresh-threshold-seconds: 300

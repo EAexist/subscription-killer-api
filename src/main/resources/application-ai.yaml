@@ -1,0 +1,19 @@
+spring:
+  ai:
+    model:
+      chat: google-genai
+    retry:
+      max-attempts: 1
+    google:
+      genai:
+        project-id: ${GOOGLE_CLOUD_PROJECT}
+        api-key: ${SPRING_AI_GOOGLE_GENAI_API_KEY_DEV}
+        chat:
+          options:
+            model: gemini-3.1-flash-lite-preview
+            thinking-level: LOW
+            temperature: 0.1
+    chat:
+      observations:
+        log-prompt: false
+        log-completion: false

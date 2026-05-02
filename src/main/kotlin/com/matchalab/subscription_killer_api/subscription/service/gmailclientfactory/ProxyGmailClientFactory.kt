@@ -1,24 +1,33 @@
 package com.matchalab.subscription_killer_api.subscription.service.gmailclientfactory
 
-import com.matchalab.subscription_killer_api.config.GuestAppUserProperties
+import com.matchalab.subscription_killer_api.guest.EmptyGmailClientAdapter
+import com.matchalab.subscription_killer_api.guest.GuestAppUserGmailClientFactory
 import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.GmailClientAdapter
-import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
+import com.matchalab.subscription_killer_api.subscription.service.gmailclientadapter.ObservingGmailClientAdapter
+import io.micrometer.observation.ObservationRegistry
 import org.springframework.stereotype.Service
 
-@Profile("google-auth && gmail")
 @Service
-@Primary
 class ProxyGmailClientFactory(
-    private val gmailClientFactoryImpl: GmailClientFactoryImpl,
-    private val mockGmailClientFactory: MockGmailClientFactory,
-    private val guestAppUserProperties: GuestAppUserProperties,
+    private val gmailClientFactory: DefaultGmailClientFactory,
+    private val guestAppUserGmailClientFactory: GuestAppUserGmailClientFactory,
+    private val observationRegistry: ObservationRegistry
 ) : GmailClientFactory {
     override fun createAdapter(subject: String): GmailClientAdapter {
-        return if (subject == guestAppUserProperties.subject) {
-            mockGmailClientFactory.createAdapter("")
+        if (subject.startsWith("GUEST")) {
+            if (subject.startsWith("GUEST-0"))
+                return ObservingGmailClientAdapter(
+                    guestAppUserGmailClientFactory.createAdapter(subject),
+                    observationRegistry
+                )
+            else {
+                return EmptyGmailClientAdapter()
+            }
         } else {
-            gmailClientFactoryImpl.createAdapter(subject)
+            return ObservingGmailClientAdapter(
+                gmailClientFactory.createAdapter(subject),
+                observationRegistry
+            )
         }
     }
 }

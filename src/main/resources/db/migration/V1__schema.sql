@@ -1,0 +1,13 @@
+create table app_user (report_updated_at timestamp(6) with time zone, id uuid not null, name varchar(255), user_role varchar(255) check (user_role in ('ADMIN','USER')), primary key (id));
+create table email_source (is_active boolean not null, id uuid not null, service_provider_id uuid not null, subject_discriminator varchar(255), target_address varchar(255) not null, event_rules jsonb, primary key (id));
+create table google_account (expires_at timestamp(6) with time zone, last_email_synced_at timestamp(6) with time zone, app_user_id uuid not null, access_token TEXT, email varchar(255), name varchar(255), refresh_token TEXT, scope varchar(255), subject varchar(255) not null, primary key (subject));
+create table service_provider (id uuid not null, display_name varchar(255), logo_dev_suffix varchar(255), payment_cycle varchar(255) check (payment_cycle in ('MONTHLY','ANNUAL','BOTH','NO_PAYMENT')), subscription_page_url varchar(255), website_url varchar(255), primary key (id));
+create table service_provider_alias_names (service_provider_id uuid not null, alias_name varchar(255), locale_key varchar(255) not null, primary key (service_provider_id, locale_key), unique (locale_key, alias_name));
+create table subscription (registered_since timestamp(6) with time zone, id uuid not null, service_provider_id uuid not null, google_account_id varchar(255) not null, subscription_events jsonb, primary key (id), constraint uk_report_provider unique (google_account_id, service_provider_id));
+create index idx_email_source_lookup on email_source (target_address, is_active);
+create index idx_alias_lookup on service_provider_alias_names (alias_name);
+alter table if exists email_source add constraint FKlotnr9sb2onbyr4qxorovke00 foreign key (service_provider_id) references service_provider;
+alter table if exists google_account add constraint FKc5ldkj3kms04ke9jwyktvy1hr foreign key (app_user_id) references app_user;
+alter table if exists service_provider_alias_names add constraint FKiyof64n4vv5cbkoecjd64q4p foreign key (service_provider_id) references service_provider;
+alter table if exists subscription add constraint FKieobf1jy3qvggwnwgvd23vpx1 foreign key (google_account_id) references google_account;
+alter table if exists subscription add constraint FK1w8ctq9rk197lhd1rtvomjyp5 foreign key (service_provider_id) references service_provider;
