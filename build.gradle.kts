@@ -290,12 +290,12 @@ tasks.register<Zip>("buildLambdaWebAdapterZip") {
     dependsOn("bootJar")
 
     into("lib") {
-        from(tasks.jar)
-        from(configurations.runtimeClasspath)
+        from(tasks.bootJar)
+//        from(tasks.jar)
+//        from(configurations.runtimeClasspath)
     }
 
-    from("run.sh") {
-        into("/")
+    from("$projectDir/scripts/run.sh") {
         filePermissions {
             // This is the clean, type-safe way to set 755
             user {

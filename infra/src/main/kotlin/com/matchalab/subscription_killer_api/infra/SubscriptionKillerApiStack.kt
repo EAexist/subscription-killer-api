@@ -9,7 +9,12 @@ import software.constructs.Construct
 import java.io.File
 
 
-class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackProps?, env: String = "stg") :
+class SubscriptionKillerApiStack(
+    scope: Construct?,
+    id: String?,
+    props: StackProps?,
+    env: String = "stg"
+) :
     Stack(scope, id, props) {
     constructor(scope: Construct?, id: String?) : this(scope, id, null)
 
@@ -23,36 +28,61 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             "arn:aws:lambda:ap-northeast-2:753240598075:layer:LambdaAdapterLayerArm64:25"
         )
 
-        val artifactPath = File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
+        val artifactPath =
+            File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
 
         val SPRING_PROFILES_ACTIVE = "prod"
 
         // Frontend
         val FRONTEND_URL =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/FRONTEND_URL")
+            StringParameter.valueFromLookup(
+                this,
+                "/stg/subscription-killer-api/FRONTEND_URL"
+            )
         val SERVICE_URL =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SERVICE_URL")
+            StringParameter.valueFromLookup(
+                this,
+                "/stg/subscription-killer-api/SERVICE_URL"
+            )
 
         // Database
         val SPRING_DATASOURCE_URL =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_URL")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/SPRING_DATASOURCE_URL"
+            )
         val SPRING_DATASOURCE_USERNAME =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_USERNAME")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/SPRING_DATASOURCE_USERNAME"
+            )
         val SPRING_DATASOURCE_PASSWORD =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_DATASOURCE_PASSWORD")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/SPRING_DATASOURCE_PASSWORD"
+            )
 
         // Google Cloud
         val appGoogleClientId =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_ID")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_ID"
+            )
         val appGoogleClientSecret =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_SECRET")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_SECRET"
+            )
         val GOOGLE_CLOUD_PROJECT =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/GOOGLE_CLOUD_PROJECT")
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/GOOGLE_CLOUD_PROJECT"
+            )
         val SPRING_AI_GOOGLE_GENAI_API_KEY =
-            StringParameter.valueForStringParameter(this, "/stg/subscription-killer-api/SPRING_AI_GOOGLE_GENAI_API_KEY")
-        val corsAllowedOrigins = StringParameter.valueForStringParameter(
-            this, "/stg/subscription-killer-api/CORS_ALLOWED_ORIGINS"
-        )
+            StringParameter.valueForStringParameter(
+                this,
+                "/stg/subscription-killer-api/SPRING_AI_GOOGLE_GENAI_API_KEY"
+            )
 
         val handler = Function.Builder.create(this, "Handler")
 //            .reservedConcurrentExecutions(10)
@@ -61,7 +91,7 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
             .architecture(Architecture.ARM_64) // Cost-effective than X86
             .snapStart(SnapStartConf.ON_PUBLISHED_VERSIONS)
             .memorySize(2048) // Required for Spring Boot performance
-            .timeout(Duration.minutes(3))
+            .timeout(Duration.minutes(5))
             .handler("run.sh")
             .code(
                 Code.fromAsset(artifactPath)
@@ -75,7 +105,6 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
                     // frontend
                     "FRONTEND_URL" to FRONTEND_URL,
                     "SERVICE_URL" to SERVICE_URL,
-                    "APP_CORS_ALLOWED_ORIGINS" to corsAllowedOrigins,
 
                     // database
                     "SPRING_DATASOURCE_URL" to SPRING_DATASOURCE_URL,
@@ -94,7 +123,13 @@ class SubscriptionKillerApiStack(scope: Construct?, id: String?, props: StackPro
 
                     // SnapStart
                     "AWS_LWA_ASYNC_INIT" to "false",
-                    "READINESS_CHECK_TIMEOUT_MS" to "15000",
+                    "READINESS_CHECK_TIMEOUT_MS" to "60000",
+
+                    // Fix Disk Space Health Check
+                    "MANAGEMENT_HEALTH_DISKSPACE_ENABLED" to "false",
+
+                    // Show details to confirm everything is fixed
+                    "MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS" to "always"
                 )
             )
             .build()
