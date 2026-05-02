@@ -42,5 +42,7 @@ logging:
     io:
       micrometer:
         observation:
+server:
+  port: 9090
 app:
   min-request-interval-seconds: 20
