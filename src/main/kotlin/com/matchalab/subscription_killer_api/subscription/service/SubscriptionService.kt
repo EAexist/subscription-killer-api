@@ -54,6 +54,10 @@ class SubscriptionService(
         return subscriptionRepository.save(subscription)
     }
 
+    fun saveAll(subscriptions: List<Subscription>): List<Subscription> {
+        return subscriptionRepository.saveAll(subscriptions)
+    }
+
     fun findAllByGoogleAccountSubject(subject: String): List<Subscription> {
         return subscriptionRepository.findAllByGoogleAccountSubject(subject)
     }
@@ -70,10 +74,9 @@ class SubscriptionService(
         return subscriptionRepository.findAllByGoogleAccountIn(gooleAccounts)
     }
 
-    @Transactional
-    suspend fun updateRegisteredSince(
+    suspend fun fetchAllRegisteredSince(
         googleAccountSubject: String,
-    ) {
+    ): List<Pair<UUID, Instant?>> {
 
         val gmailClientAdapter: GmailClientAdapter =
             clientFactory.createAdapter(googleAccountSubject)
@@ -112,6 +115,10 @@ class SubscriptionService(
         logger.debug { "Fetched ${messages.size} messages for ${subscriptions.size} subscriptions" }
 
         val messageIdToInternalDate = messages.associate { it.id to it.internalDate }
+
+        return subscriptionToFirstMessageId.map { (subscription, messageId) ->
+            subscription.id!! to messageIdToInternalDate[messageId]
+        }
 
         subscriptionToFirstMessageId.forEach { (subscription, messageId) ->
             subscription.registeredSince = messageIdToInternalDate[messageId]

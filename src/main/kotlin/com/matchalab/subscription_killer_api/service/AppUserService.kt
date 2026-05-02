@@ -1,12 +1,13 @@
 package com.matchalab.subscription_killer_api.service
 
+import com.matchalab.subscription_killer_api.controller.AppProperties
 import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
 import com.matchalab.subscription_killer_api.core.dto.AppUserResponseDto
 import com.matchalab.subscription_killer_api.domain.AppUser
 import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.subscription_killer_api.domain.UserRoleType
 import com.matchalab.subscription_killer_api.guest.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
 import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
 import com.matchalab.subscription_killer_api.utils.toResponseDto
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -63,8 +64,32 @@ class AppUserService(
         return appUserRepository.findByGoogleAccounts_Subject(googleSub)
     }
 
-    fun getGuestAppUser(): AppUser {
-        return findByIdWithGoogleAccounts(guestAppUserProperties.id)
+//    fun getGuestAppUser(): AppUser {
+//        return findByIdWithGoogleAccounts(guestAppUserProperties.id)
+//    }
+
+    fun createGuestAppUser(): AppUser {
+        val appUser =
+            AppUser(
+                null,
+                guestAppUserProperties.name,
+                UserRoleType.USER,
+                mutableListOf()
+            )
+
+        guestAppUserProperties.emails.withIndex().map { (index, email) ->
+            AddGoogleAccountCommand(
+                "GUEST-${index}-${UUID.randomUUID()}",
+                guestAppUserProperties.name,
+                email,
+            )
+        }.forEach {
+            addGoogleAccount(
+                appUser,
+                it
+            )
+        }
+        return save(appUser)
     }
 
     fun save(appUser: AppUser): AppUser {

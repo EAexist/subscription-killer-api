@@ -22,7 +22,7 @@ class GuestAuthController(
     @GetMapping
     fun loginAsGuest(request: HttpServletRequest): ResponseEntity<Void> {
 
-        val guestAppUser = appUserService.getGuestAppUser()
+        val guestAppUser = appUserService.createGuestAppUser()
         val authorities = listOf(SimpleGrantedAuthority(guestAppUser.userRole.authority))
 
         val guestOidcUser = CustomOidcUser(

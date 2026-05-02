@@ -1,9 +1,9 @@
 package com.matchalab.subscription_killer_api.subscription.service
 
+import com.matchalab.subscription_killer_api.controller.AppProperties
 import com.matchalab.subscription_killer_api.guest.GuestAppUserProperties
 import com.matchalab.subscription_killer_api.repository.AppUserRepository
 import com.matchalab.subscription_killer_api.service.AppUserService
-import com.matchalab.subscription_killer_api.subscription.controller.AppProperties
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
@@ -19,9 +19,8 @@ class AppUserServiceTest {
     private val appUserService: AppUserService = AppUserService(
         appProperties = AppProperties(minRequestIntervalSeconds = 600),
         guestAppUserProperties = GuestAppUserProperties(
-            UUID.randomUUID(),
-            "guestAppUserName",
-            listOf()
+            "TEST_GUEST",
+            listOf("TEST_GUEST_EMAIL_FIRST@example.com", "TEST_GUEST_EMAIL_SECONDS@example.com"),
         ),
         appUserRepository = appUserRepository
     )

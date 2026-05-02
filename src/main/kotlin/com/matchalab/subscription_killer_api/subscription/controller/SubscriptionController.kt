@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.subscription.controller
+package com.matchalab.subscription_killer_api.controller
 
 import com.matchalab.subscription_killer_api.config.AuthenticatedUser
 import com.matchalab.subscription_killer_api.service.AppUserService
@@ -20,6 +20,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -82,6 +83,27 @@ class SubscriptionController(
             analysisService.analyze(appUserId)
         }
         return ResponseEntity.accepted().build()
+    }
+
+    @PostMapping("/updates/stream", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun analyzeStream(@AuthenticatedUser appUserId: UUID): SseEmitter {
+
+        val newReportGeneratedAt = appUserService.claimReportQuota(appUserId)
+
+        if (newReportGeneratedAt != null) {
+
+            progressService.initializeProgress(appUserId)
+
+            CoroutineScope(dispatcher + observationRegistry.asContextElement()).launch {
+                try {
+                    analysisService.analyze(appUserId)
+                } catch (e: Exception) {
+                    progressService.error(appUserId)
+                }
+            }
+        }
+
+        return progressService.createEmitter(appUserId)
     }
 
     @GetMapping("/updates")

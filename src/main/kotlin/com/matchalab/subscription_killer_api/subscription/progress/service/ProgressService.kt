@@ -35,6 +35,21 @@ class ProgressService(
         return progresses.containsKey(appUserId)
     }
 
+    fun error(appUserId: UUID) {
+        emitters[appUserId]?.let { emitter ->
+            try {
+                emitter.send(
+                    SseEmitter.event()
+                        .data(AppUserAnalysisProgressUpdate(AnalysisProgressStatus.ERROR))
+                )
+                logger.debug { "emitter has sent the progress update: ERROR" }
+                emitter.complete()
+            } catch (e: Exception) {
+                emitter.completeWithError(e)
+            }
+        }
+    }
+
     fun createEmitter(appUserId: UUID): SseEmitter {
 
         val emitter = SseEmitter(5 * 60 * 1000L).apply {

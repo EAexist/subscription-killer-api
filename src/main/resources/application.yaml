@@ -14,38 +14,35 @@ spring:
       benchmark-dev:
         - "benchmark"
         - "dev"
+      schema-generation:
+        - "dev"
+        - "oauth"
+        - "dev-db-local"
+        - "dev-fe-local"
       local:
         - "dev"
         - "oauth"
         - "gmail"
-        - "local-ssl"
         - "dev-db-local"
         - "dev-fe-local"
-        - "ai"
       db-remote-fe-local:
         - "dev"
         - "oauth"
         - "gmail"
-        - "local-ssl"
         - "dev-db-remote"
         - "dev-fe-local"
-        - "ai"
       db-local-fe-remote:
         - "dev"
         - "oauth"
         - "gmail"
-        - "local-ssl"
         - "dev-db-local"
         - "dev-fe-remote"
-        - "ai"
       db-remote-fe-remote:
         - "dev"
         - "oauth"
         - "gmail"
-        - "local-ssl"
         - "dev-db-remote"
         - "dev-fe-remote"
-        - "ai"
 ---
 spring:
   mvc:
@@ -56,10 +53,17 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+
+      connection-timeout: 15000
+      validation-timeout: 5000
+
+      max-lifetime: 300000     # 5 min
+      idle-timeout: 60000      # 1 min
       keepalive-time: 30000
-      max-lifetime: 600000
+
       connection-test-query: SELECT 1
-      initialization-fail-timeout: 1
   jpa:
     hibernate:
       ddl-auto: none
@@ -120,10 +124,10 @@ app:
     filter-and-categorize-emails: classpath:/prompts/eventRuleUpdate/active/1-filter-and-categorize-emails-v6.st
     generalize-string-pattern: classpath:/prompts/eventRuleUpdate/active/2-generalize-string-pattern-v6.st
   guest-app-user:
-    id: 30f9a265-4f7d-3b1a-8e2b-7c4d5e6f8a9b
-    name: GUEST_APP_USER_NAME
-    subjects:
-      - GUEST_APP_USER_SUBJECT_A
+    name: GUEST
+    emails:
+      - GUEST_EMAIL_FIRST@example.com
+      - GUEST_EMAIL_SECONDS@example.com
 ---
 
 spring:

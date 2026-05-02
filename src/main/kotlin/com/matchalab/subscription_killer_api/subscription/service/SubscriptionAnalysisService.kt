@@ -5,6 +5,7 @@ import com.matchalab.subscription_killer_api.service.AppUserService
 import com.matchalab.subscription_killer_api.service.GoogleAccountService
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import com.matchalab.subscription_killer_api.subscription.ServiceProvider
+import com.matchalab.subscription_killer_api.subscription.Subscription
 import com.matchalab.subscription_killer_api.subscription.SubscriptionEventType
 import com.matchalab.subscription_killer_api.subscription.config.MailProperties
 import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
@@ -132,10 +133,10 @@ class SubscriptionAnalysisService(
 
             subscriptionService.update(googleAccountToProvidersList)
 
-            val registeredSinceDeferred =
+            val subscriptionIdToRegisteredSinceDeferred =
                 googleAccountSubjects.map { subject ->
                     async(Dispatchers.IO + observationRegistry.asContextElement()) {
-                        subscriptionService.updateRegisteredSince(subject)
+                        subscriptionService.fetchAllRegisteredSince(subject)
                     }
                 }
 
@@ -179,13 +180,24 @@ class SubscriptionAnalysisService(
                     }
                 }
             }
-            
+
             for (googleAccount in googleAccountToProvidersList.keys) {
                 googleAccount.lastEmailSyncedAt = lastEmailSyncedAt
                 googleAccountService.save(googleAccount)
             }
 
-            registeredSinceDeferred.awaitAll()
+            val subscriptionIdToRegisteredSince =
+                subscriptionIdToRegisteredSinceDeferred.awaitAll().flatten().toMap()
+
+            val subscriptions: List<Subscription> =
+                subscriptionService.findAllWithDetailsByIds(subscriptionIdToRegisteredSince.keys.toList())
+
+
+            subscriptions.forEach {
+                it.registeredSince = subscriptionIdToRegisteredSince[it.id]
+            }
+
+            subscriptionService.saveAll(subscriptions)
 
             progressService.setProgress(
                 appUserId,

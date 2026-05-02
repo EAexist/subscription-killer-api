@@ -50,7 +50,7 @@ internal data class CompanyEmailSource(
  */
 @Component
 @Lazy(false)
-@Profile("!ai")
+@Profile("!ai || !gmail")
 class EmailDatasetProvider(
     private val objectMapper: ObjectMapper,
     private val resourcePatternResolver: ResourcePatternResolver

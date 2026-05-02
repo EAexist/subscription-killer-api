@@ -23,6 +23,8 @@ class SubscriptionReportService(
 
         val reportUpdateEligibility = appUserService.getReportUpdateEligibility(appUserId)
 
+        logger.debug { "reportUpdateEligibility: ${reportUpdateEligibility.toString()}" }
+
         if (reportUpdateEligibility.reportUpdatedAt == null) {
             return null
         }

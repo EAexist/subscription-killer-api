@@ -4,11 +4,13 @@ import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
 import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
 import com.matchalab.subscription_killer_api.subscription.GmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
 @Component
+@Profile("!gmail")
 class MockGmailClientAdapter(
     private val emailDatasetProvider: EmailDatasetProvider
 ) : GmailClientAdapter {
