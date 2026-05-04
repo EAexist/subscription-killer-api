@@ -2,18 +2,28 @@ name: AWS CDK Deploy
 
 on:
   push:
-    branches: [ "chore/aws-deploy-ci" ]
+    branches: [ "main", "ci/aws-deploy-test" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write   # required for OIDC
+      id-token: write
       contents: read
+
+    environment: ${{ github.ref == 'refs/heads/main'
+      && 'staging'
+      || 'development' }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ap-northeast-2
 
       - uses: actions/setup-node@v4
         with:
@@ -27,8 +37,16 @@ jobs:
       - name: Install CDK
         run: npm install -g aws-cdk
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Sync dataset
-        run: bash sync-dataset.sh
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_OWNER: ${{ vars.HF_OWNER }}
+          HF_REPO: ${{ vars.HF_REPO }}
+          HF_BASE_URL: ${{ vars.HF_BASE_URL }}
+        run: ./gradlew downloadTestData -PsyncDataset=true
 
       - name: Build lambda zip
         run: ./gradlew buildLambdaWebAdapterZip -x test
@@ -36,12 +54,6 @@ jobs:
       - name: Build CDK
         working-directory: infra
         run: mvn -B package
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ vars.AWS_REGION || 'ap-northeast-2' }}
 
       - name: Deploy
         working-directory: infra
