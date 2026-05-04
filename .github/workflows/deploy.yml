@@ -27,8 +27,16 @@ jobs:
       - name: Install CDK
         run: npm install -g aws-cdk
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Sync dataset
-        run: bash sync-dataset.sh
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_OWNER: ${{ vars.HF_OWNER }}
+          HF_REPO: ${{ vars.HF_REPO }}
+          HF_BASE_URL: ${{ vars.HF_BASE_URL }}
+        run: ./gradlew downloadTestData -PsyncDataset=true
 
       - name: Build lambda zip
         run: ./gradlew buildLambdaWebAdapterZip -x test
