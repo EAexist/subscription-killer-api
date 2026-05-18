@@ -3,7 +3,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.matchalab.subscription_killer_api.infra</groupId>
+    <groupId>com.matchalab.sublog.infra</groupId>
     <artifactId>infra</artifactId>
     <version>0.1</version>
 
@@ -75,7 +75,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.matchalab.subscription_killer_api.infra.SubscriptionKillerApiApp</mainClass>
+                    <mainClass>com.matchalab.sublog_api.infra.SublogApiApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>

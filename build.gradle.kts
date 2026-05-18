@@ -118,7 +118,7 @@ group = "com.matchalab"
 version = "0.0.1-SNAPSHOT"
 
 description =
-    "This is api server for web app \"Subscription Killer\". It supports Next.js frontend. This secure restful api backend manages multi-account Google authentication, provides real-time status updates via STOMP WebSockets, and processes email data using the Gmail API."
+    "This is api server for web app \"Sublog\". It supports Next.js frontend. This secure restful api backend manages multi-account Google authentication, provides real-time status updates via STOMP WebSockets, and processes email data using the Gmail API."
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
@@ -372,11 +372,11 @@ publishing {
             from(components["java"])
 
             groupId = project.group.toString()
-            artifactId = "subscription-killer-api"
+            artifactId = "sublog-api"
             version = project.version.toString()
 
             pom {
-                name.set("subscription-killer-api")
+                name.set("sublog-api")
             }
         }
     }

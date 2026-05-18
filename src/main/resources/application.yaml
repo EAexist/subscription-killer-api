@@ -53,15 +53,15 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
+      maximum-pool-size: 2
+      minimum-idle: 0
 
-      connection-timeout: 15000
+      connection-timeout: 10000
       validation-timeout: 5000
 
-      max-lifetime: 300000     # 5 min
-      idle-timeout: 60000      # 1 min
-      keepalive-time: 30000
+      max-lifetime: 30000     # 30 sec
+      idle-timeout: 10000      # 10 sec
+      keepalive-time: 15000   # 15 sec
 
       connection-test-query: SELECT 1
   jpa:

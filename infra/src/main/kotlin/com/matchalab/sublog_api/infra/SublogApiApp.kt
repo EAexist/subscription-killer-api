@@ -1,11 +1,11 @@
-package com.matchalab.subscription_killer_api.infra
+package com.matchalab.sublog_api.infra
 
 import software.amazon.awscdk.App
 import software.amazon.awscdk.Environment
 import software.amazon.awscdk.StackProps
 import software.amazon.awscdk.Tags
 
-class SubscriptionKillerApiApp {
+class SublogApiApp {
 
     companion object {
 
@@ -15,9 +15,9 @@ class SubscriptionKillerApiApp {
 
             val stagingEnvName = "stg"
 
-            val stgStack: SubscriptionKillerApiStack = SubscriptionKillerApiStack(
+            val stgStack: SublogApiStack = SublogApiStack(
                 app,
-                "SubscriptionKillerApi-Stg-Stack",
+                "SublogApi-Stg-Stack",
                 StackProps.builder()
                     // If you don't specify 'env', this stack will be environment-agnostic.
                     // Account/Region-dependent features and context lookups will not work,
@@ -34,7 +34,7 @@ class SubscriptionKillerApiApp {
                     // want to deploy the stack to.
                     .env(
                         Environment.builder()
-                            .account("660410403413")
+                            .account("043309337239")
                             .region("ap-northeast-2")
                             .build()
                     )

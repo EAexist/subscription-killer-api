@@ -9,13 +9,13 @@
 // import org.junit.jupiter.api.Test;
 
 // example test. To run these tests, uncomment this file, along with the
-// example resource in java/src/main/java/com/myorg/SubscriptionKillerApiStack.java
-// public class SubscriptionKillerApiTest {
+// example resource in java/src/main/java/com/myorg/SublogApiStack.java
+// public class SublogApiTest {
 
 //     @Test
 //     public void testStack() throws IOException {
 //         App app = new App();
-//         SubscriptionKillerApiStack stack = new SubscriptionKillerApiStack(app, "test");
+//         SublogApiStack stack = new SublogApiStack(app, "test");
 
 //         Template template = Template.fromStack(stack);
 

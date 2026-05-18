@@ -1,5 +1,5 @@
 //https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/lambda-cdk-tutorial.html#lambda-cdk-step-2
-package com.matchalab.subscription_killer_api.infra
+package com.matchalab.sublog_api.infra
 
 import software.amazon.awscdk.*
 import software.amazon.awscdk.services.lambda.*
@@ -9,7 +9,7 @@ import software.constructs.Construct
 import java.io.File
 
 
-class SubscriptionKillerApiStack(
+class SublogApiStack(
     scope: Construct?,
     id: String?,
     props: StackProps?,
@@ -21,7 +21,7 @@ class SubscriptionKillerApiStack(
     init {
 
         Tags.of(this).add("Environment", env)
-        Tags.of(this).add("Application", "SubscriptionKillerApi")
+        Tags.of(this).add("Application", "SublogApi")
 
         val webAdapterLayer = LayerVersion.fromLayerVersionArn(
             this, "WebAdapterLayer",
@@ -29,7 +29,7 @@ class SubscriptionKillerApiStack(
         )
 
         val artifactPath =
-            File("..", "build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip").path
+            File("..", "build/distributions/sublog-api-0.0.1-SNAPSHOT.zip").path
 
         val SPRING_PROFILES_ACTIVE = "prod"
 
@@ -37,56 +37,56 @@ class SubscriptionKillerApiStack(
         val FRONTEND_URL =
             StringParameter.valueFromLookup(
                 this,
-                "/stg/subscription-killer-api/FRONTEND_URL"
+                "/stg/sublog-api/FRONTEND_URL"
             )
         val SERVICE_URL =
             StringParameter.valueFromLookup(
                 this,
-                "/stg/subscription-killer-api/SERVICE_URL"
+                "/stg/sublog-api/SERVICE_URL"
             )
 
         // Database
         val SPRING_DATASOURCE_URL =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/SPRING_DATASOURCE_URL"
+                "/stg/sublog-api/SPRING_DATASOURCE_URL"
             )
         val SPRING_DATASOURCE_USERNAME =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/SPRING_DATASOURCE_USERNAME"
+                "/stg/sublog-api/SPRING_DATASOURCE_USERNAME"
             )
         val SPRING_DATASOURCE_PASSWORD =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/SPRING_DATASOURCE_PASSWORD"
+                "/stg/sublog-api/SPRING_DATASOURCE_PASSWORD"
             )
 
         // Google Cloud
         val appGoogleClientId =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_ID"
+                "/stg/sublog-api/APP_GOOGLE_CLIENT_ID"
             )
         val appGoogleClientSecret =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/APP_GOOGLE_CLIENT_SECRET"
+                "/stg/sublog-api/APP_GOOGLE_CLIENT_SECRET"
             )
         val GOOGLE_CLOUD_PROJECT =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/GOOGLE_CLOUD_PROJECT"
+                "/stg/sublog-api/GOOGLE_CLOUD_PROJECT"
             )
         val SPRING_AI_GOOGLE_GENAI_API_KEY =
             StringParameter.valueForStringParameter(
                 this,
-                "/stg/subscription-killer-api/SPRING_AI_GOOGLE_GENAI_API_KEY"
+                "/stg/sublog-api/SPRING_AI_GOOGLE_GENAI_API_KEY"
             )
 
         val handler = Function.Builder.create(this, "Handler")
 //            .reservedConcurrentExecutions(10)
-            .functionName("subscription-killer-api-handler-$env")
+            .functionName("sublog-api-handler-$env")
             .runtime(Runtime.JAVA_21)
             .architecture(Architecture.ARM_64) // Cost-effective than X86
             .snapStart(SnapStartConf.ON_PUBLISHED_VERSIONS)
