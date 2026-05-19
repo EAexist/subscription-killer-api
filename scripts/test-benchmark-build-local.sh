@@ -71,7 +71,7 @@ echo "✓ Using commit hash as Docker tag: $COMMIT_HASH"
 # 1. Capture the exact ID from the build output
 docker buildx build \
   --load . \
-  --tag "subscription-killer-api:$COMMIT_HASH" \
+  --tag "sublog:$COMMIT_HASH" \
   --build-arg IMAGE_REVISION=$COMMIT_HASH \
   --build-arg IMAGE_REF_NAME="${GIT_TAG}" \
   --build-arg IMAGE_CREATED=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
@@ -80,7 +80,7 @@ docker buildx build \
   --progress=plain
 
 if [ $? -eq 0 ]; then
-  NEW_IMAGE_ID=$(docker images -q "subscription-killer-api:$COMMIT_HASH")
+  NEW_IMAGE_ID=$(docker images -q "sublog:$COMMIT_HASH")
   echo "Successfully built: $NEW_IMAGE_ID"
 else
   echo "Build failed. Check the logs above."
@@ -90,7 +90,7 @@ fi
 echo "Cleaning up old versions, keeping current image: $NEW_IMAGE_ID..."
 
 # Get all IDs with that label, but exclude the one we just created
-OLD_IMAGE_IDS=$(docker images -q --filter "label=org.opencontainers.image.title=subscription-killer-api" | grep -v "$NEW_IMAGE_ID" | sort | uniq)
+OLD_IMAGE_IDS=$(docker images -q --filter "label=org.opencontainers.image.title=sublog" | grep -v "$NEW_IMAGE_ID" | sort | uniq)
 
 if [ -n "$OLD_IMAGE_IDS" ]; then
     echo "Removing: $OLD_IMAGE_IDS"
@@ -98,4 +98,4 @@ if [ -n "$OLD_IMAGE_IDS" ]; then
 fi
 
 # 5. Prune dangling build cache/layers
-docker image prune -f --filter "label=org.opencontainers.image.title=subscription-killer-api"
+docker image prune -f --filter "label=org.opencontainers.image.title=sublog"

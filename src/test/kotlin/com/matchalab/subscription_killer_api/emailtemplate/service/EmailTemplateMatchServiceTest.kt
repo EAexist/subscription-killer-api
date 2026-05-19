@@ -1,11 +1,10 @@
-package com.matchalab.subscription_killer_api.emailtemplate.service
+package com.matchalab.sublog_api.emailtemplate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
-import com.matchalab.subscription_killer_api.emailtemplate.EmailTemplate
-import com.matchalab.subscription_killer_api.subscription.GmailMessage
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
+import com.matchalab.sublog_api.datasets.EmailDatasetProvider
+import com.matchalab.sublog_api.emailtemplate.EmailTemplate
+import com.matchalab.sublog_api.subscription.GmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -37,19 +36,19 @@ class EmailTemplateMatchServiceTest {
         // Given - Get email samples from EmailDatasetProvider
         val emailSamples = emailDatasetProvider.getEmailSamples()
         assertTrue(emailSamples.isNotEmpty(), "Email samples should not be empty for testing")
-        
+
         // Test with a subset of samples to keep test reasonable
         val random = Random(456) // Fixed seed for reproducibility
         val selectedSamples = emailSamples.shuffled(random).take(10)
-        
+
         // When & Then
         selectedSamples.forEach { emailSample ->
             val gmailMessage = emailSample.message
             val emailTemplate = emailSample.template
 
-            val subjectMatches = emailTemplateMatchService.matches( gmailMessage.subject, emailTemplate.subjectAnchors )
+            val subjectMatches = emailTemplateMatchService.matches(gmailMessage.subject, emailTemplate.subjectAnchors)
 
-            assertTrue(subjectMatches){
+            assertTrue(subjectMatches) {
                 """
                 FAILED Match for EmailSample ID: ${gmailMessage.id}
                 --------------------------------------------------
@@ -60,8 +59,8 @@ class EmailTemplateMatchServiceTest {
                 """.trimIndent()
             }
 
-            val snippetMatches = emailTemplateMatchService.matches( gmailMessage.snippet, emailTemplate.snippetAnchors )
-            assertTrue(snippetMatches){
+            val snippetMatches = emailTemplateMatchService.matches(gmailMessage.snippet, emailTemplate.snippetAnchors)
+            assertTrue(snippetMatches) {
                 """
                 FAILED Match for EmailSample ID: ${gmailMessage.id}
                 --------------------------------------------------
@@ -73,8 +72,10 @@ class EmailTemplateMatchServiceTest {
             }
 
             val matches = emailTemplateMatchService.matchMessage(emailTemplate, gmailMessage)
-            assertTrue(matches,
-                "EmailSample ID ${gmailMessage.id} should match its template using EmailTemplateMatchService matchMessage method")
+            assertTrue(
+                matches,
+                "EmailSample ID ${gmailMessage.id} should match its template using EmailTemplateMatchService matchMessage method"
+            )
         }
     }
 
@@ -93,12 +94,15 @@ class EmailTemplateMatchServiceTest {
             subject = "Your order 12345 has shipped",
             snippet = "Track your package 12345 with tracking number"
         )
-        
+
         // When
         val matches = emailTemplateMatchService.matchMessage(emailTemplate, gmailMessage)
-        
+
         // Then
-        assertTrue(matches, "Should match when both subject and snippet match their anchor lists using EmailTemplateMatchService")
+        assertTrue(
+            matches,
+            "Should match when both subject and snippet match their anchor lists using EmailTemplateMatchService"
+        )
     }
 
     @Test
@@ -106,10 +110,10 @@ class EmailTemplateMatchServiceTest {
         // Given
         val text = "Your order 12345 has shipped"
         val anchors = listOf("Your order", "has shipped")
-        
+
         // When
         val matches = emailTemplateMatchService.matches(text, anchors)
-        
+
         // Then
         assertTrue(matches, "Should match text against anchor list using matches method")
     }
@@ -119,10 +123,10 @@ class EmailTemplateMatchServiceTest {
         // Given
         val text = "Different content"
         val anchors = listOf("Your order", "has shipped")
-        
+
         // When
         val matches = emailTemplateMatchService.matches(text, anchors)
-        
+
         // Then
         assertFalse(matches, "Should not match text against anchor list using matches method")
     }
@@ -131,10 +135,10 @@ class EmailTemplateMatchServiceTest {
     fun `should evict cache successfully`() {
         // Given - Add some patterns to cache by calling matches
         emailTemplateMatchService.matches("test", listOf("test"))
-        
+
         // When
         emailTemplateMatchService.evictCache()
-        
+
         // Then - Should not throw exception
         assertTrue(true, "Cache eviction should complete successfully")
     }
@@ -144,14 +148,16 @@ class EmailTemplateMatchServiceTest {
         // Given
         val text = "Your order 12345 has shipped"
         val untrimmedAnchors = listOf("Your order ", " has shipped") // Second anchor has leading space
-        
+
         // When & Then
         val exception = assertThrows(IllegalArgumentException::class.java) {
             emailTemplateMatchService.matches(text, untrimmedAnchors)
         }
-        
-        assertTrue(exception.message == "anchors contains untrimmed strings", 
-            "Should throw exception with correct message for untrimmed anchors")
+
+        assertTrue(
+            exception.message == "anchors contains untrimmed strings",
+            "Should throw exception with correct message for untrimmed anchors"
+        )
     }
 
 }

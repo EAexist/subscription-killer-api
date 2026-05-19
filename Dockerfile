@@ -73,8 +73,8 @@ ARG IMAGE_CREATED
 LABEL org.opencontainers.image.revision=$IMAGE_REVISION \
     org.opencontainers.image.ref.name=$IMAGE_REF_NAME \
     org.opencontainers.image.created=$IMAGE_CREATED \
-    org.opencontainers.image.title="subscription-killer-api" \
-    org.opencontainers.image.description="Spring Boot API for Subscription Killer"
+    org.opencontainers.image.title="sublog" \
+    org.opencontainers.image.description="Spring Boot API for Sublog"
 
 # JVM settings
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

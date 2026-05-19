@@ -1,7 +1,7 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
-import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.security.CustomOidcUser
+import com.matchalab.sublog_api.repository.AppUserRepository
+import com.matchalab.sublog_api.security.CustomOidcUser
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.test.context.TestComponent
 import org.springframework.context.annotation.Import

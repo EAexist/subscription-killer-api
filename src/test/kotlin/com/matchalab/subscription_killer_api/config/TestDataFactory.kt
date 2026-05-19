@@ -1,16 +1,9 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
 import com.google.api.services.gmail.model.Message
-import com.matchalab.subscription_killer_api.domain.LocaleType
-import com.matchalab.subscription_killer_api.subscription.SubscriptionEventRule
-import com.matchalab.subscription_killer_api.subscription.EmailSource
-import com.matchalab.subscription_killer_api.subscription.GmailMessage
-import com.matchalab.subscription_killer_api.subscription.ServiceProvider
-import com.matchalab.subscription_killer_api.utils.readMessages
-import com.matchalab.subscription_killer_api.utils.toGmailMessage
+import com.matchalab.sublog_api.utils.readMessages
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
-import java.util.*
 
 open class TestDataFactory(
 ) {

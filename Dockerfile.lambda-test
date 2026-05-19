@@ -4,7 +4,7 @@ FROM public.ecr.aws/lambda/java:21
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt/extensions/lambda-adapter
 
 # Copy and extract zip contents (ADD automatically extracts zip files)
-ADD build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip /var/task/
+ADD build/distributions/sublog-api-0.0.1-SNAPSHOT.zip /var/task/
 
 # Run your script
 CMD ["run.sh"]

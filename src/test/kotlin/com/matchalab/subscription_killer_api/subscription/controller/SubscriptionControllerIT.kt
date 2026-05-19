@@ -1,12 +1,12 @@
-package com.matchalab.subscription_killer_api.subscription.controller
+package com.matchalab.sublog_api.subscription.controller
 
-import com.matchalab.subscription_killer_api.config.AuthenticatedClientFactory
-import com.matchalab.subscription_killer_api.config.DatabaseTestUtils
-import com.matchalab.subscription_killer_api.config.SharedTestcontainersConfig
-import com.matchalab.subscription_killer_api.subscription.progress.AnalysisProgressStatus
-import com.matchalab.subscription_killer_api.subscription.progress.dto.AnalysisProgressUpdate
-import com.matchalab.subscription_killer_api.subscription.progress.dto.AppUserAnalysisProgressUpdate
-import com.matchalab.subscription_killer_api.subscription.progress.dto.ServiceProviderAnalysisProgressUpdate
+import com.matchalab.sublog_api.config.AuthenticatedClientFactory
+import com.matchalab.sublog_api.config.DatabaseTestUtils
+import com.matchalab.sublog_api.config.SharedTestcontainersConfig
+import com.matchalab.sublog_api.subscription.progress.AnalysisProgressStatus
+import com.matchalab.sublog_api.subscription.progress.dto.AnalysisProgressUpdate
+import com.matchalab.sublog_api.subscription.progress.dto.AppUserAnalysisProgressUpdate
+import com.matchalab.sublog_api.subscription.progress.dto.ServiceProviderAnalysisProgressUpdate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat

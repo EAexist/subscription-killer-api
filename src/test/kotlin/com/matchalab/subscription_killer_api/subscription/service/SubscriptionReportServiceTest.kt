@@ -1,12 +1,12 @@
-package com.matchalab.subscription_killer_api.subscription.service
+package com.matchalab.sublog_api.subscription.service
 
-import com.matchalab.subscription_killer_api.domain.AppUser
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import com.matchalab.subscription_killer_api.domain.UserRoleType
-import com.matchalab.subscription_killer_api.service.AppUserService
-import com.matchalab.subscription_killer_api.subscription.dto.ReportUpdateEligibilityDto
-import com.matchalab.subscription_killer_api.subscription.dto.ServiceProviderResponseDto
-import com.matchalab.subscription_killer_api.subscription.dto.SubscriptionResponseDto
+import com.matchalab.sublog_api.domain.AppUser
+import com.matchalab.sublog_api.domain.GoogleAccount
+import com.matchalab.sublog_api.domain.UserRoleType
+import com.matchalab.sublog_api.service.AppUserService
+import com.matchalab.sublog_api.subscription.dto.ReportUpdateEligibilityDto
+import com.matchalab.sublog_api.subscription.dto.ServiceProviderResponseDto
+import com.matchalab.sublog_api.subscription.dto.SubscriptionResponseDto
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*

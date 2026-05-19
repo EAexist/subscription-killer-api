@@ -1,0 +1,72 @@
+package com.matchalab.sublog_api.subscription
+
+import com.matchalab.sublog_api.subscription.providers.core.PaymentCycle
+import jakarta.persistence.*
+import java.util.*
+
+@Entity
+class ServiceProvider(
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id")
+    var id: UUID? = null,
+    var displayName: String,
+    var logoDevSuffix: String?,
+    var websiteUrl: String,
+    var subscriptionPageUrl: String?,
+
+    @ElementCollection
+    @CollectionTable(
+        name = "serviceProvider_aliasNames",
+        joinColumns = [JoinColumn(name = "service_provider_id")],
+        uniqueConstraints = [
+            UniqueConstraint(columnNames = ["locale_key", "alias_name"])
+        ],
+        indexes = [
+            Index(name = "idx_alias_lookup", columnList = "alias_name")
+        ]
+    )
+    @MapKeyColumn(name = "locale_key")
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "alias_name")
+    val aliasNames: MutableMap<String, String> = mutableMapOf(),
+
+    @OneToMany(mappedBy = "serviceProvider", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val emailSources: MutableList<EmailSource> = mutableListOf(),
+
+    @Enumerated(EnumType.STRING)
+    val paymentCycle: PaymentCycle? = null,
+
+    @OneToMany(mappedBy = "serviceProvider", cascade = [CascadeType.ALL])
+    val subscriptions: MutableList<Subscription> = mutableListOf(),
+) {
+    val requiredId: UUID
+        get() = checkNotNull(id) { "🚨 Entity must be saved before accessing ID" }
+
+    val activeEmailSources: List<EmailSource> get() = emailSources.filter { it.isActive }
+    val emailSearchAddresses: List<String> get() = activeEmailSources.map { it.targetAddress }
+    val emailSearchAliasNames: Map<String, String>? get() = if (isSubscriptionEventRuleComplete()) aliasNames else null
+
+    fun isSubscriptionStartRulePresent(): Boolean {
+        return emailSources.any { it.hasPaymentStartRule() }
+    }
+
+    fun isSubscriptionCancelRulePresent(): Boolean {
+        return emailSources.any { it.hasPaymentCancelRule() }
+    }
+
+    fun isMonthlyPaymentRulePresent(): Boolean {
+        return emailSources.any { it.hasMonthlyPaymentRule() }
+    }
+
+    fun isSubscriptionEventRuleAvailable(): Boolean {
+        return isSubscriptionStartRulePresent() || isMonthlyPaymentRulePresent()
+    }
+
+    fun isSubscriptionEventRuleComplete(): Boolean {
+        return (isSubscriptionStartRulePresent() && isSubscriptionCancelRulePresent()) || isMonthlyPaymentRulePresent()
+    }
+
+    fun addAllEmailSources(newEmailSources: List<EmailSource>) {
+        newEmailSources.forEach { it.serviceProvider = this }
+        this.emailSources.addAll(newEmailSources)
+    }
+}

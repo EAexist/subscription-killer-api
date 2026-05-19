@@ -1,7 +1,7 @@
-package com.matchalab.subscription_killer_api.utils
+package com.matchalab.sublog_api.utils
 
 import com.google.api.services.gmail.model.Message
-import com.matchalab.subscription_killer_api.config.TestDataFactory
+import com.matchalab.sublog_api.config.TestDataFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Import
 import kotlin.test.Test

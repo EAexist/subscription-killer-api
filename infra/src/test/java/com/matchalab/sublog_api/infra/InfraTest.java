@@ -1,4 +1,4 @@
-// package com.matchalab.subscription_killer_api.infra;
+// package com.matchalab.sublog_api.infra;
 
 // import software.amazon.awscdk.App;
 // import software.amazon.awscdk.assertions.Template;

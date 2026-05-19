@@ -1,1 +1,1 @@
-rootProject.name = "subscription-killer-api"
+rootProject.name = "sublog-api"

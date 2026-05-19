@@ -1,11 +1,11 @@
-package com.matchalab.subscription_killer_api.ai.observation
+package com.matchalab.sublog_api.ai.observation
 
-import com.matchalab.subscription_killer_api.ai.service.prompt.emailcategorization.EmailCategorizationPromptService
-import com.matchalab.subscription_killer_api.ai.service.prompt.emailtemplateextraction.EmailTemplateExtractionPromptService
-import com.matchalab.subscription_killer_api.config.DatasetTestConfiguration
-import com.matchalab.subscription_killer_api.config.ObservationTestConfig
-import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
-import com.matchalab.subscription_killer_api.datasets.EmailSample
+import com.matchalab.sublog_api.ai.service.prompt.emailcategorization.EmailCategorizationPromptService
+import com.matchalab.sublog_api.ai.service.prompt.emailtemplateextraction.EmailTemplateExtractionPromptService
+import com.matchalab.sublog_api.config.DatasetTestConfiguration
+import com.matchalab.sublog_api.config.ObservationTestConfig
+import com.matchalab.sublog_api.datasets.EmailDatasetProvider
+import com.matchalab.sublog_api.datasets.EmailSample
 import io.micrometer.observation.tck.TestObservationRegistry
 import io.micrometer.observation.tck.TestObservationRegistryAssert
 import org.junit.jupiter.api.AfterEach

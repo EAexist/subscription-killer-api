@@ -1,6 +1,6 @@
-package com.matchalab.subscription_killer_api.subscription
+package com.matchalab.sublog_api.subscription
 
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
+import com.matchalab.sublog_api.domain.GoogleAccount
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

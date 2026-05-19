@@ -30,7 +30,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
   level:
     #    root: INFO
-    com.matchalab.subscription_killer_api: DEBUG
+    com.matchalab.sublog_api: DEBUG
     org:
       springframework:
         security: DEBUG

@@ -3,7 +3,7 @@ set -euo pipefail
 
 echo "🚀 Testing Lambda deployment with Docker..."
 
-ZIP_FILE="build/distributions/subscription-killer-api-0.0.1-SNAPSHOT.zip"
+ZIP_FILE="build/distributions/sublog-api-0.0.1-SNAPSHOT.zip"
 
 if [ ! -f "$ZIP_FILE" ]; then
     echo "❌ Error: ZIP file not found at $ZIP_FILE"

@@ -1,12 +1,12 @@
-package com.matchalab.subscription_killer_api.benchmark
+package com.matchalab.sublog_api.benchmark
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.matchalab.subscription_killer_api.gmail.MessageFetchPlan
-import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.sublog_api.gmail.MessageFetchPlan
+import com.matchalab.sublog_api.subscription.GmailMessage
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +22,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Instant
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class BenchmarkMockGmailClientAdapterTest {
 
@@ -44,7 +43,8 @@ class BenchmarkMockGmailClientAdapterTest {
         // Create the adapter with BenchmarkProperties
         val benchmarkProperties = BenchmarkProperties(wireMockBaseUrl)
         val objectMapper = ObjectMapper().registerKotlinModule().registerModule(JavaTimeModule()).disable(
-            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+        )
             .disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS)
 
         // Mock HttpClient.newBuilder() to return our mock
@@ -118,14 +118,16 @@ class BenchmarkMockGmailClientAdapterTest {
         }
     """.trimIndent()
 
-        val expectedMessages = listOf(GmailMessage(
-            id = "msg1",
-            internalDate = Instant.ofEpochMilli(1710410000000L),
-            senderName = "Lucifer Morningstar",
-            senderEmail = "test@example.com",
-            subject = "Hello from Gemini",
-            snippet = "This is a test snippet"
-        ))
+        val expectedMessages = listOf(
+            GmailMessage(
+                id = "msg1",
+                internalDate = Instant.ofEpochMilli(1710410000000L),
+                senderName = "Lucifer Morningstar",
+                senderEmail = "test@example.com",
+                subject = "Hello from Gemini",
+                snippet = "This is a test snippet"
+            )
+        )
 
         every {
             mockHttpClient.send(

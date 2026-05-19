@@ -56,7 +56,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-5line --- [%thread] %-40.40logger{39} : %msg%n"
   level:
-    com.matchalab.subscription_killer_api: DEBUG
+    com.matchalab.sublog_api: DEBUG
 app:
   benchmark:
     mock-gmail-api:

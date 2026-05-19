@@ -1,11 +1,11 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
-import com.matchalab.subscription_killer_api.core.dto.AddGoogleAccountCommand
-import com.matchalab.subscription_killer_api.domain.AppUser
-import com.matchalab.subscription_killer_api.domain.GoogleAccount
-import com.matchalab.subscription_killer_api.domain.UserRoleType
-import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.sublog_api.core.dto.AddGoogleAccountCommand
+import com.matchalab.sublog_api.domain.AppUser
+import com.matchalab.sublog_api.domain.GoogleAccount
+import com.matchalab.sublog_api.domain.UserRoleType
+import com.matchalab.sublog_api.repository.AppUserRepository
+import com.matchalab.sublog_api.service.AppUserService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.test.context.TestConfiguration
 import java.util.*

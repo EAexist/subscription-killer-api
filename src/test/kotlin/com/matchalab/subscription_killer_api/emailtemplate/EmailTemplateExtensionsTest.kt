@@ -1,10 +1,10 @@
-package com.matchalab.subscription_killer_api.emailtemplate
+package com.matchalab.sublog_api.emailtemplate
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
-import com.matchalab.subscription_killer_api.emailtemplate.service.EmailTemplateMatchService
-import com.matchalab.subscription_killer_api.subscription.GmailMessage
+import com.matchalab.sublog_api.datasets.EmailDatasetProvider
+import com.matchalab.sublog_api.emailtemplate.service.EmailTemplateMatchService
+import com.matchalab.sublog_api.subscription.GmailMessage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -35,10 +35,10 @@ class EmailTemplateExtensionsTest {
         // Given
         val templates = emailDatasetProvider.loadTemplates().values.toList()
         assertTrue(templates.isNotEmpty(), "Templates should not be empty for testing")
-        
+
         val random = Random(42) // Fixed seed for reproducibility
         val selectedTemplates = templates.shuffled(random).take(5)
-        
+
         // When & Then - Test each randomly selected template
         selectedTemplates.forEach { template ->
             // Test subject
@@ -46,13 +46,13 @@ class EmailTemplateExtensionsTest {
             testTemplateString(template.snippet, "snippet")
         }
     }
-    
+
     private fun testTemplateString(templateString: String, fieldType: String) {
         logger.info { "Testing template $fieldType: '$templateString'" }
-        
+
         val result = templateString.extractAnchors()
         logger.info { "Converted $fieldType anchors: $result" }
-        
+
         // Then - Verify anchors are extracted properly
         if (templateString.contains("{{")) {
             // If template has placeholders, we should have multiple anchors
@@ -69,11 +69,11 @@ class EmailTemplateExtensionsTest {
         // Given
         val templateString = "Simple subject without placeholders"
         logger.info { "Original template string: '$templateString'" }
-        
+
         // When
         val result = templateString.extractAnchors()
         logger.info { "Extracted anchors: $result" }
-        
+
         // Then
         assertEquals(1, result.size, "Should have exactly one anchor")
         assertEquals(templateString, result.first(), "Anchor should match original text")
@@ -84,11 +84,11 @@ class EmailTemplateExtensionsTest {
         // Given
         val templateString = "Hello {{name}}, your order {{orderId}} is ready"
         logger.info { "Original template string: '$templateString'" }
-        
+
         // When
         val result = templateString.extractAnchors()
         logger.info { "Extracted anchors: $result" }
-        
+
         // Then
         assertEquals(3, result.size, "Should have 3 anchors")
         assertEquals("Hello", result[0], "First anchor should be 'Hello'")
@@ -101,11 +101,11 @@ class EmailTemplateExtensionsTest {
         // Given
         val templateString = ""
         logger.info { "Original template string: '$templateString'" }
-        
+
         // When
         val result = templateString.extractAnchors()
         logger.info { "Extracted anchors: $result" }
-        
+
         // Then
         assertEquals(0, result.size, "Empty string should result in empty anchor list")
     }
@@ -115,24 +115,24 @@ class EmailTemplateExtensionsTest {
         // Given
         val emails = emailDatasetProvider.loadEmails()
         assertTrue(emails.isNotEmpty(), "Emails should not be empty for testing")
-        
+
         val templates = emailDatasetProvider.loadTemplates()
         assertTrue(templates.isNotEmpty(), "Templates should not be empty for testing")
-        
+
         val templateMap = templates
-        
+
         val random = Random(123) // Different seed for variety
         val selectedEmails = emails.shuffled(random).take(5)
-        
+
         // When & Then
         selectedEmails.forEach { email ->
             val template = templateMap[email.templateId]
                 ?: throw IllegalStateException("Template not found for templateId: ${email.templateId}")
-            
+
             // Convert template to anchors using the new implementation
             val subjectAnchors = template.subject.extractAnchors()
             val snippetAnchors = template.snippet.extractAnchors()
-            
+
             // Match real email with anchor patterns using EmailTemplateMatchService
             val matchService = EmailTemplateMatchService()
             val gmailMessage = GmailMessage(
@@ -143,14 +143,14 @@ class EmailTemplateExtensionsTest {
                 senderEmail = "test@exmaple.com",
                 senderName = null,
             )
-            
+
             val emailTemplate = EmailTemplate(
                 subjectAnchors = subjectAnchors,
                 snippetAnchors = snippetAnchors
             )
-            
+
             val isMatch = matchService.matchMessage(emailTemplate, gmailMessage)
-            
+
             assertTrue(isMatch) {
                 """
                 FAILED Match for Email ID: ${email.id} (templateId: ${email.templateId})
@@ -169,10 +169,10 @@ class EmailTemplateExtensionsTest {
     fun `extractAnchors should handle template with untrimmed anchors`() {
         // Given - Template with leading/trailing spaces that should be trimmed
         val templateString = "Hello {{name}} , your order {{orderId}} is ready"
-        
+
         // When
         val result = templateString.extractAnchors()
-        
+
         // Then - Anchors should be trimmed automatically
         assertEquals(3, result.size, "Should have 3 anchors")
         assertEquals("Hello", result[0], "First anchor should be trimmed to 'Hello'")
@@ -184,10 +184,10 @@ class EmailTemplateExtensionsTest {
     fun `extractAnchors should handle template with leading space anchor`() {
         // Given - Template that would produce anchor with leading space
         val templateString = " {{name}}Hello"
-        
+
         // When
         val result = templateString.extractAnchors()
-        
+
         // Then - Leading space should be trimmed
         assertEquals(1, result.size, "Should have 1 anchor")
         assertEquals("Hello", result[0], "Anchor should be trimmed to 'Hello'")
@@ -197,10 +197,10 @@ class EmailTemplateExtensionsTest {
     fun `extractAnchors should handle template with trailing space anchor`() {
         // Given - Template that would produce anchor with trailing space
         val templateString = "Hello{{name}} "
-        
+
         // When
         val result = templateString.extractAnchors()
-        
+
         // Then - Trailing space should be trimmed
         assertEquals(1, result.size, "Should have 1 anchor")
         assertEquals("Hello", result[0], "Anchor should be trimmed to 'Hello'")

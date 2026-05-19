@@ -1,0 +1,52 @@
+package com.matchalab.sublog_api.guest
+
+import com.matchalab.sublog_api.security.CustomOidcUser
+import com.matchalab.sublog_api.service.AppUserService
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.oidc.OidcIdToken
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/v1/guest")
+class GuestAuthController(
+    private val appUserService: AppUserService,
+) {
+    @GetMapping
+    fun loginAsGuest(request: HttpServletRequest): ResponseEntity<Void> {
+
+        val guestAppUser = appUserService.createGuestAppUser()
+        val authorities = listOf(SimpleGrantedAuthority(guestAppUser.userRole.authority))
+
+        val guestOidcUser = CustomOidcUser(
+            guestAppUser.id,
+            authorities,
+            DefaultOidcUser(authorities, OidcIdToken.withTokenValue("mock").claims { claims ->
+                claims["sub"] = guestAppUser.googleAccounts[0].subject
+                claims["email"] = guestAppUser.googleAccounts[0].email
+                claims["name"] = guestAppUser.googleAccounts[0].name
+                claims["preferred_username"] = guestAppUser.name
+            }.build())
+        )
+
+        val authentication = OAuth2AuthenticationToken(
+            guestOidcUser, authorities, "google"
+        )
+
+        val context = SecurityContextHolder.createEmptyContext()
+        context.authentication = authentication
+        SecurityContextHolder.setContext(context)
+
+
+        val session = request.getSession(true)
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context)
+        return ResponseEntity.status(HttpStatus.OK).build<Void>()
+    }
+}

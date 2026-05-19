@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.utils
+package com.matchalab.sublog_api.utils
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken

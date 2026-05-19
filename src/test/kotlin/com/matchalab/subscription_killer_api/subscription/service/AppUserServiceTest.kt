@@ -1,9 +1,9 @@
-package com.matchalab.subscription_killer_api.subscription.service
+package com.matchalab.sublog_api.subscription.service
 
-import com.matchalab.subscription_killer_api.controller.AppProperties
-import com.matchalab.subscription_killer_api.guest.GuestAppUserProperties
-import com.matchalab.subscription_killer_api.repository.AppUserRepository
-import com.matchalab.subscription_killer_api.service.AppUserService
+import com.matchalab.sublog_api.controller.AppProperties
+import com.matchalab.sublog_api.guest.GuestAppUserProperties
+import com.matchalab.sublog_api.repository.AppUserRepository
+import com.matchalab.sublog_api.service.AppUserService
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*

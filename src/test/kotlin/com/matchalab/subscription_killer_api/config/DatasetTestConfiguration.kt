@@ -1,8 +1,8 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.matchalab.subscription_killer_api.datasets.EmailDatasetProvider
+import com.matchalab.sublog_api.datasets.EmailDatasetProvider
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
@@ -22,5 +22,5 @@ class DatasetTestConfiguration {
     fun emailDatasetProvider(
         objectMapper: ObjectMapper,
         resourceResolver: ResourcePatternResolver
-    ): EmailDatasetProvider = EmailDatasetProvider( objectMapper, resourceResolver)
+    ): EmailDatasetProvider = EmailDatasetProvider(objectMapper, resourceResolver)
 }

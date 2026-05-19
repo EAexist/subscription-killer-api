@@ -344,7 +344,7 @@ tasks.withType<BootBuildImage>().configureEach {
 
     imageName.set(
         project.findProperty("imageName")?.toString()
-            ?: "ghcr.io/eaexist/subscription-killer-api:${project.version}"
+            ?: "ghcr.io/eaexist/sublog:${project.version}"
     )
 
     environment.set(
@@ -410,7 +410,7 @@ tasks.withType<org.gradle.api.publish.maven.tasks.GenerateMavenPom>().configureE
 
 tasks.register<JavaExec>("benchmark") {
     group = "application"
-    mainClass.set("com.matchalab.subscription_killer_api")
+    mainClass.set("com.matchalab.sublog_api")
     classpath = sourceSets["main"].runtimeClasspath + sourceSets["test"].runtimeClasspath
     args("--spring.profiles.active=benchmark")
 }

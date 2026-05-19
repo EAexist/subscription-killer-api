@@ -49,19 +49,19 @@ spring:
     async:
       request-timeout: 60000
   application:
-    name: subscription-killer-api
+    name: sublog-api
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 2
+      maximum-pool-size: 4
       minimum-idle: 0
 
       connection-timeout: 10000
       validation-timeout: 5000
 
-      max-lifetime: 30000     # 30 sec
-      idle-timeout: 10000      # 10 sec
-      keepalive-time: 15000   # 15 sec
+      max-lifetime: 60000     # 60 sec
+      idle-timeout: 15000      # 15 sec
+      keepalive-time: 30000
 
       connection-test-query: SELECT 1
   jpa:
@@ -139,6 +139,6 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
   level:
     root: INFO
-    com.matchalab.subscription_killer_api: INFO
+    com.matchalab.sublog_api: INFO
     org.springframework: INFO
     org.springframework.security: INFO

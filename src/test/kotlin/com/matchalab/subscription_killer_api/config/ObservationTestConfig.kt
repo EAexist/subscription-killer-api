@@ -1,4 +1,4 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
 import io.micrometer.observation.tck.TestObservationRegistry
 import org.springframework.boot.test.context.TestConfiguration

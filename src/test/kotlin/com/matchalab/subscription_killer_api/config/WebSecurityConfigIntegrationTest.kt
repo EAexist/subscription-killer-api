@@ -1,6 +1,6 @@
-package com.matchalab.subscription_killer_api.config
+package com.matchalab.sublog_api.config
 
-import com.matchalab.subscription_killer_api.security.config.CorsProperties
+import com.matchalab.sublog_api.security.config.CorsProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -59,7 +59,7 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
         val request: MockHttpServletRequest = MockHttpServletRequest("OPTIONS", "/ping")
         request.addHeader(
             "Origin",
-            "https://subscription-killer-git-main-matchalab-project.vercel.app"
+            "https://sublog-app.vercel.app"
         )
         request.addHeader("Access-Control-Request-Method", "GET")
 
@@ -93,7 +93,7 @@ class WebSecurityConfigIntegrationTest(private val corsProperties: CorsPropertie
 
     @ParameterizedTest
     @MethodSource("allowedOrigins")
-    fun `should only allow subscription-killer frontend origins`(origin: String) {
+    fun `should only allow sublog frontend origins`(origin: String) {
         assertAllowedCorsGetRequest(origin)
     }
 

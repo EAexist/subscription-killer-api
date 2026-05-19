@@ -1,0 +1,20 @@
+package com.matchalab.sublog_api.service
+
+import com.matchalab.sublog_api.subscription.service.gmailclientfactory.ProxyGmailClientFactory
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.stereotype.Service
+import java.util.*
+
+private val logger = KotlinLogging.logger {}
+
+@Service
+class ProvisioningService(
+    private val appUserService: AppUserService,
+    private val gmailClientFactory: ProxyGmailClientFactory
+) {
+    fun provisionResources(appUserId: UUID) {
+        appUserService.findGoogleAccountSubjectsByAppUserId(appUserId).forEach { subject ->
+            gmailClientFactory.createAdapter(subject)
+        }
+    }
+}
